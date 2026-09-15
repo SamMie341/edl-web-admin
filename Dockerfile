@@ -16,7 +16,7 @@ COPY package*.json ./
 COPY prisma7.config.ts ./
 COPY prisma ./prisma/
 
-RUN npm ci
+RUN npm install
 
 # Copy source code
 COPY . .
