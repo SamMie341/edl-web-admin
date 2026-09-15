@@ -1,0 +1,451 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model Province {
+  id         Int      @id
+  name       String
+  code       String?
+  shortName  String?
+  branchCode String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  disctricts     Disctrict[]
+  villages       Village[]
+  serviceCenters ServiceCenter[]
+
+  @@map("provinces")
+}
+
+model Disctrict {
+  id         Int      @id
+  provinceId Int
+  code       String?
+  name       String?
+  nameEn     String?
+  status     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  villages Village[]
+
+  province       Province        @relation(fields: [provinceId], references: [id])
+  serviceCenters ServiceCenter[]
+
+  @@map("districts")
+}
+
+model Village {
+  id         Int      @id
+  districtId Int
+  code       String?
+  name       String?
+  nameEn     String?
+  status     String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  district Disctrict @relation(fields: [districtId], references: [id])
+
+  provinces      Province[]
+  serviceCenters ServiceCenter[]
+
+  @@map("villages")
+}
+
+// ==========================================
+// MOD-01: Organization Structure & Branches
+// ==========================================
+
+model Department {
+  id        Int      @id @default(autoincrement())
+  name      String
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime @updatedAt @map("updated_at") @db.Timestamptz
+
+  branches       Branch[]
+  serviceCenters ServiceCenter[]
+  users          User[]
+
+  @@map("departments")
+}
+
+model Branch {
+  id                   Int          @id @default(autoincrement())
+  departmentId         Int          @map("department_id")
+  branchName           String       @map("branch_name")
+  branchImage          String?      @map("branch_image")
+  coverImage           String?      @map("cover_image")
+  orgChartImage        String?      @map("org_chart_image")
+  address              String?
+  locationCoordinates  String?      @map("location_coordinates")
+  email                String?
+  phoneNumber          String?      @map("phone_number")
+  roleResponsibilities String?      @map("role_responsibilities")
+  orderIndex           Int          @default(0) @map("order_index")
+  status               BranchStatus @default(ACTIVE)
+  createdAt            DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt            DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  department     Department      @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  serviceCenters ServiceCenter[]
+
+  @@map("branches")
+}
+
+model ServiceCenter {
+  id           Int                 @id @default(autoincrement())
+  departmentId Int                 @map("department_id")
+  branchId     Int                 @map("branch_id")
+  centerName   String              @map("center_name")
+  phoneNumber  String?             @map("phone_number")
+  provinceId   Int
+  districtId   Int
+  villageId    Int
+  longitude    Decimal?            @db.Decimal(11, 8)
+  latitude     Decimal?            @db.Decimal(10, 8)
+  imageUrl     String?             @map("image_url")
+  status       ServiceCenterStatus @default(ACTIVE)
+  createdAt    DateTime            @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime            @updatedAt @map("updated_at") @db.Timestamptz
+
+  department Department @relation(fields: [departmentId], references: [id], onDelete: Restrict)
+  branch     Branch     @relation(fields: [branchId], references: [id], onDelete: Restrict)
+
+  province Province  @relation(fields: [provinceId], references: [id])
+  district Disctrict @relation(fields: [districtId], references: [id])
+  village  Village   @relation(fields: [villageId], references: [id])
+
+  @@map("service_centers")
+}
+
+model OrganizationStructure {
+  id            Int           @id @default(autoincrement())
+  structureType StructureType @map("structure_type")
+  structureName String        @map("structure_name")
+  imageUrl      String        @map("image_url")
+  orderIndex    Int           @default(0) @map("order_index")
+  status        CommonStatus  @default(ACTIVE)
+  createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime      @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("organization_structures")
+}
+
+model VisionMission {
+  id          Int               @id @default(autoincrement())
+  entryType   VisionMissionType @default(VISION) @map("entry_type")
+  title       String
+  slogan      String?
+  description String?
+  imageUrl    String?           @map("image_url")
+  orderIndex  Int               @default(0) @map("order_index")
+  status      CommonStatus      @default(ACTIVE)
+  createdAt   DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("vision_missions")
+}
+
+// ==========================================
+// MOD-02: News & Media Management
+// ==========================================
+
+model ElectricalKnowledge {
+  id         Int                       @id @default(autoincrement())
+  title      String
+  coverImage String?                   @map("cover_image")
+  videoUrl   String?                   @map("video_url")
+  content    String?
+  viewCount  Int                       @default(0) @map("view_count")
+  status     ElectricalKnowledgeStatus @default(ACTIVE)
+  createdAt  DateTime                  @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime                  @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("electrical_knowledge")
+}
+
+model Magazine {
+  id            Int          @id @default(autoincrement())
+  title         String
+  issueNumber   String?      @map("issue_number")
+  coverImage    String?      @map("cover_image")
+  fileUrl       String       @map("file_url")
+  publishedDate DateTime?    @map("published_date") @db.Date
+  downloadCount Int          @default(0) @map("download_count")
+  status        CommonStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("magazines")
+}
+
+model NewsCategory {
+  id           Int          @id @default(autoincrement())
+  categoryName String       @map("category_name")
+  description  String?
+  orderIndex   Int          @default(0) @map("order_index")
+  status       CommonStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  news News[]
+
+  @@map("news_categories")
+}
+
+model News {
+  id            Int        @id @default(autoincrement())
+  categoryId    Int        @map("category_id")
+  titleLa       String     @map("title_la")
+  titleEn       String?    @map("title_en")
+  subtitleLa    String?    @map("subtitle_la")
+  subtitleEn    String?    @map("subtitle_en")
+  coverImage    String?    @map("cover_image")
+  galleryImages Json?      @map("gallery_images")
+  videoUrl      String?    @map("video_url")
+  contentLa     String     @map("content_la")
+  contentEn     String?    @map("content_en")
+  viewCount     Int        @default(0) @map("view_count")
+  publishedAt   DateTime?  @map("published_at") @db.Timestamptz
+  status        NewsStatus @default(DRAFT)
+  createdAt     DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  category NewsCategory      @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tags     NewsTagRelation[]
+
+  @@map("news")
+}
+
+model NewsTag {
+  id        Int          @id @default(autoincrement())
+  tagName   String       @unique @map("tag_name")
+  status    CommonStatus @default(ACTIVE)
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  news NewsTagRelation[]
+
+  @@map("news_tags")
+}
+
+model NewsTagRelation {
+  newsId    Int      @map("news_id")
+  tagId     Int      @map("tag_id")
+  createdAt DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  news News    @relation(fields: [newsId], references: [id], onDelete: Cascade)
+  tag  NewsTag @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([newsId, tagId])
+  @@map("news_tag_relations")
+}
+
+// ==========================================
+// MOD-03: Public Disclosure & Services
+// ==========================================
+
+model Legislation {
+  id             Int               @id @default(autoincrement())
+  documentNumber String            @map("document_number")
+  title          String
+  fileUrl        String            @map("file_url")
+  issueDate      DateTime          @map("issue_date") @db.Date
+  status         LegislationStatus @default(ACTIVE)
+  createdAt      DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("legislations")
+}
+
+model ElectricityTariff {
+  id            Int          @id @default(autoincrement())
+  title         String
+  tariffType    TariffType   @map("tariff_type")
+  imageUrl      String?      @map("image_url")
+  pdfUrl        String?      @map("pdf_url")
+  effectiveDate DateTime?    @map("effective_date") @db.Date
+  status        TariffStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("electricity_tariffs")
+}
+
+model Procurement {
+  id           Int               @id @default(autoincrement())
+  tenderNumber String?           @unique @map("tender_number")
+  title        String
+  fileUrl      String?           @map("file_url")
+  imageUrl     String?           @map("image_url")
+  startDate    DateTime          @map("start_date") @db.Timestamptz
+  endDate      DateTime          @map("end_date") @db.Timestamptz
+  description  String?
+  status       ProcurementStatus @default(OPEN)
+  createdAt    DateTime          @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime          @updatedAt @map("updated_at") @db.Timestamptz
+
+  @@map("procurements")
+}
+
+model JobPosting {
+  id          Int              @id @default(autoincrement())
+  positionId  Int              @map("position_id")
+  title       String
+  subtitle    String?
+  imageUrl    String?          @map("image_url")
+  startDate   DateTime         @map("start_date") @db.Date
+  endDate     DateTime         @map("end_date") @db.Date
+  description String
+  status      JobPostingStatus @default(OPEN)
+  createdAt   DateTime         @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt   DateTime         @updatedAt @map("updated_at") @db.Timestamptz
+
+  position Position @relation(fields: [positionId], references: [id], onDelete: Restrict)
+
+  @@map("job_postings")
+}
+
+// ==========================================
+// MOD-04: IAM & Personnel Management
+// ==========================================
+
+model Position {
+  id           Int          @id @default(autoincrement())
+  positionName String       @map("position_name")
+  positionCode String?      @unique @map("position_code")
+  description  String?
+  status       CommonStatus @default(ACTIVE)
+  createdAt    DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt    DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  jobPostings JobPosting[]
+
+  @@map("positions")
+}
+
+model User {
+  id             Int        @id @default(autoincrement())
+  employeeCode   String     @unique @map("employee_code")
+  firstName      String     @map("first_name")
+  lastName       String     @map("last_name")
+  email          String     @unique
+  passwordHash   String     @map("password_hash")
+  phoneNumber    String?    @map("phone_number")
+  departmentId   Int?       @map("department_id")
+  departmentName String?    @map("department_name")
+  divisionName   String?    @map("division_name")
+  unitName       String?    @map("unit_name")
+  role           Role       @default(STAFF)
+  status         UserStatus @default(ACTIVE)
+  lastLoginAt    DateTime?  @map("last_login_at") @db.Timestamptz
+  createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt      DateTime   @updatedAt @map("updated_at") @db.Timestamptz
+
+  department Department? @relation(fields: [departmentId], references: [id], onDelete: SetNull)
+
+  @@map("users")
+}
+
+// ==========================================
+// ENUMS (According to Data Dictionary)
+// ==========================================
+
+enum CommonStatus {
+  ACTIVE
+  INACTIVE
+}
+
+enum BranchStatus {
+  ACTIVE
+  INACTIVE
+  UNDER_MAINTENANCE
+}
+
+enum ServiceCenterStatus {
+  ACTIVE
+  INACTIVE
+  TEMPORARILY_CLOSED
+}
+
+enum StructureType {
+  BOARD_OF_DIRECTORS
+  EXECUTIVE_BOARD
+  ORG_STRUCTURE
+}
+
+enum VisionMissionType {
+  VISION
+  MISSION
+  CORE_VALUES
+  SLOGAN
+}
+
+enum ElectricalKnowledgeStatus {
+  ACTIVE
+  DRAFT
+  ARCHIVED
+}
+
+enum LegislationStatus {
+  ACTIVE
+  INACTIVE
+  ARCHIVED
+}
+
+enum TariffType {
+  RESIDENTIAL
+  COMMERCIAL
+  INDUSTRIAL
+}
+
+enum TariffStatus {
+  ACTIVE
+  INACTIVE
+  HISTORICAL
+}
+
+enum ProcurementStatus {
+  DRAFT
+  OPEN
+  CLOSED
+  CANCELLED
+  AWARDED
+}
+
+enum NewsStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+enum JobPostingStatus {
+  OPEN
+  CLOSED
+  CANCELLED
+}
+
+enum Role {
+  SUPERADMIN
+  ADMIN
+  EDITOR
+  STAFF
+}
+
+enum UserStatus {
+  ACTIVE
+  INACTIVE
+  SUSPENDED
+}

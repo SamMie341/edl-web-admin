@@ -1,0 +1,16 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: edl-admin-backend
+    restart: always
+    ports:
+      - "${PORT:-3000}:3000"
+    env_file:
+      - .env
+    environment:
+      - NODE_ENV=production
+    volumes:
+      # Mount directory for uploaded files (persists across container rebuilds)
+      - ${UPLOADS_PATH:-../uploads}:/app/uploads
