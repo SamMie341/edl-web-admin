@@ -33,11 +33,6 @@ export class SyncUserUseCase {
 
             const status = emp.status === 'A' ? UserStatus.ACTIVE : UserStatus.INACTIVE;
 
-            const alReadyUser = await this.prismaService.user.findUnique({ where: { employeeCode } });
-            if (alReadyUser) {
-                return { message: `ລະຫັດ ${employeeCode} ມີໃນລະບົບແລ້ວ` };
-            }
-
             // 2. ກວດສອບ ແລະ ບັນທຶກລົງຖານຂໍ້ມູນ (ຜ່ານ Repository Interface)
             let user = await this.userRepository.findByEmployeeCode(emp.emp_code.toString());
 
@@ -51,7 +46,7 @@ export class SyncUserUseCase {
 
                 user = await this.userRepository.create({
                     employeeCode: emp.emp_code.toString(),
-                    firstName, lastName, email, phoneNumber, departmentName, divisionName, unitName, status: UserStatus.ACTIVE,
+                    firstName, lastName, email, phoneNumber, departmentName, divisionName, unitName, status,
                     passwordHash: passwordHash,
                     role: Role.ADMIN,
                 });
@@ -60,7 +55,7 @@ export class SyncUserUseCase {
             return user;
         } catch (error: any) {
             if (error.status === 404 || error.status === 401) throw error;
-            throw new BadRequestException(`ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນຈາກ HRM: ${error.message}`);
+            throw new BadRequestException(`ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນຈາກ HRM: ${error.message}`)
         }
     }
 }

@@ -21,8 +21,12 @@ export class SyncProvinceUseCase {
                 branchCode: item.branch_code,
             };
 
-            const saved = await this.provinceRepo.upsert(item.province_id, dataToSave);
-            syncedRecords.push(saved);
+            try {
+                const saved = await this.provinceRepo.upsert(item.province_id, dataToSave);
+                syncedRecords.push(saved);
+            } catch (error: any) {
+                console.warn(`[Warning] ບໍ່ສາມາດ Sync ແຂວງ ${item.province_name} ໄດ້:`, error.message);
+            }
         }
 
         return {

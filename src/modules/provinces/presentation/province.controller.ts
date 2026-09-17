@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
 import { GetProvincesUseCase } from "../application/use-cases/get-provinces.use-case.js";
 import { SyncProvinceUseCase } from "../application/use-cases/sync-provinces.use-case.js";
@@ -18,11 +18,11 @@ export class ProvinceController {
             message: 'Sync ຂໍ້ມູນແຂວງສຳເລັດ',
             total: result.totalSynced,
             data: result.data,
-        }
+        };
     }
 
     @Get()
-    async findAll() {
-        return this.getUseCase.execute();
+    async findAll(@Query('includeDistricts') includeDistricts?: string) {
+        return this.getUseCase.execute(includeDistricts === 'true');
     }
 }

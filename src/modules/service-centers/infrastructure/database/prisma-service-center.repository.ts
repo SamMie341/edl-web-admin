@@ -12,9 +12,21 @@ export class PrismaServiceCenterRepository implements IServiceCenterRepository {
 
     }
     async create(data: any): Promise<ServiceCenter> {
-        return await this.prisma.serviceCenter.create({
-            data
-        });
+        try {
+            return await this.prisma.serviceCenter.create({
+                data
+            });
+        } catch (error: any) {
+            if (error?.code === 'P2002' && (error?.meta?.modelName === 'ServiceCenter' || error?.message?.includes('service_centers_pkey'))) {
+                await this.prisma.$executeRawUnsafe(
+                    `SELECT setval(pg_get_serial_sequence('service_centers', 'id'), COALESCE((SELECT MAX(id) FROM service_centers), 1))`
+                );
+                return await this.prisma.serviceCenter.create({
+                    data
+                });
+            }
+            throw error;
+        }
     }
 
     async update(id: number, data: any): Promise<ServiceCenter> {

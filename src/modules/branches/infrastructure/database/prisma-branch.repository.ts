@@ -15,7 +15,17 @@ export class PrismaBranchRepository implements IBranchRepository {
     }
 
     async create(data: any): Promise<Branch> {
-        return await this.prisma.branch.create({ data });
+        try {
+            return await this.prisma.branch.create({ data });
+        } catch (error: any) {
+            if (error?.code === 'P2002' && (error?.meta?.modelName === 'Branch' || error?.message?.includes('branches_pkey'))) {
+                await this.prisma.$executeRawUnsafe(
+                    `SELECT setval(pg_get_serial_sequence('branches', 'id'), COALESCE((SELECT MAX(id) FROM branches), 1))`
+                );
+                return await this.prisma.branch.create({ data });
+            }
+            throw error;
+        }
     }
 
     async update(id: number, data: any): Promise<Branch> {

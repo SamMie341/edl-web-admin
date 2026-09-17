@@ -209,25 +209,26 @@
 
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
-| :--- | :--- | :---: | :--- |
+| :--- | :--- | :--- | :--- |
 | `POST` | `/api/v1/provinces/sync` | JWT | ຊິ້ງຂໍ້ມູນແຂວງຈາກ HRM |
-| `GET` | `/api/v1/provinces` | JWT | ດຶງລາຍຊື່ແຂວງທັງໝົດ |
+| `GET` | `/api/v1/provinces` | JWT | ດຶງລາຍຊື່ແຂວງທັງໝົດ (ສາມາດສົ່ງ `?includeDistricts=true` ເພື່ອດຶງລາຍຊື່ເມືອງພ້ອມ) |
 
 ---
 
 ### 3.7 Districts Module (ລະບົບຂໍ້ມູນເມືອງ)
 * **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/districts/`
-* **ຄວາມຮັບຜິດຊອບ:** ຄຸ້ມຄອງຂໍ້ມູນເມືອງທັງໝົດໃນ ສປປ ລາວ ພ້ອມຜູກໂຍງກັບລະຫັດແຂວງ (`provinceId`).
+* **ความรับຜິດຊອບ:** ຄຸ້ມຄອງຂໍ້ມູນເມືອງທັງໝົດໃນ ສປປ ລາວ ພ້ອມຜູກໂຍງກັບລະຫັດແຂວງ (`provinceId`).
 
 #### Use Cases ໃນລະບົບ:
 1. **`SyncDistrictsUseCase`**: ຊິ້ງຂໍ້ມູນເມືອງຈາກລະບົບ **HRM District Service API** ພ້ອມກວດສອບ Relation ຫາແຂວງ.
-2. **`GetDistrictsUseCase`**: ດຶງລາຍຊື່ເມືອງທັງໝົດ.
+2. **`GetDistrictsUseCase`**: ດຶງລາຍຊື່ເມືອງທັງໝົດ ຫຼື ກັ່ນຕອງຕາມແຂວງ (`provinceId`).
 
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
-| :--- | :--- | :---: | :--- |
+| :--- | :--- | :--- | :--- |
 | `POST` | `/api/v1/districts/sync` | JWT | ຊິ້ງຂໍ້ມູນເມືອງຈາກ HRM |
-| `GET` | `/api/v1/districts` | JWT | ດຶງລາຍຊື່ເມືອງທັງໝົດ |
+| `GET` | `/api/v1/districts` | JWT | ດຶງລາຍຊື່ເມືອງທັງໝົດ (ຮອງຮັບ `?provinceId=:id` ເພື່ອດຶງສະເພາະເມືອງໃນແຂວງນັ້ນ) |
+| `GET` | `/api/v1/districts/province/:provinceId` | JWT | ດຶງສະເພາະເມືອງທີ່ຂຶ້ນກັບແຂວງຕາມ ID ທີ່ລະບຸ |
 
 ---
 

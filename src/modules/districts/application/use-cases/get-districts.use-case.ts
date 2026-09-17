@@ -5,7 +5,7 @@ import * as districtRepositoryInterface from "../../domain/repositories/district
 export class GetDistrictsUseCase {
     constructor(@Inject(districtRepositoryInterface.DISTRICT_REPOSITORY) private readonly districtRepo: districtRepositoryInterface.IDistrictRepository) { }
 
-    async execute() {
-        return this.districtRepo.findAll();
+    async execute(provinceId?: number) {
+        return this.districtRepo.findAll(provinceId);
     }
 }

@@ -20,6 +20,9 @@ export class LegacyBranchService implements ILegacyBranchService {
                 fs.mkdirSync(uploadDir, { recursive: true });
             }
             const filePath = path.join(uploadDir, fileName);
+            if (fs.existsSync(filePath)) {
+                return `/uploads/branches/${fileName}`;
+            }
             const response = await this.httpService.axiosRef({
                 url,
                 method: 'GET',

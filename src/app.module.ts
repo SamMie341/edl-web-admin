@@ -11,6 +11,8 @@ import { ProvincesModule } from './modules/provinces/provinces.module.js';
 import { DistrictsModule } from './modules/districts/districts.module.js';
 import { VillagesModule } from './modules/villages/villages.module.js';
 import { ServiceCentersModule } from './modules/service-centers/service-center.module.js';
+import { OrganizationsModule } from './modules/organization-structures/organization-structures.module.js';
+import { VisionMissionModule } from './modules/vision-missions/vision-missions.module.js';
 
 @Module({
   imports: [
@@ -30,6 +32,8 @@ import { ServiceCentersModule } from './modules/service-centers/service-center.m
     DistrictsModule,
     VillagesModule,
     ServiceCentersModule,
+    OrganizationsModule,
+    VisionMissionModule,
   ],
   controllers: [],
   providers: [],

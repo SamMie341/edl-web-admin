@@ -15,6 +15,11 @@ export class SyncDistrictsUseCase {
 
         for (const item of districts) {
             const provinceId = item.province?.province_id || parseInt(item.province_code, 10);
+            if (!provinceId || isNaN(provinceId)) {
+                console.warn(`[Warning] ຂ້າມເມືອງ ${item.district_name} ເນື່ອງຈາກບໍ່ມີລະຫັດແຂວງ`);
+                continue;
+            }
+
             const dataToSave = {
                 provinceId: provinceId,
                 code: item.district_code,

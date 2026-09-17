@@ -6,9 +6,10 @@ import { PrismaService } from "../../../../core/database/prisma.service.js";
 @Injectable()
 export class PrismaProvinceRepository implements IProvinceRepository {
     constructor(private readonly prisma: PrismaService) { }
-    async findAll(): Promise<Province[]> {
+    async findAll(includeDistricts?: boolean): Promise<Province[]> {
         return this.prisma.province.findMany({
-            orderBy: { id: 'asc' }
+            include: includeDistricts ? { disctricts: { orderBy: { id: 'asc' } } } : undefined,
+            orderBy: { id: 'asc' },
         });
     }
 

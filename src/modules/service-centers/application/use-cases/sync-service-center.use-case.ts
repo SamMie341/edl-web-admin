@@ -116,6 +116,16 @@ export class SyncServiceCenterUseCase {
                 }
             }
         }
+
+        // ອັບເດດ Sequence ສຳລັບ PostgreSQL Auto-increment
+        try {
+            await this.prisma.$executeRawUnsafe(
+                `SELECT setval(pg_get_serial_sequence('service_centers', 'id'), COALESCE((SELECT MAX(id) FROM service_centers), 1))`
+            );
+        } catch (seqError: any) {
+            console.warn('[Warning] ບໍ່ສາມາດອັບເດດ Sequence ໄດ້:', seqError.message);
+        }
+
         return {
             totalSynced: syncedRecords.length,
             data: syncedRecords,

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
 import { SyncDistrictsUseCase } from "../application/use-cases/sync-districts.use-case.js";
 import { GetDistrictsUseCase } from "../application/use-cases/get-districts.use-case.js";
@@ -18,11 +18,17 @@ export class DistrictsController {
             message: 'Sync ຂໍ້ມູນເມືອງສຳເລັດ',
             total: result.totalSynced,
             data: result.data,
-        }
+        };
     }
 
     @Get()
-    async findAll() {
-        return await this.getUseCase.execute();
+    async findAll(@Query('provinceId') provinceId?: string) {
+        const parsedProvinceId = provinceId ? parseInt(provinceId, 10) : undefined;
+        return await this.getUseCase.execute(parsedProvinceId);
+    }
+
+    @Get('province/:provinceId')
+    async findByProvince(@Param('provinceId', ParseIntPipe) provinceId: number) {
+        return await this.getUseCase.execute(provinceId);
     }
 }

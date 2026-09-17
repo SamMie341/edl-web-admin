@@ -87,7 +87,7 @@ export class BranchesController {
         return this.getBranchesUseCase.execute();
     }
 
-    @Post('sync')
+    @Post()
     create(@Body() createBranchDto: CreateBranchDto) {
         return this.createUseCase.execute(createBranchDto);
     }
@@ -98,7 +98,7 @@ export class BranchesController {
     }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, dto: UpdateBranchDto) {
+    update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBranchDto) {
         return this.updateUseCase.execute(id, dto);
     }
 

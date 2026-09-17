@@ -34,8 +34,7 @@ export class LegacyCenterService implements ILegacyCenterService {
             }
             const filePath = path.join(uploadDir, fileName);
             if (fs.existsSync(filePath)) {
-                return `uploads/centers/${fileName}`;
-
+                return `/uploads/centers/${fileName}`;
             }
             const response = await this.httpService.axiosRef({
                 url,
