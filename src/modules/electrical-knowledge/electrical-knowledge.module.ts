@@ -9,6 +9,7 @@ import { ElectricalKnowledgeController } from './presentation/electrical-knowled
 import { GetElectricalKnowledgeUseCase } from './application/use-cases/get-electrical-knowledge.use-case.js';
 import { UploadElectricalKnowledgeUseCase } from './application/use-cases/upload-electrical-knowledge-image.use-case.js';
 import { PrismaElectricalKnowlege } from './infrastructure/database/prisma-electrical-knowledge.repository.js';
+import { IncrementElectricalKnowledgeViewUseCase } from '../organization-structures/application/use-cases/increment-electrical-knowledge-view.use-case.js';
 
 @Module({
     imports: [PrismaModule],
@@ -20,6 +21,7 @@ import { PrismaElectricalKnowlege } from './infrastructure/database/prisma-elect
         GetElectricalKnowledgeUseCase,
         GetElectricalKnowledgeByIdUseCase,
         UploadElectricalKnowledgeUseCase,
+        IncrementElectricalKnowledgeViewUseCase,
         {
             provide: ELECTRICAL_KNOWLEDGE_REPOSITORY,
             useClass: PrismaElectricalKnowlege,

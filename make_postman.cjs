@@ -5,11 +5,11 @@ const collection = {
   info: {
     _postman_id: "e4d1a001-ed1a-4d1a-8000-000000000001",
     name: "EDL Admin Management System API",
-    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages (ລວມ 30 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge (ລວມ 48 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   auth: {
-    type: "bearer",
+    // type: "bearer",
     bearer: [
       {
         key: "token",
@@ -683,11 +683,18 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/provinces",
+              raw: "{{baseUrl}}/provinces?includeDistricts=true",
               host: ["{{baseUrl}}"],
-              path: ["provinces"]
+              path: ["provinces"],
+              query: [
+                {
+                  key: "includeDistricts",
+                  value: "true",
+                  description: "ຖ້າໃສ່ true ຈະດຶງຂໍ້ມູນເມືອງໃນແຕ່ລະແຂວງມານຳ (optional)"
+                }
+              ]
             },
-            description: "ດຶງລາຍຊື່ແຂວງທັງໝົດໃນລະບົບ"
+            description: "ດຶງລາຍຊື່ແຂວງທັງໝົດໃນລະບົບ (ຮອງຮັບ param includeDistricts=true)"
           },
           response: []
         },
@@ -719,11 +726,39 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/districts",
+              raw: "{{baseUrl}}/districts?provinceId=1",
               host: ["{{baseUrl}}"],
-              path: ["districts"]
+              path: ["districts"],
+              query: [
+                {
+                  key: "provinceId",
+                  value: "1",
+                  description: "ກັ່ນຕອງຕາມ ID ແຂວງ (optional)"
+                }
+              ]
             },
-            description: "ດຶງລາຍຊື່ເມືອງທັງໝົດ"
+            description: "ດຶງລາຍຊື່ເມືອງທັງໝົດ (ສາມາດ filter ດ້ວຍ ?provinceId=... ໄດ້)"
+          },
+          response: []
+        },
+        {
+          name: "Get Districts By Province ID (ດຶງເມືອງຕາມ ID ແຂວງ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/districts/province/:provinceId",
+              host: ["{{baseUrl}}"],
+              path: ["districts", "province", ":provinceId"],
+              variable: [
+                {
+                  key: "provinceId",
+                  value: "1",
+                  description: "ID ຂອງແຂວງ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍຊື່ເມືອງທັງໝົດທີ່ຂຶ້ນກັບແຂວງທີ່ລະບຸ"
           },
           response: []
         },
@@ -778,6 +813,459 @@ const collection = {
           response: []
         }
       ]
+    },
+
+    // 9. Organization Structures Module
+    {
+      name: "9. Organization Structures",
+      description: "ໂມດູນຈັດການໂຄງຮ່າງການຈັດຕັ້ງ: ສະພາບໍລິຫານ, ຄະນະບໍລິຫານ, ແລະ ໂຄງສ້າງອົງກອນ",
+      item: [
+        {
+          name: "Get All Org Structures (ດຶງໂຄງສ້າງອົງກອນທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/org-structures",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures"]
+            },
+            description: "ດຶງຂໍ້ມູນໂຄງຮ່າງການຈັດຕັ້ງທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Get Org Structures Dropdown (ດຶງ Dropdown)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/org-structures/dropdown",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures", "dropdown"]
+            },
+            description: "ດຶງລາຍການໂຄງຮ່າງສຳລັບສະແດງໃນ Dropdown ເມນູ"
+          },
+          response: []
+        },
+        {
+          name: "Create Org Structure (ສ້າງໂຄງຮ່າງໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                structureType: "BOARD_OF_DIRECTORS",
+                structureName: "ສະພາບໍລິຫານ ຟຟລ (Board of Directors)",
+                imageUrl: "/uploads/org-structures/sample.jpg",
+                orderIndex: 1,
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/org-structures",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures"]
+            },
+            description: "ສ້າງໂຄງຮ່າງອົງກອນໃໝ່\n- structureType: BOARD_OF_DIRECTORS | EXECUTIVE_BOARD | ORG_STRUCTURE\n- status: ACTIVE | INACTIVE"
+          },
+          response: []
+        },
+        {
+          name: "Update Org Structure (ແກ້ໄຂໂຄງຮ່າງ)",
+          request: {
+            method: "PUT",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                structureType: "EXECUTIVE_BOARD",
+                structureName: "ຄະນະບໍລິຫານ ຟຟລ (Executive Board)",
+                imageUrl: "/uploads/org-structures/sample-updated.jpg",
+                orderIndex: 2,
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/org-structures/:id",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໂຄງຮ່າງ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນໂຄງຮ່າງອົງກອນ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Org Structure (ລຶບໂຄງຮ່າງ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/org-structures/:id",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໂຄງຮ່າງທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            description: "ລຶບໂຄງຮ່າງອົງກອນອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Org Structure Image (ອັບໂຫຼດຮູບໂຄງຮ່າງ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/org-structures/:id/upload/image",
+              host: ["{{baseUrl}}"],
+              path: ["org-structures", ":id", "upload", "image"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໂຄງຮ່າງ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບພາບໂຄງຮ່າງອົງກອນ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 10. Vision & Missions Module
+    {
+      name: "10. Vision & Missions",
+      description: "ໂມດູນຈັດການວິໄສທັດ, ພາລະກິດ, ຄ່ານິຍົມຫຼັກ ແລະ ສະໂລແກນ ຂອງ ຟຟລ",
+      item: [
+        {
+          name: "Get All Vision & Missions (ດຶງຂໍ້ມູນທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/vision-missions",
+              host: ["{{baseUrl}}"],
+              path: ["vision-missions"]
+            },
+            description: "ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Create Vision & Mission (ສ້າງຂໍ້ມູນໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                entryType: "VISION",
+                title: "ວິໄສທັດຂອງ ຟຟລ (Vision)",
+                slogan: "ພະລັງງານສີຂຽວ ເພື່ອການພັດທະນາແບບຍືນຍົງ",
+                description: "ເປັນລັດວິສາຫະກິດຊັ້ນນຳໃນການສະໜອງພະລັງງານໄຟຟ້າທີ່ໝັ້ນຄົງ ແລະ ປອດໄພ...",
+                imageUrl: "/uploads/vision-missions/sample.jpg",
+                orderIndex: 1,
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/vision-missions",
+              host: ["{{baseUrl}}"],
+              path: ["vision-missions"]
+            },
+            description: "ສ້າງຂໍ້ມູນວິໄສທັດ/ພາລະກິດ\n- entryType: VISION | MISSION | CORE_VALUES | SLOGAN\n- status: ACTIVE | INACTIVE"
+          },
+          response: []
+        },
+        {
+          name: "Update Vision & Mission (ແກ້ໄຂຂໍ້ມູນ)",
+          request: {
+            method: "PUT",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                entryType: "MISSION",
+                title: "ພາລະກິດ (Mission)",
+                slogan: "ບໍລິການດ້ວຍຄວາມຈິງໃຈ",
+                description: "ສະໜອງພະລັງງານໄຟຟ້າຢ່າງພຽງພໍ, ໝັ້ນຄົງ ແລະ ທົ່ວເຖິງ...",
+                orderIndex: 2,
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/vision-missions/:id",
+              host: ["{{baseUrl}}"],
+              path: ["vision-missions", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂໍ້ມູນ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Vision & Mission (ລຶບຂໍ້ມູນ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/vision-missions/:id",
+              host: ["{{baseUrl}}"],
+              path: ["vision-missions", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂໍ້ມູນທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            description: "ລຶບຂໍ້ມູນວິໄສທັດ/ພາລະກິດອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Vision & Mission Image (ອັບໂຫຼດຮູບ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/vision-missions/:id/upload/image",
+              host: ["{{baseUrl}}"],
+              path: ["vision-missions", ":id", "upload", "image"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂໍ້ມູນ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບພາບສຳລັບວິໄສທັດ/ພາລະກິດ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 11. Electrical Knowledge Module
+    {
+      name: "11. Electrical Knowledge",
+      description: "ໂມດູນບົດຄວາມ ແລະ ວິດິໂອຄວາມຮູ້ດ້ານໄຟຟ້າ ແລະ ຄວາມປອດໄພ",
+      item: [
+        {
+          name: "Get All Electrical Knowledge (ດຶງບົດຄວາມທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge"]
+            },
+            description: "ດຶງລາຍຊື່ບົດຄວາມ ແລະ ວິດິໂອຄວາມຮູ້ດ້ານໄຟຟ້າທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Get Electrical Knowledge By ID (ດຶງບົດຄວາມຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງບົດຄວາມ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍລະອຽດບົດຄວາມຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Electrical Knowledge (ສ້າງບົດຄວາມໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ວິທີການນຳໃຊ້ໄຟຟ້າຢ່າງປອດໄພໃນລະດູຝົນ",
+                coverImage: "/uploads/electrical-knowledge/sample.jpg",
+                videoUrl: "https://www.youtube.com/watch?v=sample",
+                content: "<p>ເນື້ອໃນບົດຄວາມແນະນຳການນຳໃຊ້ໄຟຟ້າຢ່າງຖືກຕ້ອງ ແລະ ປອດໄພໃນຍາມຝົນ...</p>",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge"]
+            },
+            description: "ສ້າງບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າໃໝ່ (ຮອງຮັບ HTML content ຈາກ Rich Text Editor)\n- status: ACTIVE | DRAFT | ARCHIVED"
+          },
+          response: []
+        },
+        {
+          name: "Update Electrical Knowledge (ແກ້ໄຂບົດຄວາມ)",
+          request: {
+            method: "PATCH",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ວິທີການນຳໃຊ້ໄຟຟ້າຢ່າງປອດໄພໃນລະດູຝົນ (ສະບັບປັບປຸງ)",
+                content: "<p>ເນື້ອໃນບົດຄວາມສະບັບປັບປຸງ...</p>",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງບົດຄວາມ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Electrical Knowledge (ລຶບບົດຄວາມ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງບົດຄວາມທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            description: "ລຶບຂໍ້ມູນບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Electrical Knowledge Cover (ອັບໂຫຼດຮູບປົກ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge/:id/upload/cover",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge", ":id", "upload", "cover"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງບົດຄວາມ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບໜ້າປົກສຳລັບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
+          },
+          response: []
+        }
+      ]
     }
   ]
 };
@@ -786,8 +1274,8 @@ const jsonStr = JSON.stringify(collection, null, 2);
 
 const rootPath = path.resolve(__dirname, '..', 'EDL_Admin_API.postman_collection.json');
 fs.writeFileSync(rootPath, jsonStr, 'utf-8');
-console.log('Successfully saved to:', rootPath);
+console.log('Successfully saved to root:', rootPath);
 
 const innerPath = path.resolve(__dirname, 'EDL_Admin_API.postman_collection.json');
 fs.writeFileSync(innerPath, jsonStr, 'utf-8');
-console.log('Successfully saved to:', innerPath);
+console.log('Successfully saved to inner:', innerPath);

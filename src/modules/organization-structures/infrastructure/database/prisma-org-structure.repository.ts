@@ -38,7 +38,7 @@ export class PrismaOrgStructureRepository implements IOrgStructureRepository {
     async update(id: number, data: any): Promise<OrganizationStructure> {
         return this.prisma.organizationStructure.update({
             where: { id },
-            data,
+            data
         });
     }
 

@@ -13,6 +13,9 @@ import { VillagesModule } from './modules/villages/villages.module.js';
 import { ServiceCentersModule } from './modules/service-centers/service-center.module.js';
 import { OrganizationsModule } from './modules/organization-structures/organization-structures.module.js';
 import { VisionMissionModule } from './modules/vision-missions/vision-missions.module.js';
+import { ElectricalKnowledgeModule } from './modules/electrical-knowledge/electrical-knowledge.module.js';
+import { MagazinesModule } from './modules/magazines/magazines.module.js';
+import { NewsCategoriesModule } from './modules/news-categories/news-categories.module.js';
 
 @Module({
   imports: [
@@ -34,6 +37,9 @@ import { VisionMissionModule } from './modules/vision-missions/vision-missions.m
     ServiceCentersModule,
     OrganizationsModule,
     VisionMissionModule,
+    ElectricalKnowledgeModule,
+    MagazinesModule,
+    NewsCategoriesModule,
   ],
   controllers: [],
   providers: [],

@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -13,6 +13,7 @@ import { GetElectricalKnowledgeByIdUseCase } from '../application/use-cases/get-
 import { UpdateElectricalKnowledgeUseCase } from '../application/use-cases/update-electrical-knowledge.use-case.js';
 import { GetElectricalKnowledgeUseCase } from '../application/use-cases/get-electrical-knowledge.use-case.js';
 import { UploadElectricalKnowledgeUseCase } from '../application/use-cases/upload-electrical-knowledge-image.use-case.js';
+import { IncrementElectricalKnowledgeViewUseCase } from '../../organization-structures/application/use-cases/increment-electrical-knowledge-view.use-case.js';
 
 @UseGuards(JwtAuthGuard)
 @Controller('electrical-knowledge')
@@ -24,6 +25,7 @@ export class ElectricalKnowledgeController {
         private readonly getAllUseCase: GetElectricalKnowledgeUseCase,
         private readonly getByIdUseCase: GetElectricalKnowledgeByIdUseCase,
         private readonly uploadImageUseCase: UploadElectricalKnowledgeUseCase,
+        private readonly incrementViewUseCase: IncrementElectricalKnowledgeViewUseCase,
     ) { }
 
     @Post()
@@ -71,5 +73,14 @@ export class ElectricalKnowledgeController {
         const imagePath = `/uploads/electrical-knowledge/${file.filename}`;
         const updatedRecord = await this.uploadImageUseCase.execute(id, imagePath);
         return { message: 'ອັບໂຫຼດຮູບປົກສຳເລັດ', imagePath, data: updatedRecord };
+    }
+
+    @Put(':id')
+    async incrementViewCount(@Param('id', ParseIntPipe) id: number) {
+        const updatedArticle = await this.incrementViewUseCase.execute(id);
+        return {
+            message: 'ເພີ່ມຍອດເຂົ້າຊົມສຳເລັດ',
+            viewCount: updatedArticle,
+        }
     }
 }

@@ -26,3 +26,17 @@ export const editFileName = (
     const randomName = uuidv4();
     callback(null, `${randomName}${fileExtName}`);
 };
+
+export const documentFileFilter = (
+    req: any,
+    file: Express.Multer.File,
+    callback: (error: Error | null, acceptFile: boolean) => void,
+) => {
+    if (!file.originalname.match(/\.(pdf)$/i)) {
+        return callback(
+            new HttpException('ອະນຸຍາດສະເພາະໄຟລ໌ PDF ເທົ່ານັ້ນ', HttpStatus.BAD_REQUEST),
+            false,
+        );
+    }
+    callback(null, true);
+};

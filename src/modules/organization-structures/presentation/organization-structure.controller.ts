@@ -36,7 +36,7 @@ export class OrganizationStructureController {
         return this.updateUseCase.execute(id, dto);
     }
 
-    @Delete('id')
+    @Delete(':id')
     delete(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }

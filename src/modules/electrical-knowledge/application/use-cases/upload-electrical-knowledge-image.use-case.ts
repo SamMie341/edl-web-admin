@@ -11,6 +11,6 @@ export class UploadElectricalKnowledgeUseCase {
     async execute(id: number, filePath: string) {
         const existing = await this.repo.findById(id);
         if (!existing) throw new NotFoundException('ບໍ່ພົບບົດຄວາມ');
-        return this.repo.update(id, filePath);
+        return this.repo.update(id, { coverImage: filePath })
     }
 }
