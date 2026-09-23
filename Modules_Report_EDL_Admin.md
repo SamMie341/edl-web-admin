@@ -65,7 +65,7 @@
 | ໂມດູນ (Module) | ເສັ້ນທາງ API (Base Path) | ຈຳນວນ Use Cases | ການເຊື່ອມຕໍ່ລະບົບພາຍນອກ | ສະຖານະ |
 | :--- | :--- | :---: | :--- | :---: |
 | **Auth** | `/api/v1/auth` | Service-based | ລະບົບ Hash ລະຫັດຜ່ານ (Bcrypt), JWT | ພ້ອມໃຊ້ງານ |
-| **Users** | `/api/v1/users` | 4 | EDL HRM API (Sync ພະນັກງານ) | ພ້ອມໃຊ້ງານ |
+| **Users** | `/api/v1/users` | 5 | EDL HRM API (Sync ພະນັກງານ) | ພ້ອມໃຊ້ງານ |
 | **Departments** | `/api/v1/departments` | 5 | - | ພ້ອມໃຊ້ງານ |
 | **Branches** | `/api/v1/branches` | 6 | EDL Inside API (Sync ສາຂາ & ຮູບພາບ) | ພ້ອມໃຊ້ງານ |
 | **Service Centers** | `/api/v1/service-centers` | 3 | EDL Inside API (Sync ສູນບໍລິການ) | ພ້ອມໃຊ້ງານ |
@@ -113,6 +113,7 @@
 2. **`GetUsersUseCase`**: ດຶງຂໍ້ມູນລາຍຊື່ຜູ້ໃຊ້ທັງໝົດໃນລະບົບ.
 3. **`UpdateUserUseCase`**: ອັບເດດສິດທິ (Role) ແລະ ສະຖານະ (Status) ຂອງຜູ້ໃຊ້.
 4. **`DeleteUserUseCase`**: ລຶບບັນຊີຜູ້ໃຊ້ອອກຈາກລະບົບ.
+5. **`ChangePasswordUseCase`**: ປ່ຽນລະຫັດຜ່ານຂອງຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນລະຫັດຜ່ານພ້ອມຢືນຢັນ `oldPassword` ຫຼື Admin Reset ລະຫັດຜ່ານໃໝ່ໂດຍກົງ).
 
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
@@ -120,6 +121,7 @@
 | `POST` | `/api/v1/users/sync/:empCode` | JWT | ຊິ້ງຂໍ້ມູນພະນັກງານຈາກລະບົບ HRM |
 | `GET` | `/api/v1/users` | JWT | ດຶງລາຍຊື່ຜູ້ໃຊ້ງານທັງໝົດ |
 | `PUT` | `/api/v1/users/change-role/:id` | JWT | ແກ້ໄຂສິດທິ/ສະຖານະຜູ້ໃຊ້ |
+| `PUT` / `PATCH` | `/api/v1/users/change-password/:id` | JWT | ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ |
 | `DELETE` | `/api/v1/users/:id` | JWT | ລຶບຜູ້ໃຊ້ອອກຈາກລະບົບ |
 
 ---

@@ -1,10 +1,12 @@
-import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
 import { GetUsersUseCase } from "../application/use-cases/get-users.use-case.js";
 import { SyncUserUseCase } from "../application/use-cases/sync-user.use-case.js";
 import { UpdateUserUseCase } from "../application/use-cases/update-users.use-case.js";
 import { UpdateUserDto } from "../application/dto/update-user.dto.js";
 import { DeleteUserUseCase } from "../application/use-cases/delete-user.use-case.js";
+import { ChangePasswordUseCase } from "../application/use-cases/change-password.use-case.js";
+import { ChangePasswordDto } from "../application/dto/change-password.dto.js";
 
 @UseGuards(JwtAuthGuard)
 @Controller('users')
@@ -14,6 +16,7 @@ export class UsersController {
         private readonly syncUsersUseCase: SyncUserUseCase,
         private readonly updateUseCase: UpdateUserUseCase,
         private readonly deleteUseCase: DeleteUserUseCase,
+        private readonly changePasswordUseCase: ChangePasswordUseCase,
     ) { }
 
     @Post('sync/:empCode')
@@ -33,6 +36,14 @@ export class UsersController {
     @Put('change-role/:id')
     async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
         return await this.updateUseCase.execute(id, dto);
+    }
+
+    @Put('change-password/:id')
+    async changePassword(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: ChangePasswordDto,
+    ) {
+        return await this.changePasswordUseCase.execute(id, dto);
     }
 
     @Delete(':id')

@@ -5,11 +5,11 @@ const collection = {
   info: {
     _postman_id: "e4d1a001-ed1a-4d1a-8000-000000000001",
     name: "EDL Admin Management System API",
-    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge (ລວມ 48 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories (ລວມ 62 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   auth: {
-    // type: "bearer",
+    type: "bearer",
     bearer: [
       {
         key: "token",
@@ -159,6 +159,40 @@ const collection = {
               ]
             },
             description: "ແກ້ໄຂ Role (SUPERADMIN, ADMIN, EDITOR, STAFF) ແລະ Status (ACTIVE, INACTIVE, SUSPENDED)"
+          },
+          response: []
+        },
+        {
+          name: "Change Password (ປ່ຽນລະຫັດຜ່ານ)",
+          request: {
+            method: "PUT",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                oldPassword: "oldPassword123",
+                newPassword: "newPassword123",
+                confirmPassword: "newPassword123"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/users/change-password/:id",
+              host: ["{{baseUrl}}"],
+              path: ["users", "change-password", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຜູ້ໃຊ້ງານທີ່ຕ້ອງການປ່ຽນລະຫັດຜ່ານ"
+                }
+              ]
+            },
+            description: "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງແບບ Admin Reset ໂດຍສົ່ງສະເພາະ newPassword ຫຼື ແບບກວດສອບ oldPassword)"
           },
           response: []
         },
@@ -1262,6 +1296,362 @@ const collection = {
               ]
             },
             description: "ອັບໂຫຼດຮູບໜ້າປົກສຳລັບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
+          },
+          response: []
+        },
+        {
+          name: "Increment View Count (ເພີ່ມຍອດເຂົ້າຊົມ)",
+          request: {
+            method: "PUT",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electrical-knowledge/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electrical-knowledge", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງບົດຄວາມ"
+                }
+              ]
+            },
+            description: "ເພີ່ມຍອດເຂົ້າຊົມ (viewCount) ຂອງບົດຄວາມ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 12. Magazines Module
+    {
+      name: "12. Magazines",
+      description: "ໂມດູນຈັດການວາລະສານດິຈິຕອນ (E-Magazine) ພ້ອມອັບໂຫຼດໄຟລ໌ PDF ແລະ ຮູບໜ້າປົກ",
+      item: [
+        {
+          name: "Get All Magazines (ດຶງລາຍຊື່ວາລະສານທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/magazines",
+              host: ["{{baseUrl}}"],
+              path: ["magazines"]
+            },
+            description: "ດຶງລາຍຊື່ວາລະສານທັງໝົດໃນລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Get Magazine By ID (ດຶງຂໍ້ມູນວາລະສານຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/magazines/:id",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍລະອຽດວາລະສານຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Magazine (ສ້າງວາລະສານໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ວາລະສານ ໄຟຟ້າລາວ ສະບັບທີ 45",
+                issueNumber: "Vol. 45 - 2026",
+                coverImage: "/uploads/magazines/covers/sample.jpg",
+                fileUrl: "/uploads/magazines/documents/sample.pdf",
+                publishedDate: "2026-09-01T00:00:00.000Z",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/magazines",
+              host: ["{{baseUrl}}"],
+              path: ["magazines"]
+            },
+            description: "ສ້າງຂໍ້ມູນວາລະສານໃໝ່\n- status: ACTIVE | INACTIVE"
+          },
+          response: []
+        },
+        {
+          name: "Update Magazine (ແກ້ໄຂວາລະສານ)",
+          request: {
+            method: "PUT",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ວາລະສານ ໄຟຟ້າລາວ ສະບັບທີ 45 (ສະບັບປັບປຸງ)",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/magazines/:id",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນວາລະສານ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Magazine (ລຶບວາລະສານ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/magazines/:id",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ລຶບວາລະສານອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Increment Download Count (ເພີ່ມຍອດດາວໂຫຼດ)",
+          request: {
+            method: "PUT",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/magazines/:id/download",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id", "download"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ເພີ່ມຍອດດາວໂຫຼດ (downloadCount) ຂອງວາລະສານ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Magazine Cover (ອັບໂຫຼດຮູບໜ້າປົກ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/magazines/:id/upload/cover",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id", "upload", "cover"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບໜ້າປົກວາລະສານ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Magazine Document (ອັບໂຫຼດໄຟລ໌ເອກະສານ PDF)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ເອກະສານ PDF"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/magazines/:id/upload/document",
+              host: ["{{baseUrl}}"],
+              path: ["magazines", ":id", "upload", "document"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງວາລະສານ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດໄຟລ໌ PDF ຂອງວາລະສານ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 13. News Categories Module
+    {
+      name: "13. News Categories",
+      description: "ໂມດູນຈັດການໝວດໝູ່ຂ່າວສານປະຊາສຳພັນ",
+      item: [
+        {
+          name: "Get All News Categories (ດຶງໝວດໝູ່ຂ່າວທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-categories",
+              host: ["{{baseUrl}}"],
+              path: ["news-categories"]
+            },
+            description: "ດຶງລາຍຊື່ໝວດໝູ່ຂ່າວທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Get News Category By ID (ດຶງໝວດໝູ່ຂ່າວຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-categories/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-categories", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍລະອຽດໝວດໝູ່ຂ່າວຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create News Category (ສ້າງໝວດໝູ່ຂ່າວໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                categoryName: "ຂ່າວສານການເຄື່ອນໄຫວ",
+                description: "ຂ່າວສານການເຄື່ອນໄຫວທົ່ວໄປຂອງ ຟຟລ",
+                orderIndex: 1,
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news-categories",
+              host: ["{{baseUrl}}"],
+              path: ["news-categories"]
+            },
+            description: "ສ້າງໝວດໝູ່ຂ່າວໃໝ່\n- status: ACTIVE | INACTIVE"
+          },
+          response: []
+        },
+        {
+          name: "Update News Category (ແກ້ໄຂໝວດໝູ່ຂ່າວ)",
+          request: {
+            method: "PATCH",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                categoryName: "ຂ່າວສານການເຄື່ອນໄຫວ (ປັບປຸງ)",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news-categories/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-categories", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂໝວດໝູ່ຂ່າວ"
+          },
+          response: []
+        },
+        {
+          name: "Delete News Category (ລຶບໝວດໝູ່ຂ່າວ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-categories/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-categories", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
+                }
+              ]
+            },
+            description: "ລຶບໝວດໝູ່ຂ່າວອອກຈາກລະບົບ"
           },
           response: []
         }

@@ -16,6 +16,8 @@ import { VisionMissionModule } from './modules/vision-missions/vision-missions.m
 import { ElectricalKnowledgeModule } from './modules/electrical-knowledge/electrical-knowledge.module.js';
 import { MagazinesModule } from './modules/magazines/magazines.module.js';
 import { NewsCategoriesModule } from './modules/news-categories/news-categories.module.js';
+import { NewsModule } from './modules/news/news.module.js';
+import { NewsTagModule } from './modules/news-tags/news-tag.module.js';
 
 @Module({
   imports: [
@@ -40,6 +42,8 @@ import { NewsCategoriesModule } from './modules/news-categories/news-categories.
     ElectricalKnowledgeModule,
     MagazinesModule,
     NewsCategoriesModule,
+    NewsModule,
+    NewsTagModule,
   ],
   controllers: [],
   providers: [],

@@ -9,6 +9,7 @@ import { HRM_SERVICE } from "./domain/repositories/hrm.service.interface.js";
 import { HrmService } from "./infrastructure/external/hrm.service.js";
 import { UpdateUserUseCase } from "./application/use-cases/update-users.use-case.js";
 import { DeleteUserUseCase } from "./application/use-cases/delete-user.use-case.js";
+import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case.js";
 
 @Module({
     imports: [HttpModule],
@@ -22,6 +23,7 @@ import { DeleteUserUseCase } from "./application/use-cases/delete-user.use-case.
         GetUsersUseCase,
         UpdateUserUseCase,
         DeleteUserUseCase,
+        ChangePasswordUseCase,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,
