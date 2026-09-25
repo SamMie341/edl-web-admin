@@ -50,4 +50,9 @@ export class CreateNewsDto {
     @IsOptional()
     @IsEnum(NewsStatus)
     status?: NewsStatus;
+
+    @IsOptional()
+    @IsArray()
+    @IsInt({ each: true })
+    tagIds?: number[];
 }

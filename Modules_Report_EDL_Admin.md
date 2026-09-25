@@ -19,6 +19,13 @@
    - [3.6 Provinces Module (ລະບົບຂໍ້ມູນແຂວງ)](#36-provinces-module-ລະບົບຂໍ້ມູນແຂວງ)
    - [3.7 Districts Module (ລະບົບຂໍ້ມູນເມືອງ)](#37-districts-module-ລະບົບຂໍ້ມູນເມືອງ)
    - [3.8 Villages Module (ລະບົບຂໍ້ມູນບ້ານ)](#38-villages-module-ລະບົບຂໍ້ມູນບ້ານ)
+   - [3.9 Organization Structures Module (ລະບົບໂຄງຮ່າງການຈັດຕັ້ງ)](#39-organization-structures-module-ລະບົບໂຄງຮ່າງການຈັດຕັ້ງ)
+   - [3.10 Vision & Missions Module (ລະບົບວິໄສທັດ ແລະ ພາລະກິດ)](#310-vision--missions-module-ລະບົບວິໄສທັດ-ແລະ-ພາລະກິດ)
+   - [3.11 Electrical Knowledge Module (ລະບົບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ)](#311-electrical-knowledge-module-ລະບົບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ)
+   - [3.12 Magazines Module (ລະບົບວາລະສານດິຈິຕອນ E-Magazine)](#312-magazines-module-ລະບົບວາລະສານດິຈິຕອນ-e-magazine)
+   - [3.13 News Categories Module (ລະບົບໝວດໝູ່ຂ່າວສານ)](#313-news-categories-module-ລະບົບໝວດໝູ່ຂ່າວສານ)
+   - [3.14 News Module (ລະບົບຂ່າວສານປະຊາສຳພັນ 2 ພາສາ)](#314-news-module-ລະບົບຂ່າວສານປະຊາສຳພັນ-2-ພາສາ)
+   - [3.15 News Tags Module (ລະບົບແທັກຂ່າວສານ)](#315-news-tags-module-ລະບົບແທັກຂ່າວສານ)
 4. [ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ (Roadmap / Pending Modules)](#4-ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ-roadmap--pending-modules)
 5. [ຄູ່ມືການອັບເດດເອກະສານ (Documentation Update Guide)](#5-ຄູ່ມືການອັບເດດເອກະສານ-documentation-update-guide)
 
@@ -72,6 +79,13 @@
 | **Provinces** | `/api/v1/provinces` | 2 | EDL HRM Address API | ພ້ອມໃຊ້ງານ |
 | **Districts** | `/api/v1/districts` | 2 | EDL HRM District API | ພ້ອມໃຊ້ງານ |
 | **Villages** | `/api/v1/villages` | 2 | EDL HRM Village API | ພ້ອມໃຊ້ງານ |
+| **Organization Structures** | `/api/v1/org-structures` | 6 | File System (/uploads/org-structures) | ພ້ອມໃຊ້ງານ |
+| **Vision & Missions** | `/api/v1/vision-missions` | 5 | File System (/uploads/vision-missions) | ພ້ອມໃຊ້ງານ |
+| **Electrical Knowledge** | `/api/v1/electrical-knowledge` | 7 | File System (/uploads/electrical-knowledge) | ພ້ອມໃຊ້ງານ |
+| **Magazines** | `/api/v1/magazines` | 7 | File System (/uploads/magazines) | ພ້ອມໃຊ້ງານ |
+| **News Categories** | `/api/v1/news-categories` | 5 | - | ພ້ອມໃຊ້ງານ |
+| **News** | `/api/v1/news` | 7 | File System (/uploads/news) | ພ້ອມໃຊ້ງານ |
+| **News Tags** | `/api/v1/news-tags` | 5 | - | ພ້ອມໃຊ້ງານ |
 
 ---
 
@@ -113,7 +127,7 @@
 2. **`GetUsersUseCase`**: ດຶງຂໍ້ມູນລາຍຊື່ຜູ້ໃຊ້ທັງໝົດໃນລະບົບ.
 3. **`UpdateUserUseCase`**: ອັບເດດສິດທິ (Role) ແລະ ສະຖານະ (Status) ຂອງຜູ້ໃຊ້.
 4. **`DeleteUserUseCase`**: ລຶບບັນຊີຜູ້ໃຊ້ອອກຈາກລະບົບ.
-5. **`ChangePasswordUseCase`**: ປ່ຽນລະຫັດຜ່ານຂອງຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນລະຫັດຜ່ານພ້ອມຢືນຢັນ `oldPassword` ຫຼື Admin Reset ລະຫັດຜ່ານໃໝ່ໂດຍກົງ).
+5. **`ChangePasswordUseCase`**: ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນດ້ວຍຕົນເອງໂດຍກວດສອບ `oldPassword` ຫຼື Admin Reset ລະຫັດຜ່ານໃໝ່).
 
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
@@ -121,7 +135,7 @@
 | `POST` | `/api/v1/users/sync/:empCode` | JWT | ຊິ້ງຂໍ້ມູນພະນັກງານຈາກລະບົບ HRM |
 | `GET` | `/api/v1/users` | JWT | ດຶງລາຍຊື່ຜູ້ໃຊ້ງານທັງໝົດ |
 | `PUT` | `/api/v1/users/change-role/:id` | JWT | ແກ້ໄຂສິດທິ/ສະຖານະຜູ້ໃຊ້ |
-| `PUT` / `PATCH` | `/api/v1/users/change-password/:id` | JWT | ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ |
+| `PUT` | `/api/v1/users/change-password/:id` | JWT | ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ |
 | `DELETE` | `/api/v1/users/:id` | JWT | ລຶບຜູ້ໃຊ້ອອກຈາກລະບົບ |
 
 ---
@@ -219,7 +233,7 @@
 
 ### 3.7 Districts Module (ລະບົບຂໍ້ມູນເມືອງ)
 * **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/districts/`
-* **ความรับຜິດຊອບ:** ຄຸ້ມຄອງຂໍ້ມູນເມືອງທັງໝົດໃນ ສປປ ລາວ ພ້ອມຜູກໂຍງກັບລະຫັດແຂວງ (`provinceId`).
+* **ຄວາມຮັບຜິດຊອບ:** ຄຸ້ມຄອງຂໍ້ມູນເມືອງທັງໝົດໃນ ສປປ ລາວ ພ້ອມຜູກໂຍງກັບລະຫັດແຂວງ (`provinceId`).
 
 #### Use Cases ໃນລະບົບ:
 1. **`SyncDistrictsUseCase`**: ຊິ້ງຂໍ້ມູນເມືອງຈາກລະບົບ **HRM District Service API** ພ້ອມກວດສອບ Relation ຫາແຂວງ.
@@ -250,26 +264,205 @@
 
 ---
 
+### 3.9 Organization Structures Module (ລະບົບໂຄງຮ່າງການຈັດຕັ້ງ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/organization-structures/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງຂໍ້ມູນແຜນຜັງໂຄງຮ່າງການຈັດຕັ້ງ: ສະພາບໍລິຫານ (Board of Directors), ຄະນະບໍລິຫານ (Executive Board), ແລະ ແຜນຜັງໂຄງສ້າງອົງກອນ (Org Structure).
+  - ຮອງຮັບການອັບໂຫຼດຮູບພາບແຜນຜັງໂຄງຮ່າງມາຍັງ Server (`/uploads/org-structures/`).
+  - ໃຫ້ບໍລິການ Dropdown API ສຳລັບ Frontend ນຳໄປໃຊ້ສະແດງຜົນ.
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateOrgStructureUseCase`**: ສ້າງຂໍ້ມູນໂຄງຮ່າງໃໝ່.
+2. **`GetOrgStructureUseCase`**: ດຶງລາຍການໂຄງຮ່າງທັງໝົດ.
+3. **`GetOrgStructureDropdownUseCase`**: ດຶງສະເພາະ ID, ຊື່ ແລະ ປະເພດໂຄງຮ່າງສຳລັບ Dropdown.
+4. **`UpdateOrgStructureUseCase`**: ແກ້ໄຂຂໍ້ມູນໂຄງຮ່າງ.
+5. **`DeleteOrgStructureUseCase`**: ລຶບຂໍ້ມູນໂຄງຮ່າງ.
+6. **`UploadImageStructureUseCase`**: ອັບໂຫຼດຮູບພາບໂຄງຮ່າງ.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/org-structures` | JWT | ດຶງຂໍ້ມູນໂຄງຮ່າງການຈັດຕັ້ງທັງໝົດ |
+| `GET` | `/api/v1/org-structures/dropdown` | JWT | ດຶງລາຍການໂຄງຮ່າງສຳລັບ Dropdown |
+| `POST` | `/api/v1/org-structures` | JWT | ສ້າງໂຄງຮ່າງໃໝ່ (`structureType`: BOARD_OF_DIRECTORS, EXECUTIVE_BOARD, ORG_STRUCTURE) |
+| `PUT` | `/api/v1/org-structures/:id` | JWT | ແກ້ໄຂຂໍ້ມູນໂຄງຮ່າງ |
+| `DELETE` | `/api/v1/org-structures/:id` | JWT | ລຶບຂໍ້ມູນໂຄງຮ່າງ |
+| `POST` | `/api/v1/org-structures/:id/upload/image` | JWT | ອັບໂຫຼດຮູບພາບໂຄງຮ່າງ (form-data: `file`) |
+
+---
+
+### 3.10 Vision & Missions Module (ລະບົບວິໄສທັດ ແລະ ພາລະກິດ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/vision-missions/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງຂໍ້ມູນວິໄສທັດ (Vision), ພາລະກິດ (Mission), ຄ່ານິຍົມຫຼັກ (Core Values), ແລະ ສະໂລແກນ (Slogan) ຂອງ ຟຟລ.
+  - ຮອງຮັບການອັບໂຫຼດຮູບພາບປະກອບມາຍັງ Server (`/uploads/vision-missions/`).
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateVisionMissionUseCase`**: ສ້າງຂໍ້ມູນວິໄສທັດ/ພາລະກິດໃໝ່.
+2. **`GetVisionMissionUseCase`**: ດຶງລາຍການວິໄສທັດ/ພາລະກິດທັງໝົດ.
+3. **`UpdateVisionMissionUseCase`**: ແກ້ໄຂຂໍ້ມູນ.
+4. **`DeleteVisionMissionUseCase`**: ລຶບຂໍ້ມູນ.
+5. **`UploadVisionMissionImageUseCase`**: ອັບໂຫຼດຮູບພາບປະກອບ.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/vision-missions` | JWT | ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດທັງໝົດ |
+| `POST` | `/api/v1/vision-missions` | JWT | ສ້າງຂໍ້ມູນໃໝ່ (`entryType`: VISION, MISSION, CORE_VALUES, SLOGAN) |
+| `PUT` | `/api/v1/vision-missions/:id` | JWT | ແກ້ໄຂຂໍ້ມູນ |
+| `DELETE` | `/api/v1/vision-missions/:id` | JWT | ລຶບຂໍ້ມູນ |
+| `POST` | `/api/v1/vision-missions/:id/upload/image` | JWT | ອັບໂຫຼດຮູບພາບປະກອບ (form-data: `file`) |
+
+---
+
+### 3.11 Electrical Knowledge Module (ລະບົບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/electrical-knowledge/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງບົດຄວາມ ແລະ ຄລິບວິດິໂອໃຫ້ຄວາມຮູ້ດ້ານໄຟຟ້າ ແລະ ຄວາມປອດໄພ.
+  - ຮອງຮັບເນື້ອຫາແບບ HTML Rich Text, ລິ້ງວິດິໂອ (YouTube/Video URL), ແລະ ການນັບຍອດເຂົ້າຊົມ (view_count).
+  - ຮອງຮັບການອັບໂຫຼດຮູບໜ້າປົກ (Cover Image) ມາຍັງ Server (`/uploads/electrical-knowledge/`).
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateElectricalKnowledgeUseCase`**: ສ້າງບົດຄວາມໃໝ່.
+2. **`GetElectricalKnowledgeUseCase`**: ດຶງລາຍຊື່ບົດຄວາມທັງໝົດ.
+3. **`GetElectricalKnowledgeByIdUseCase`**: ດຶງລາຍລະອຽດບົດຄວາມຕາມ ID.
+4. **`UpdateElectricalKnowledgeUseCase`**: ແກ້ໄຂບົດຄວາມ.
+5. **`DeleteElectricalKnowledgeUseCase`**: ລຶບບົດຄວາມ.
+6. **`UploadElectricalKnowledgeUseCase`**: ອັບໂຫຼດຮູບໜ້າປົກບົດຄວາມ.
+7. **`IncrementElectricalKnowledgeViewUseCase`**: ເພີ່ມຍອດເຂົ້າຊົມບົດຄວາມ (`view_count`).
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/electrical-knowledge` | JWT | ດຶງລາຍຊື່ບົດຄວາມທັງໝົດ |
+| `GET` | `/api/v1/electrical-knowledge/:id` | JWT | ດຶງຂໍ້ມູນບົດຄວາມຕາມ ID |
+| `POST` | `/api/v1/electrical-knowledge` | JWT | ສ້າງບົດຄວາມໃໝ່ (`status`: ACTIVE, DRAFT, ARCHIVED) |
+| `PATCH` | `/api/v1/electrical-knowledge/:id` | JWT | ແກ້ໄຂຂໍ້ມູນບົດຄວາມ |
+| `DELETE` | `/api/v1/electrical-knowledge/:id` | JWT | ລຶບບົດຄວາມ |
+| `PUT` | `/api/v1/electrical-knowledge/:id` | JWT | ເພີ່ມຍອດເຂົ້າຊົມບົດຄວາມ (Increment view count) |
+| `POST` | `/api/v1/electrical-knowledge/:id/upload/cover` | JWT | ອັບໂຫຼດຮູບໜ້າປົກບົດຄວາມ (form-data: `file`) |
+
+---
+
+### 3.12 Magazines Module (ລະບົບວາລະສານດິຈິຕອນ E-Magazine)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/magazines/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງວາລະສານດິຈິຕອນ (E-Magazine) ຂອງ ຟຟລ.
+  - ຮອງຮັບການອັບໂຫຼດຮູບໜ້າປົກ (`/uploads/magazines/covers/`) ແລະ ໄຟລ໌ເອກະສານ PDF (`/uploads/magazines/documents/`).
+  - ບັນທຶກ ແລະ ນັບຍອດດາວໂຫຼດວາລະສານ (`download_count`).
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateMagazineUseCase`**: ສ້າງຂໍ້ມູນວາລະສານໃໝ່.
+2. **`GetMagazinesUseCase`**: ດຶງລາຍຊື່ວາລະສານທັງໝົດ.
+3. **`GetMagazineByIdUseCase`**: ດຶງລາຍລະອຽດວາລະສານຕາມ ID.
+4. **`UpdateMagazineUseCase`**: ແກ້ໄຂຂໍ້ມູນວາລະສານ.
+5. **`DeleteMagazinUseCase`**: ລຶບວາລະສານ.
+6. **`IncrementMagazineDownloadUseCase`**: ເພີ່ມຍອດດາວໂຫຼດວາລະສານ.
+7. **`UploadMagazineFilesUseCase`**: ອັບໂຫຼດຮູບໜ້າປົກ ຫຼື ໄຟລ໌ PDF.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/magazines` | JWT | ດຶງລາຍຊື່ວາລະສານທັງໝົດ |
+| `GET` | `/api/v1/magazines/:id` | JWT | ດຶງຂໍ້ມູນວາລະສານຕາມ ID |
+| `POST` | `/api/v1/magazines` | JWT | ສ້າງວາລະສານໃໝ່ |
+| `PUT` | `/api/v1/magazines/:id` | JWT | ແກ້ໄຂຂໍ້ມູນວາລະສານ |
+| `DELETE` | `/api/v1/magazines/:id` | JWT | ລຶບວາລະສານ |
+| `PUT` | `/api/v1/magazines/:id/download` | JWT | ເພີ່ມຍອດດາວໂຫຼດ (Increment download count) |
+| `POST` | `/api/v1/magazines/:id/upload/cover` | JWT | ອັບໂຫຼດຮູບໜ້າປົກວາລະສານ (form-data: `file`) |
+| `POST` | `/api/v1/magazines/:id/upload/document` | JWT | ອັບໂຫຼດໄຟລ໌ເອກະສານ PDF (form-data: `file`) |
+
+---
+
+### 3.13 News Categories Module (ລະບົບໝວດໝູ່ຂ່າວສານ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/news-categories/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງໝວດໝູ່ຂ່າວສານປະຊາສຳພັນ ແລະ ບົດຄວາມຕ່າງໆ.
+  - ຮອງຮັບການຈັດລຳດັບການສະແດງຜົນ (`order_index`) ແລະ ສະຖານະ (`ACTIVE`, `INACTIVE`).
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateNewsCategoryUseCase`**: ສ້າງໝວດໝູ່ຂ່າວໃໝ່.
+2. **`GetNewsCategoriesUseCase`**: ດຶງລາຍຊື່ໝວດໝູ່ຂ່າວທັງໝົດ.
+3. **`GetNewsCategoryByIdUseCase`**: ດຶງຂໍ້ມູນໝວດໝູ່ຕາມ ID.
+4. **`UpdateNewsCategoryUseCase`**: ແກ້ໄຂຂໍ້ມູນໝວດໝູ່.
+5. **`DeleteNewsCategoryUseCase`**: ລຶບໝວດໝູ່ຂ່າວ.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/news-categories` | JWT | ດຶງລາຍຊື່ໝວດໝູ່ຂ່າວທັງໝົດ |
+| `GET` | `/api/v1/news-categories/:id` | JWT | ດຶງຂໍ້ມູນໝວດໝູ່ຕາມ ID |
+| `POST` | `/api/v1/news-categories` | JWT | ສ້າງໝວດໝູ່ຂ່າວໃໝ່ |
+| `PATCH` | `/api/v1/news-categories/:id` | JWT | ແກ້ໄຂຂໍ້ມູນໝວດໝູ່ |
+| `DELETE` | `/api/v1/news-categories/:id` | JWT | ລຶບໝວດໝູ່ຂ່າວ |
+
+---
+
+### 3.14 News Module (ລະບົບຂ່າວສານປະຊາສຳພັນ 2 ພາສາ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/news/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງຂ່າວສານປະຊາສຳພັນ 2 ພາສາ (ພາສາລາວ ແລະ ພາສາອັງກິດ) ພ້ອມຫົວຂໍ້ຂ່າວ, ຫົວຂໍ້ຍ່ອຍ, ແລະ ເນື້ອໃນ HTML.
+  - ຮອງຮັບການອັບໂຫຼດຮູບໜ້າປົກ (`/uploads/news/covers/`) ແລະ ຮູບພາບ Gallery ຫຼາຍຮູບ (`/uploads/news/galleries/`).
+  - ຮອງຮັບວິດິໂອລິ້ງ (YouTube/Video URL) ແລະ ນັບຍອດເຂົ້າຊົມຂ່າວ (`view_count`).
+  - ຜູກໂຍງກັບໝວດໝູ່ຂ່າວສານ (`categoryId`).
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateNewsUseCase`**: ສ້າງຂ່າວສານໃໝ່.
+2. **`GetNewsUseCase`**: ດຶງລາຍການຂ່າວສານທັງໝົດ.
+3. **`GetNewsByIdUseCase`**: ດຶງລາຍລະອຽດຂ່າວສານຕາມ ID.
+4. **`UpdateNewsUseCase`**: ແກ້ໄຂຂໍ້ມູນຂ່າວສານ.
+5. **`DeleteNewsUseCase`**: ລຶບຂ່າວສານ.
+6. **`IncrementNewsViewUseCase`**: ເພີ່ມຍອດເຂົ້າຊົມຂ່າວ.
+7. **`UploadNewsImagesUseCase`**: ອັບໂຫຼດຮູບໜ້າປົກ (Cover) ຫຼື ຮູບພາບ Gallery (ສູງສຸດ 10 ຮູບ).
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/news` | JWT | ດຶງລາຍການຂ່າວສານທັງໝົດ |
+| `GET` | `/api/v1/news/:id` | JWT | ດຶງຂໍ້ມູນຂ່າວຕາມ ID |
+| `POST` | `/api/v1/news` | JWT | ສ້າງຂ່າວສານໃໝ່ (`status`: DRAFT, PUBLISHED, ARCHIVED) |
+| `PATCH` | `/api/v1/news/:id` | JWT | ແກ້ໄຂຂໍ້ມູນຂ່າວສານ |
+| `DELETE` | `/api/v1/news/:id` | JWT | ລຶບຂ່າວສານ |
+| `PATCH` | `/api/v1/news/:id/view` | JWT | ເພີ່ມຍອດເຂົ້າຊົມຂ່າວ (Increment view count) |
+| `POST` | `/api/v1/news/:id/upload/cover` | JWT | ອັບໂຫຼດຮູບໜ້າປົກຂ່າວ (form-data: `file`) |
+| `POST` | `/api/v1/news/:id/upload/gallery` | JWT | ອັບໂຫຼດຮູບ Gallery ຫຼາຍຮູບ (form-data: `files`) |
+
+---
+
+### 3.15 News Tags Module (ລະບົບແທັກຂ່າວສານ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/news-tags/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງແທັກຂ່າວສານ (News Tags) ສຳລັບຈັດກຸ່ມ ແລະ ຄົ້ນຫາຂ່າວສານ.
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateNewsTagUseCase`**: ສ້າງແທັກໃໝ່.
+2. **`GetAllNewsTagUseCase`**: ດຶງລາຍຊື່ແທັກທັງໝົດ.
+3. **`GetNewsTagByIdUseCase`**: ດຶງຂໍ້ມູນແທັກຕາມ ID.
+4. **`UpdateNewsTagUseCase`**: ແກ້ໄຂຂໍ້ມູນແທັກ.
+5. **`DeleteNewsTagUseCase`**: ລຶບແທັກ.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `GET` | `/api/v1/news-tags` | JWT | ດຶງລາຍຊື່ແທັກທັງໝົດ |
+| `GET` | `/api/v1/news-tags/:id` | JWT | ດຶງຂໍ້ມູນແທັກຕາມ ID |
+| `POST` | `/api/v1/news-tags` | JWT | ສ້າງແທັກໃໝ່ |
+| `PUT` | `/api/v1/news-tags/:id` | JWT | ແກ້ໄຂຂໍ້ມູນແທັກ |
+| `DELETE` | `/api/v1/news-tags/:id` | JWT | ລຶບແທັກອອກຈາກລະບົບ |
+
+---
+
 ## 4. ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ (Roadmap / Pending Modules)
 
 ຕາມການອອກແບບໃນ **Prisma Schema (`schema.prisma`)** ແລະ **Data Dictionary**, ຍັງມີຕາຕະລາງທີ່ກຽມໄວ້ສຳລັບພັດທະນາເປັນ Module ໃໝ່ໃນຂັ້ນຕອນຕໍ່ໄປດັ່ງນີ້:
 
-### 1. ໂມດູນໂຄງສ້າງອົງກອນ (Organization Structure & Vision - MOD-01 Part 2)
-- **`organization_structures`**: ເກັບກຳແຜນຜັງສະພາບໍລິຫານ (Board of Directors), ຄະນະບໍລິຫານ (Executive Board), ແລະ ແຜນຜັງໂຄງສ້າງອົງກອນ.
-- **`vision_missions`**: ເກັບກຳວິໄສທັດ, ພາລະກິດ, ຄ່ານິຍົມຫຼັກ (Core Values), ແລະ ສະໂລແກນ.
-
-### 2. ໂມດູນຂ່າວສານ ແລະ ສື່ປະຊາສຳພັນ (News & Media Management - MOD-02)
-- **`news` / `news_categories` / `news_tags`**: ລະບົບຂ່າວສານປະຊາສຳພັນ 2 ພາສາ (ລາວ/ອັງກິດ), ອັບໂຫຼດຮູບພາບ Gallery, ວິດິໂອ, ໝວດໝູ່ ແລະ ແທັກ.
-- **`electrical_knowledge`**: ບົດຄວາມ ແລະ ຄລິບວິດິໂອໃຫ້ຄວາມຮູ້ດ້ານໄຟຟ້າ ແລະ ຄວາມປອດໄພ.
-- **`magazines`**: ວາລະສານດິຈິຕອນ (E-Magazine) ພ້ອມລະບົບດາວໂຫຼດໄຟລ໌ PDF.
-
-### 3. ໂມດູນຂໍ້ມູນສາທາລະນະ ແລະ ບໍລິການ (Public Disclosure & Services - MOD-03)
+### 1. ໂມດູນຂໍ້ມູນສາທາລະນະ ແລະ ບໍລິການ (Public Disclosure & Services - MOD-03)
 - **`electricity_tariffs`**: ປະກາດໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ (ທີ່ຢູ່ອາໄສ, ທຸລະກິດ, ອຸດສາຫະກຳ).
 - **`legislations`**: ເອກະສານນິຕິກຳ, ດຳລັດ, ຂໍ້ຕົກລົງ, ແລະ ລະບຽບການ (ໄຟລ໌ PDF).
 - **`procurements`**: ປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງ, ເອກະສານ TOR, ວັນທີເປີດ-ປິດຊອງປະມູນ.
 - **`job_postings`**: ປະກາດຮັບສະໝັກພະນັກງານໃໝ່ ພ້ອມກຳນົດວັນທີຮັບສະໝັກ.
 
-### 4. ໂມດູນຕຳແໜ່ງງານ (Positions Management - MOD-04 Part 2)
+### 2. ໂມດູນຕຳແໜ່ງງານ (Positions Management - MOD-04 Part 2)
 - **`positions`**: ຕາຕະລາງ Master Data ຕຳແໜ່ງພະນັກງານ ສຳລັບຜູກໂຍງກັບປະກາດຮັບສະໝັກງານ ແລະ ໂຄງສ້າງບຸກຄະລາກອນ.
 
 ---

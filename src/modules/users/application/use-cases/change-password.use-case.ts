@@ -1,5 +1,5 @@
 import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
-import * as bcrypt from 'bcrypt';
+import bcrypt from 'bcryptjs';
 import * as userRepositoryInterface from "../../domain/repositories/user.repository.interface.js";
 import { ChangePasswordDto } from "../dto/change-password.dto.js";
 

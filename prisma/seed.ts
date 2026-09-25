@@ -13,7 +13,7 @@ async function main() {
 
     // เข้ารหัสรหัสผ่าน (ตัวอย่างตั้งรหัสผ่านเป็น: admin1234)
     const saltRounds = 10;
-    const passwordHash = await bcrypt.hash('admin1234', saltRounds);
+    const passwordHash = await bcrypt.hash('EDL1234', saltRounds);
 
     // ใช้ upsert เพื่อให้รันคำสั่งซ้ำได้โดยไม่เกิด Error ถ้ามีข้อมูลอยู่แล้ว
     const superAdmin = await prisma.user.upsert({

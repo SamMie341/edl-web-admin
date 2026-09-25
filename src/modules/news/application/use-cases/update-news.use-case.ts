@@ -9,11 +9,12 @@ export class UpdateNewsUseCase {
         const existing = await this.repository.findById(id);
         if (!existing) throw new NotFoundException('ບໍ່ພົບຂ່າວສານ');
 
+        const { tagIds, ...newsData } = dto;
         const dataToUpdate = {
-            ...dto,
-            ...(dto.publishedAt && { publishedAt: new Date(dto.publishedAt) }),
+            ...newsData,
+            ...(newsData.publishedAt && { publishedAt: new Date(newsData.publishedAt) }),
         };
 
-        return this.repository.update(id, dataToUpdate);
+        return this.repository.update(id, dataToUpdate, tagIds);
     }
 }

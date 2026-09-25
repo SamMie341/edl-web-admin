@@ -5,7 +5,7 @@ const collection = {
   info: {
     _postman_id: "e4d1a001-ed1a-4d1a-8000-000000000001",
     name: "EDL Admin Management System API",
-    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories (ລວມ 62 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags (ລວມ 76 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   auth: {
@@ -1652,6 +1652,346 @@ const collection = {
               ]
             },
             description: "ລຶບໝວດໝູ່ຂ່າວອອກຈາກລະບົບ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 14. News Module
+    {
+      name: "14. News",
+      description: "ໂມດູນຈັດການຂ່າວສານປະຊາສຳພັນ 2 ພາສາ (ລາວ/ອັງກິດ), ຮູບໜ້າປົກ, Gallery, ແລະ ວິດິໂອ",
+      item: [
+        {
+          name: "Get All News (ດຶງຂ່າວທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news",
+              host: ["{{baseUrl}}"],
+              path: ["news"]
+            },
+            description: "ດຶງລາຍການຂ່າວສານປະຊາສຳພັນທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Get News By ID (ດຶງຂໍ້ມູນຂ່າວຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍລະອຽດຂ່າວສານຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create News (ສ້າງຂ່າວໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                categoryId: 1,
+                titleLa: "ພິທີເປີດນຳໃຊ້ສະຖານີໄຟຟ້າແຫ່ງໃໝ່",
+                titleEn: "Opening Ceremony of New Substation",
+                subtitleLa: "ເພື່ອຮອງຮັບການຊົມໃຊ້ໄຟຟ້າທີ່ເພີ່ມຂຶ້ນໃນນະຄອນຫຼວງ",
+                subtitleEn: "To accommodate growing electricity demand",
+                coverImage: "/uploads/news/covers/sample.jpg",
+                galleryImages: [
+                  "/uploads/news/galleries/img1.jpg",
+                  "/uploads/news/galleries/img2.jpg"
+                ],
+                videoUrl: "https://www.youtube.com/watch?v=sample",
+                contentLa: "<p>ເນື້ອໃນຂ່າວສານພາສາລາວ...</p>",
+                contentEn: "<p>English news content...</p>",
+                publishedAt: "2026-09-23T00:00:00.000Z",
+                status: "PUBLISHED"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news",
+              host: ["{{baseUrl}}"],
+              path: ["news"]
+            },
+            description: "ສ້າງຂ່າວສານໃໝ່\n- status: DRAFT | PUBLISHED | ARCHIVED"
+          },
+          response: []
+        },
+        {
+          name: "Update News (ແກ້ໄຂຂ່າວ)",
+          request: {
+            method: "PATCH",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                titleLa: "ພິທີເປີດນຳໃຊ້ສະຖານີໄຟຟ້າແຫ່ງໃໝ່ (ສະບັບປັບປຸງ)",
+                status: "PUBLISHED"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນຂ່າວສານ"
+          },
+          response: []
+        },
+        {
+          name: "Delete News (ລຶບຂ່າວ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            description: "ລຶບຂ່າວສານອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Increment View Count (ເພີ່ມຍອດເຂົ້າຊົມຂ່າວ)",
+          request: {
+            method: "PATCH",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news/:id/view",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id", "view"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວ"
+                }
+              ]
+            },
+            description: "ເພີ່ມຍອດເຂົ້າຊົມ (viewCount) ຂອງຂ່າວສານ"
+          },
+          response: []
+        },
+        {
+          name: "Upload News Cover (ອັບໂຫຼດຮູບໜ້າປົກຂ່າວ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "file",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/news/:id/upload/cover",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id", "upload", "cover"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບໜ້າປົກຂ່າວ (1 ຮູບ)"
+          },
+          response: []
+        },
+        {
+          name: "Upload News Gallery (ອັບໂຫຼດຮູບ Gallery)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [
+                {
+                  key: "files",
+                  type: "file",
+                  description: "ເລືອກໄຟລ໌ຮູບພາບ Gallery ຫຼາຍຮູບ (ສູງສຸດ 10 ຮູບ)"
+                }
+              ]
+            },
+            url: {
+              raw: "{{baseUrl}}/news/:id/upload/gallery",
+              host: ["{{baseUrl}}"],
+              path: ["news", ":id", "upload", "gallery"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງຂ່າວ"
+                }
+              ]
+            },
+            description: "ອັບໂຫຼດຮູບພາບ Gallery ສຳລັບຂ່າວສານ (ຫຼາຍຮູບ, ສູງສຸດ 10 ຮູບ)"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 15. News Tags Module
+    {
+      name: "15. News Tags",
+      description: "ໂມດູນຈັດການແທັກຂ່າວສານ (Tags)",
+      item: [
+        {
+          name: "Get All News Tags (ດຶງແທັກທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-tags",
+              host: ["{{baseUrl}}"],
+              path: ["news-tags"]
+            },
+            description: "ດຶງລາຍຊື່ແທັກຂ່າວສານທັງໝົດ"
+          },
+          response: []
+        },
+        {
+          name: "Get News Tag By ID (ດຶງແທັກຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-tags/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-tags", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງແທັກ"
+                }
+              ]
+            },
+            description: "ດຶງລາຍລະອຽດແທັກຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create News Tag (ສ້າງແທັກໃໝ່)",
+          request: {
+            method: "POST",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                tagName: "ພະລັງງານສະອາດ"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news-tags",
+              host: ["{{baseUrl}}"],
+              path: ["news-tags"]
+            },
+            description: "ສ້າງແທັກຂ່າວສານໃໝ່"
+          },
+          response: []
+        },
+        {
+          name: "Update News Tag (ແກ້ໄຂແທັກ)",
+          request: {
+            method: "PUT",
+            header: [
+              {
+                key: "Content-Type",
+                value: "application/json"
+              }
+            ],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                tagName: "ພະລັງງານສະອາດ (ປັບປຸງ)"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/news-tags/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-tags", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງແທັກ"
+                }
+              ]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນແທັກ"
+          },
+          response: []
+        },
+        {
+          name: "Delete News Tag (ລຶບແທັກ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/news-tags/:id",
+              host: ["{{baseUrl}}"],
+              path: ["news-tags", ":id"],
+              variable: [
+                {
+                  key: "id",
+                  value: "1",
+                  description: "ID ຂອງແທັກ"
+                }
+              ]
+            },
+            description: "ລຶບແທັກອອກຈາກລະບົບ"
           },
           response: []
         }

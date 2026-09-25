@@ -6,11 +6,12 @@ import { CreateNewsDto } from '../dtos/create-news.dto.js';
 export class CreateNewsUseCase {
     constructor(@Inject(newsRepositoryInterface.NEWS_REPOSITORY) private readonly repository: newsRepositoryInterface.INewsRepository) { }
     async execute(dto: CreateNewsDto) {
+        const { tagIds, ...newsData } = dto;
         const dataToSave = {
-            ...dto,
-            publishedAt: dto.publishedAt ? new Date(dto.publishedAt) : null,
-            galleryImages: dto.galleryImages || [], // ແປງເປັນ array ວ່າງຖ້າບໍ່ມີ
+            ...newsData,
+            publishedAt: newsData.publishedAt ? new Date(newsData.publishedAt) : null,
+            galleryImages: newsData.galleryImages || [], // ແປງເປັນ array ວ່າງຖ້າບໍ່ມີ
         };
-        return this.repository.create(dataToSave);
+        return this.repository.create(dataToSave, tagIds);
     }
 }
