@@ -38,9 +38,10 @@ export class PrismaBranchRepository implements IBranchRepository {
         return await this.prisma.branch.delete({ where: { id } });
     }
 
-    async findAll(): Promise<Branch[]> {
+    async findAll(departmentId?: number): Promise<Branch[]> {
         // ດຶງຂໍ້ມູນສາຂາ ພ້ອມກັບຊື່ຝ່າຍ (Department)
         return this.prisma.branch.findMany({
+            where: departmentId ? { departmentId } : undefined,
             include: { department: true },
             orderBy: { orderIndex: 'asc' },
         });

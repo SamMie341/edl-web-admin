@@ -18,6 +18,11 @@ import { MagazinesModule } from './modules/magazines/magazines.module.js';
 import { NewsCategoriesModule } from './modules/news-categories/news-categories.module.js';
 import { NewsModule } from './modules/news/news.module.js';
 import { NewsTagModule } from './modules/news-tags/news-tag.module.js';
+import { LegislationsModule } from './modules/legislations/legislations.module.js';
+import { ElectricityTariffsModule } from './modules/electricity-tariffs/electricity-tariffs.module.js';
+import { ProcurementsModule } from './modules/procurements/procurements.module.js';
+import { PositionsModule } from './modules/positions/positions.module.js';
+import { JobPostingsModule } from './modules/job-postings/job-postings.module.js';
 
 @Module({
   imports: [
@@ -44,6 +49,11 @@ import { NewsTagModule } from './modules/news-tags/news-tag.module.js';
     NewsCategoriesModule,
     NewsModule,
     NewsTagModule,
+    LegislationsModule,
+    ElectricityTariffsModule,
+    ProcurementsModule,
+    PositionsModule,
+    JobPostingsModule,
   ],
   controllers: [],
   providers: [],

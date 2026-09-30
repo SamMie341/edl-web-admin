@@ -35,11 +35,37 @@ export class PrismaNewsRepository implements INewsRepository {
         });
     }
 
-    async findAll(): Promise<News[]> {
-        return this.prisma.news.findMany({
-            include: { category: true, tags: { include: { tag: true } } },
-            orderBy: { createdAt: 'desc' },
-        }) as unknown as News[];
+    async findAll(search?: string, page: number = 1, limit: number = 10): Promise<{ data: News[], meta: any }> {
+        const skip = (page - 1) * limit;
+        const whereCondition = search ? {
+            OR: [
+                { titleLa: { contains: search, mode: 'insensitive' } },
+                { titleEn: { contains: search, mode: 'insensitive' } },
+            ]
+        } : undefined;
+
+        const [data, total] = await Promise.all([
+            this.prisma.news.findMany({
+                where: whereCondition as any,
+                skip,
+                take: limit,
+                include: { category: true, tags: { include: { tag: true } } },
+                orderBy: { createdAt: 'desc' },
+            }),
+            this.prisma.news.count({ where: whereCondition as any })
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
+            }
+        }
     }
 
     async findById(id: number): Promise<News | null> {

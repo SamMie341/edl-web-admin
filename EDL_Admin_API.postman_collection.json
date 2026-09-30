@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "e4d1a001-ed1a-4d1a-8000-000000000001",
     "name": "EDL Admin Management System API",
-    "description": "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags (ລວມ 76 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    "description": "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags, Legislations, Electricity Tariffs, Procurements, Positions, Job Postings (ລວມ 20 Modules, 109 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "auth": {
@@ -127,7 +127,7 @@
                 {
                   "key": "empCode",
                   "value": "00001",
-                  "description": "ລະຫັດພະນັກງານທີ່ຕ້ອງການຊິງຄ໌ຂໍ້ມູນຈາກ EDL HRM"
+                  "description": "ລະຫັດພະນັກງານ"
                 }
               ]
             },
@@ -199,11 +199,11 @@
                 {
                   "key": "id",
                   "value": "1",
-                  "description": "ID ຂອງຜູ້ໃຊ້ງານທີ່ຕ້ອງການປ່ຽນລະຫັດຜ່ານ"
+                  "description": "ID ຂອງຜູ້ໃຊ້ງານ"
                 }
               ]
             },
-            "description": "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງແບບ Admin Reset ໂດຍສົ່ງສະເພາະ newPassword ຫຼື ແບບກວດສອບ oldPassword)"
+            "description": "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນດ້ວຍຕົນເອງ ຫຼື Admin Reset)"
           },
           "response": []
         },
@@ -313,7 +313,7 @@
         {
           "name": "Update Department (ແກ້ໄຂຂໍ້ມູນຝ່າຍ)",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -383,15 +383,49 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/branches",
+              "raw": "{{baseUrl}}/branches?departmentId=1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "branches"
+              ],
+              "query": [
+                {
+                  "key": "departmentId",
+                  "value": "1",
+                  "description": "ກັ່ນຕອງຕາມ ID ຝ່າຍ (optional)"
+                }
               ]
             },
-            "description": "ດຶງລາຍຊື່ສາຂາທັງໝົດ"
+            "description": "ດຶງລາຍຊື່ສາຂາທັງໝົດ (ສາມາດ filter ດ້ວຍ ?departmentId=... ໄດ້)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Branches By Department ID (ດຶງສາຂາຕາມ ID ຝ່າຍ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/branches/department/:departmentId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "branches",
+                "department",
+                ":departmentId"
+              ],
+              "variable": [
+                {
+                  "key": "departmentId",
+                  "value": "1",
+                  "description": "ID ຂອງຝ່າຍ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍຊື່ສາຂາທີ່ຂຶ້ນກັບຝ່າຍທີ່ລະບຸ"
           },
           "response": []
         },
@@ -789,7 +823,7 @@
                 {
                   "key": "includeDistricts",
                   "value": "true",
-                  "description": "ຖ້າໃສ່ true ຈະດຶງຂໍ້ມູນເມືອງໃນແຕ່ລະແຂວງມານຳ (optional)"
+                  "description": "ດຶງຂໍ້ມູນເມືອງໃນແຕ່ລະແຂວງມານຳ (optional)"
                 }
               ]
             },
@@ -905,15 +939,49 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/villages",
+              "raw": "{{baseUrl}}/villages?districtId=1",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "villages"
+              ],
+              "query": [
+                {
+                  "key": "districtId",
+                  "value": "1",
+                  "description": "ກັ່ນຕອງຕາມ ID ເມືອງ (optional)"
+                }
               ]
             },
-            "description": "ດຶງລາຍຊື່ບ້ານທັງໝົດ"
+            "description": "ດຶງລາຍຊື່ບ້ານທັງໝົດ (ສາມາດ filter ດ້ວຍ ?districtId=... ໄດ້)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Villages By District ID (ດຶງບ້ານຕາມ ID ເມືອງ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/villages/district/:districtId",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "villages",
+                "district",
+                ":districtId"
+              ],
+              "variable": [
+                {
+                  "key": "districtId",
+                  "value": "1",
+                  "description": "ID ຂອງເມືອງ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍຊື່ບ້ານທັງໝົດທີ່ຂຶ້ນກັບເມືອງທີ່ລະບຸ"
           },
           "response": []
         },
@@ -1328,14 +1396,14 @@
                 "electrical-knowledge"
               ]
             },
-            "description": "ສ້າງບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າໃໝ່ (ຮອງຮັບ HTML content ຈາກ Rich Text Editor)\n- status: ACTIVE | DRAFT | ARCHIVED"
+            "description": "ສ້າງບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າໃໝ່ (ຮອງຮັບ HTML content)\n- status: ACTIVE | DRAFT | ARCHIVED"
           },
           "response": []
         },
         {
           "name": "Update Electrical Knowledge (ແກ້ໄຂບົດຄວາມ)",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -1437,13 +1505,14 @@
             "method": "PUT",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/electrical-knowledge/:id",
+              "raw": "{{baseUrl}}/electrical-knowledge/:id/view",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "electrical-knowledge",
-                ":id"
+                ":id",
+                "view"
               ],
               "variable": [
                 {
@@ -1778,7 +1847,7 @@
         {
           "name": "Update News Category (ແກ້ໄຂໝວດໝູ່ຂ່າວ)",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -1848,15 +1917,32 @@
             "method": "GET",
             "header": [],
             "url": {
-              "raw": "{{baseUrl}}/news",
+              "raw": "{{baseUrl}}/news?search=&page=1&limit=10",
               "host": [
                 "{{baseUrl}}"
               ],
               "path": [
                 "news"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄຳຄົ້ນຫາຫົວຂໍ້ຂ່າວ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
               ]
             },
-            "description": "ດຶງລາຍການຂ່າວສານປະຊາສຳພັນທັງໝົດ"
+            "description": "ດຶງລາຍການຂ່າວສານປະຊາສຳພັນທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
           },
           "response": []
         },
@@ -1916,7 +2002,7 @@
         {
           "name": "Update News (ແກ້ໄຂຂ່າວ)",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [
               {
                 "key": "Content-Type",
@@ -1977,7 +2063,7 @@
         {
           "name": "Increment View Count (ເພີ່ມຍອດເຂົ້າຊົມຂ່າວ)",
           "request": {
-            "method": "PATCH",
+            "method": "PUT",
             "header": [],
             "url": {
               "raw": "{{baseUrl}}/news/:id/view",
@@ -2212,6 +2298,1009 @@
               ]
             },
             "description": "ລຶບແທັກອອກຈາກລະບົບ"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "16. Legislations",
+      "description": "ໂມດູນຈັດການເອກະສານນິຕິກຳ, ດຳລັດ, ຂໍ້ຕົກລົງ ແລະ ລະບຽບການ ພ້ອມໄຟລ໌ PDF",
+      "item": [
+        {
+          "name": "Get All Legislations (ດຶງເອກະສານນິຕິກຳທັງໝົດ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/legislations?search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄົ້ນຫາເລກທີ ຫຼື ຊື່ເອກະສານ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍການເອກະສານນິຕິກຳທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Legislation By ID (ດຶງເອກະສານນິຕິກຳຕາມ ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/legislations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງນິຕິກຳ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍລະອຽດເອກະສານນິຕິກຳຕາມ ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Legislation (ສ້າງເອກະສານນິຕິກຳໃໝ່)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"documentNumber\": \"012/ຟຟລ\",\n  \"title\": \"ຂໍ້ຕົກລົງວ່າດ້ວຍການຄຸ້ມຄອງ ແລະ ນຳໃຊ້ຕາຂ່າຍໄຟຟ້າ\",\n  \"fileUrl\": \"/uploads/legislations/sample.pdf\",\n  \"issueDate\": \"2026-09-01T00:00:00.000Z\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/legislations",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations"
+              ]
+            },
+            "description": "ສ້າງເອກະສານນິຕິກຳໃໝ່\n- status: ACTIVE | INACTIVE | ARCHIVED"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Legislation (ແກ້ໄຂເອກະສານນິຕິກຳ)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ຂໍ້ຕົກລົງວ່າດ້ວຍການຄຸ້ມຄອງ ແລະ ນຳໃຊ້ຕາຂ່າຍໄຟຟ້າ (ສະບັບປັບປຸງ)\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/legislations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງນິຕິກຳ"
+                }
+              ]
+            },
+            "description": "ແກ້ໄຂຂໍ້ມູນເອກະສານນິຕິກຳ"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Legislation (ລຶບເອກະສານນິຕິກຳ)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/legislations/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງນິຕິກຳທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            "description": "ລຶບເອກະສານນິຕິກຳອອກຈາກລະບົບ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Legislation Document (ອັບໂຫຼດໄຟລ໌ PDF ນິຕິກຳ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ເອກະສານ PDF"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/legislations/:id/upload/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "legislations",
+                ":id",
+                "upload",
+                "document"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງນິຕິກຳ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດໄຟລ໌ PDF ສຳລັບເອກະສານນິຕິກຳ"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "17. Electricity Tariffs",
+      "description": "ໂມດູນຈັດການໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ (ທີ່ຢູ່ອາໄສ, ທຸລະກິດ, ອຸດສາຫະກຳ) ພ້ອມໄຟລ໌ PDF ແລະ ຮູບພາບ",
+      "item": [
+        {
+          "name": "Get All Tariffs (ດຶງອັດຕາຄ່າໄຟຟ້າທັງໝົດ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs?search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄົ້ນຫາຊື່ໂຄງສ້າງອັດຕາ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍການອັດຕາຄ່າໄຟຟ້າທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Tariff By ID (ດຶງອັດຕາຄ່າໄຟຟ້າຕາມ ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງອັດຕາຄ່າໄຟຟ້າ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍລະອຽດອັດຕາຄ່າໄຟຟ້າຕາມ ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Tariff (ສ້າງອັດຕາຄ່າໄຟຟ້າໃໝ່)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ ສຳລັບທີ່ຢູ່ອາໄສ ປີ 2026\",\n  \"tariffType\": \"RESIDENTIAL\",\n  \"imageUrl\": \"/uploads/electricity-tariffs/images/sample.jpg\",\n  \"pdfUrl\": \"/uploads/electricity-tariffs/documents/sample.pdf\",\n  \"effectiveDate\": \"2026-01-01T00:00:00.000Z\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs"
+              ]
+            },
+            "description": "ສ້າງໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າໃໝ່\n- tariffType: RESIDENTIAL | COMMERCIAL | INDUSTRIAL\n- status: ACTIVE | INACTIVE | HISTORICAL"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Tariff (ແກ້ໄຂອັດຕາຄ່າໄຟຟ້າ)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ ສຳລັບທີ່ຢູ່ອາໄສ ປີ 2026 (ສະບັບປັບປຸງ)\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງອັດຕາຄ່າໄຟຟ້າ"
+                }
+              ]
+            },
+            "description": "ແກ້ໄຂຂໍ້ມູນໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Tariff (ລຶບອັດຕາຄ່າໄຟຟ້າ)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງອັດຕາຄ່າໄຟຟ້າທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            "description": "ລຶບອັດຕາຄ່າໄຟຟ້າອອກຈາກລະບົບ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Tariff Image (ອັບໂຫຼດຮູບພາບປະກອບ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs/:id/upload/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs",
+                ":id",
+                "upload",
+                "image"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງອັດຕາຄ່າໄຟຟ້າ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດຮູບພາບຕາຕະລາງອັດຕາຄ່າໄຟຟ້າ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Tariff Document (ອັບໂຫຼດໄຟລ໌ PDF ອັດຕາຄ່າໄຟ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ເອກະສານ PDF"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/electricity-tariffs/:id/upload/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "electricity-tariffs",
+                ":id",
+                "upload",
+                "document"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງອັດຕາຄ່າໄຟຟ້າ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດໄຟລ໌ PDF ລາຍລະອຽດອັດຕາຄ່າໄຟຟ້າ"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "18. Procurements",
+      "description": "ໂມດູນຈັດການປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງ, ເອກະສານ TOR ພ້ອມໄຟລ໌ PDF",
+      "item": [
+        {
+          "name": "Get All Procurements (ດຶງການປະມູນທັງໝົດ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/procurements?search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄົ້ນຫາເລກທີປະມູນ ຫຼື ຫົວຂໍ້ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍການປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Procurement By ID (ດຶງການປະມູນຕາມ ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/procurements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງການປະມູນ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍລະອຽດການປະມູນຕາມ ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Procurement (ສ້າງການປະມູນໃໝ່)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"tenderNumber\": \"EDL-PROC-2026-001\",\n  \"title\": \"ປະກາດປະມູນຈັດຊື້ອຸປະກອນໝໍ້ແປງໄຟຟ້າ\",\n  \"fileUrl\": \"/uploads/procurements/documents/tor.pdf\",\n  \"imageUrl\": \"/uploads/procurements/images/sample.jpg\",\n  \"startDate\": \"2026-10-01T00:00:00.000Z\",\n  \"endDate\": \"2026-10-31T17:00:00.000Z\",\n  \"description\": \"<p>ລາຍລະອຽດການປະມູນຈັດຊື້ອຸປະກອນໄຟຟ້າ...</p>\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/procurements",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements"
+              ]
+            },
+            "description": "ສ້າງປະກາດປະມູນໃໝ່\n- status: DRAFT | OPEN | CLOSED | CANCELLED | AWARDED"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Procurement (ແກ້ໄຂການປະມູນ)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ປະກາດປະມູນຈັດຊື້ອຸປະກອນໝໍ້ແປງໄຟຟ້າ (ຂະຫຍາຍເວລາ)\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/procurements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງການປະມູນ"
+                }
+              ]
+            },
+            "description": "ແກ້ໄຂຂໍ້ມູນການປະມູນ"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Procurement (ລຶບການປະມູນ)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/procurements/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງການປະມູນທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            "description": "ລຶບການປະມູນອອກຈາກລະບົບ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Procurement Image (ອັບໂຫຼດຮູບປະກອບການປະມູນ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/procurements/:id/upload/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements",
+                ":id",
+                "upload",
+                "image"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງການປະມູນ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດຮູບພາບປະກອບການປະກາດປະມູນ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Procurement Document (ອັບໂຫຼດໄຟລ໌ TOR/PDF)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ເອກະສານ PDF (TOR)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/procurements/:id/upload/document",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "procurements",
+                ":id",
+                "upload",
+                "document"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງການປະມູນ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດໄຟລ໌ PDF ລາຍລະອຽດການປະມູນ (TOR)"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "19. Positions",
+      "description": "ໂມດູນຈັດການຂໍ້ມູນຕຳແໜ່ງງານ (Master Data)",
+      "item": [
+        {
+          "name": "Get All Positions (ດຶງຕຳແໜ່ງງານທັງໝົດ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/positions?search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "positions"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄົ້ນຫາຊື່ຕຳແໜ່ງ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍຊື່ຕຳແໜ່ງງານທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Position By ID (ດຶງຕຳແໜ່ງຕາມ ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງຕຳແໜ່ງ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍລະອຽດຕຳແໜ່ງງານຕາມ ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Position (ສ້າງຕຳແໜ່ງງານໃໝ່)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionName\": \"ວິສະວະກອນໄຟຟ້າ\",\n  \"description\": \"ຮັບຜິດຊອບລະບົບສາຍສົ່ງ ແລະ ສະຖານີໄຟຟ້າ\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/positions",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "positions"
+              ]
+            },
+            "description": "ສ້າງຕຳແໜ່ງງານໃໝ່\n- status: ACTIVE | INACTIVE"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Position (ແກ້ໄຂຕຳແໜ່ງງານ)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionName\": \"ວິສະວະກອນໄຟຟ້າອາວຸໂສ\",\n  \"status\": \"ACTIVE\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງຕຳແໜ່ງ"
+                }
+              ]
+            },
+            "description": "ແກ້ໄຂຂໍ້ມູນຕຳແໜ່ງງານ"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Position (ລຶບຕຳແໜ່ງງານ)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/positions/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "positions",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງຕຳແໜ່ງທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            "description": "ລຶບຕຳແໜ່ງງານອອກຈາກລະບົບ"
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "20. Job Postings",
+      "description": "ໂມດູນຈັດການປະກາດຮັບສະໝັກພະນັກງານໃໝ່ ພ້ອມກຳນົດວັນທີ ແລະ ຮູບພາບ",
+      "item": [
+        {
+          "name": "Get All Job Postings (ດຶງປະກາດຮັບສະໝັກທັງໝົດ)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-postings?search=&page=1&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings"
+              ],
+              "query": [
+                {
+                  "key": "search",
+                  "value": "",
+                  "description": "ຄົ້ນຫາຫົວຂໍ້ປະກາດ (optional)"
+                },
+                {
+                  "key": "page",
+                  "value": "1",
+                  "description": "ໜ້າທີ່ (optional)"
+                },
+                {
+                  "key": "limit",
+                  "value": "10",
+                  "description": "ຈຳນວນຕໍ່ໜ້າ (optional)"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍການປະກາດຮັບສະໝັກພະນັກງານທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Job Posting By ID (ດຶງປະກາດຕາມ ID)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-postings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງປະກາດ"
+                }
+              ]
+            },
+            "description": "ດຶງລາຍລະອຽດປະກາດຮັບສະໝັກຕາມ ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Job Posting (ສ້າງປະກາດຮັບສະໝັກໃໝ່)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"positionId\": 1,\n  \"title\": \"ຮັບສະໝັກພະນັກງານ ຕຳແໜ່ງ ວິສະວະກອນໄຟຟ້າ\",\n  \"subtitle\": \"ປະຈຳສາຂານະຄອນຫຼວງ 1\",\n  \"imageUrl\": \"/uploads/job-postings/sample.jpg\",\n  \"startDate\": \"2026-10-01T00:00:00.000Z\",\n  \"endDate\": \"2026-10-25T17:00:00.000Z\",\n  \"description\": \"<p>ເງື່ອນໄຂຜູ້ສະໝັກ: ຈົບປະລິນຍາຕີຂະແໜງວິສະວະກຳໄຟຟ້າ...</p>\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-postings",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings"
+              ]
+            },
+            "description": "ສ້າງປະກາດຮັບສະໝັກງານໃໝ່\n- status: OPEN | CLOSED | CANCELLED"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Job Posting (ແກ້ໄຂປະກາດຮັບສະໝັກ)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"ຮັບສະໝັກພະນັກງານ ຕຳແໜ່ງ ວິສະວະກອນໄຟຟ້າ (ຂະຫຍາຍເວລາ)\",\n  \"status\": \"OPEN\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-postings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງປະກາດ"
+                }
+              ]
+            },
+            "description": "ແກ້ໄຂຂໍ້ມູນປະກາດຮັບສະໝັກງານ"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Job Posting (ລຶບປະກາດຮັບສະໝັກ)",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/job-postings/:id",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings",
+                ":id"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງປະກາດທີ່ຕ້ອງການລຶບ"
+                }
+              ]
+            },
+            "description": "ລຶບປະກາດຮັບສະໝັກງານອອກຈາກລະບົບ"
+          },
+          "response": []
+        },
+        {
+          "name": "Upload Job Posting Image (ອັບໂຫຼດຮູບພາບປະກາດ)",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "description": "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/job-postings/:id/upload/image",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "job-postings",
+                ":id",
+                "upload",
+                "image"
+              ],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "1",
+                  "description": "ID ຂອງປະກາດ"
+                }
+              ]
+            },
+            "description": "ອັບໂຫຼດຮູບພາບສຳລັບປະກາດຮັບສະໝັກງານ"
           },
           "response": []
         }

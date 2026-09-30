@@ -5,7 +5,7 @@ const collection = {
   info: {
     _postman_id: "e4d1a001-ed1a-4d1a-8000-000000000001",
     name: "EDL Admin Management System API",
-    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags (ລວມ 76 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags, Legislations, Electricity Tariffs, Procurements, Positions, Job Postings (ລວມ 20 Modules, 109 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   auth: {
@@ -60,22 +60,12 @@ const collection = {
             }
           ],
           request: {
-            auth: {
-              type: "noauth"
-            },
+            auth: { type: "noauth" },
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                empCode: "00001",
-                password: "password123"
-              }, null, 2)
+              raw: JSON.stringify({ empCode: "00001", password: "password123" }, null, 2)
             },
             url: {
               raw: "{{baseUrl}}/auth/login",
@@ -99,11 +89,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/users",
-              host: ["{{baseUrl}}"],
-              path: ["users"]
-            },
+            url: { raw: "{{baseUrl}}/users", host: ["{{baseUrl}}"], path: ["users"] },
             description: "ດຶງລາຍຊື່ຜູ້ໃຊ້ງານລະບົບທັງໝົດ"
           },
           response: []
@@ -117,13 +103,7 @@ const collection = {
               raw: "{{baseUrl}}/users/sync/:empCode",
               host: ["{{baseUrl}}"],
               path: ["users", "sync", ":empCode"],
-              variable: [
-                {
-                  key: "empCode",
-                  value: "00001",
-                  description: "ລະຫັດພະນັກງານທີ່ຕ້ອງການຊິງຄ໌ຂໍ້ມູນຈາກ EDL HRM"
-                }
-              ]
+              variable: [{ key: "empCode", value: "00001", description: "ລະຫັດພະນັກງານ" }]
             },
             description: "ດຶງຂໍ້ມູນພະນັກງານຈາກລະບົບ EDL HRM ມາບັນທຶກ ຫຼື ອັບເດດໃນຖານຂໍ້ມູນ"
           },
@@ -133,30 +113,16 @@ const collection = {
           name: "Change Role & Status (ແກ້ໄຂສິດ ແລະ ສະຖານະຜູ້ໃຊ້)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                role: "ADMIN",
-                status: "ACTIVE"
-              }, null, 2)
+              raw: JSON.stringify({ role: "ADMIN", status: "ACTIVE" }, null, 2)
             },
             url: {
               raw: "{{baseUrl}}/users/change-role/:id",
               host: ["{{baseUrl}}"],
               path: ["users", "change-role", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຜູ້ໃຊ້ງານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຜູ້ໃຊ້ງານ" }]
             },
             description: "ແກ້ໄຂ Role (SUPERADMIN, ADMIN, EDITOR, STAFF) ແລະ Status (ACTIVE, INACTIVE, SUSPENDED)"
           },
@@ -166,12 +132,7 @@ const collection = {
           name: "Change Password (ປ່ຽນລະຫັດຜ່ານ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -184,15 +145,9 @@ const collection = {
               raw: "{{baseUrl}}/users/change-password/:id",
               host: ["{{baseUrl}}"],
               path: ["users", "change-password", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຜູ້ໃຊ້ງານທີ່ຕ້ອງການປ່ຽນລະຫັດຜ່ານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຜູ້ໃຊ້ງານ" }]
             },
-            description: "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງແບບ Admin Reset ໂດຍສົ່ງສະເພາະ newPassword ຫຼື ແບບກວດສອບ oldPassword)"
+            description: "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນດ້ວຍຕົນເອງ ຫຼື Admin Reset)"
           },
           response: []
         },
@@ -205,13 +160,7 @@ const collection = {
               raw: "{{baseUrl}}/users/:id",
               host: ["{{baseUrl}}"],
               path: ["users", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຜູ້ໃຊ້ງານທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຜູ້ໃຊ້ງານທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຜູ້ໃຊ້ງານອອກຈາກລະບົບ"
           },
@@ -230,11 +179,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/departments",
-              host: ["{{baseUrl}}"],
-              path: ["departments"]
-            },
+            url: { raw: "{{baseUrl}}/departments", host: ["{{baseUrl}}"], path: ["departments"] },
             description: "ດຶງຂໍ້ມູນຝ່າຍທັງໝົດໃນລະບົບ"
           },
           response: []
@@ -248,13 +193,7 @@ const collection = {
               raw: "{{baseUrl}}/departments/:id",
               host: ["{{baseUrl}}"],
               path: ["departments", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຝ່າຍ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຝ່າຍ" }]
             },
             description: "ດຶງລາຍລະອຽດຂໍ້ມູນຝ່າຍຕາມ ID"
           },
@@ -264,23 +203,12 @@ const collection = {
           name: "Create Department (ເພີ່ມຝ່າຍໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                name: "ຝ່າຍເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ"
-              }, null, 2)
+              raw: JSON.stringify({ name: "ຝ່າຍເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ" }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/departments",
-              host: ["{{baseUrl}}"],
-              path: ["departments"]
-            },
+            url: { raw: "{{baseUrl}}/departments", host: ["{{baseUrl}}"], path: ["departments"] },
             description: "ສ້າງຂໍ້ມູນຝ່າຍໃໝ່"
           },
           response: []
@@ -288,30 +216,17 @@ const collection = {
         {
           name: "Update Department (ແກ້ໄຂຂໍ້ມູນຝ່າຍ)",
           request: {
-            method: "PATCH",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                name: "ຝ່າຍເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ ແລະ ການສື່ສານ"
-              }, null, 2)
+              raw: JSON.stringify({ name: "ຝ່າຍເຕັກໂນໂລຊີຂໍ້ມູນຂ່າວສານ ແລະ ການສື່ສານ" }, null, 2)
             },
             url: {
               raw: "{{baseUrl}}/departments/:id",
               host: ["{{baseUrl}}"],
               path: ["departments", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຝ່າຍ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຝ່າຍ" }]
             },
             description: "ແກ້ໄຂຊື່ຝ່າຍ"
           },
@@ -326,13 +241,7 @@ const collection = {
               raw: "{{baseUrl}}/departments/:id",
               host: ["{{baseUrl}}"],
               path: ["departments", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຝ່າຍທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຝ່າຍທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຂໍ້ມູນຝ່າຍອອກຈາກລະບົບ"
           },
@@ -352,11 +261,27 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/branches",
+              raw: "{{baseUrl}}/branches?departmentId=1",
               host: ["{{baseUrl}}"],
-              path: ["branches"]
+              path: ["branches"],
+              query: [{ key: "departmentId", value: "1", description: "ກັ່ນຕອງຕາມ ID ຝ່າຍ (optional)" }]
             },
-            description: "ດຶງລາຍຊື່ສາຂາທັງໝົດ"
+            description: "ດຶງລາຍຊື່ສາຂາທັງໝົດ (ສາມາດ filter ດ້ວຍ ?departmentId=... ໄດ້)"
+          },
+          response: []
+        },
+        {
+          name: "Get Branches By Department ID (ດຶງສາຂາຕາມ ID ຝ່າຍ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/branches/department/:departmentId",
+              host: ["{{baseUrl}}"],
+              path: ["branches", "department", ":departmentId"],
+              variable: [{ key: "departmentId", value: "1", description: "ID ຂອງຝ່າຍ" }]
+            },
+            description: "ດຶງລາຍຊື່ສາຂາທີ່ຂຶ້ນກັບຝ່າຍທີ່ລະບຸ"
           },
           response: []
         },
@@ -369,13 +294,7 @@ const collection = {
               raw: "{{baseUrl}}/branches/:id",
               host: ["{{baseUrl}}"],
               path: ["branches", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສາຂາ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສາຂາ" }]
             },
             description: "ດຶງຂໍ້ມູນສາຂາຕາມ ID ພ້ອມຂໍ້ມູນ Relation ຝ່າຍ"
           },
@@ -385,12 +304,7 @@ const collection = {
           name: "Create Branch (ສ້າງສາຂາໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -404,11 +318,7 @@ const collection = {
                 orderIndex: 1
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/branches",
-              host: ["{{baseUrl}}"],
-              path: ["branches"]
-            },
+            url: { raw: "{{baseUrl}}/branches", host: ["{{baseUrl}}"], path: ["branches"] },
             description: "ສ້າງສາຂາໃໝ່"
           },
           response: []
@@ -417,12 +327,7 @@ const collection = {
           name: "Update Branch (ແກ້ໄຂຂໍ້ມູນສາຂາ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -440,13 +345,7 @@ const collection = {
               raw: "{{baseUrl}}/branches/:id",
               host: ["{{baseUrl}}"],
               path: ["branches", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສາຂາ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສາຂາ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນສາຂາ"
           },
@@ -461,13 +360,7 @@ const collection = {
               raw: "{{baseUrl}}/branches/:id",
               host: ["{{baseUrl}}"],
               path: ["branches", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສາຂາ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສາຂາ" }]
             },
             description: "ລຶບຂໍ້ມູນສາຂາອອກຈາກລະບົບ"
           },
@@ -478,11 +371,7 @@ const collection = {
           request: {
             method: "POST",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/branches/sync",
-              host: ["{{baseUrl}}"],
-              path: ["branches", "sync"]
-            },
+            url: { raw: "{{baseUrl}}/branches/sync", host: ["{{baseUrl}}"], path: ["branches", "sync"] },
             description: "ຊິງຄ໌ຂໍ້ມູນສາຂາ ແລະ ດາວໂຫຼດຮູບພາບສາຂາ/ຮູບໜ້າປົກ/ໂຄງຮ່າງ ອັດຕະໂນມັດຈາກ EDL Inside API"
           },
           response: []
@@ -494,29 +383,15 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/branches/:id/upload/:imageType",
               host: ["{{baseUrl}}"],
               path: ["branches", ":id", "upload", ":imageType"],
               variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສາຂາ"
-                },
-                {
-                  key: "imageType",
-                  value: "branchImage",
-                  description: "ປະເພດຮູບ: branchImage (ຮູບສາຂາ), coverImage (ຮູບໜ້າປົກ), orgChartImage (ຮູບໂຄງຮ່າງ)"
-                }
+                { key: "id", value: "1", description: "ID ຂອງສາຂາ" },
+                { key: "imageType", value: "branchImage", description: "ປະເພດຮູບ: branchImage (ຮູບສາຂາ), coverImage (ຮູບໜ້າປົກ), orgChartImage (ຮູບໂຄງຮ່າງ)" }
               ]
             },
             description: "ອັບໂຫຼດຮູບພາບໃຫ້ສາຂາ ໂດຍເລືອກປະເພດຮູບໃນ :imageType (branchImage, coverImage, orgChartImage)"
@@ -536,11 +411,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/service-centers",
-              host: ["{{baseUrl}}"],
-              path: ["service-centers"]
-            },
+            url: { raw: "{{baseUrl}}/service-centers", host: ["{{baseUrl}}"], path: ["service-centers"] },
             description: "ດຶງລາຍຊື່ສູນບໍລິການລູກຄ້າທັງໝົດ ພ້ອມຂໍ້ມູນ Relation ສາຂາ ແລະ ທີ່ຕັ້ງ"
           },
           response: []
@@ -554,13 +425,7 @@ const collection = {
               raw: "{{baseUrl}}/service-centers/:id",
               host: ["{{baseUrl}}"],
               path: ["service-centers", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສູນບໍລິການ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສູນບໍລິການ" }]
             },
             description: "ດຶງລາຍລະອຽດສູນບໍລິການຕາມ ID"
           },
@@ -570,12 +435,7 @@ const collection = {
           name: "Create Service Center (ສ້າງສູນບໍລິການໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -592,11 +452,7 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/service-centers",
-              host: ["{{baseUrl}}"],
-              path: ["service-centers"]
-            },
+            url: { raw: "{{baseUrl}}/service-centers", host: ["{{baseUrl}}"], path: ["service-centers"] },
             description: "ສ້າງສູນບໍລິການລູກຄ້າໃໝ່"
           },
           response: []
@@ -605,12 +461,7 @@ const collection = {
           name: "Update Service Center (ແກ້ໄຂຂໍ້ມູນສູນບໍລິການ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -625,13 +476,7 @@ const collection = {
               raw: "{{baseUrl}}/service-centers/:id",
               host: ["{{baseUrl}}"],
               path: ["service-centers", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສູນບໍລິການ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສູນບໍລິການ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນສູນບໍລິການລູກຄ້າ"
           },
@@ -646,13 +491,7 @@ const collection = {
               raw: "{{baseUrl}}/service-centers/:id",
               host: ["{{baseUrl}}"],
               path: ["service-centers", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສູນບໍລິການທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສູນບໍລິການທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຂໍ້ມູນສູນບໍລິການອອກຈາກລະບົບ"
           },
@@ -663,11 +502,7 @@ const collection = {
           request: {
             method: "POST",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/service-centers/sync",
-              host: ["{{baseUrl}}"],
-              path: ["service-centers", "sync"]
-            },
+            url: { raw: "{{baseUrl}}/service-centers/sync", host: ["{{baseUrl}}"], path: ["service-centers", "sync"] },
             description: "ຊິງຄ໌ຂໍ້ມູນສູນບໍລິການ ແລະ ດາວໂຫຼດຮູບພາບຈາກ EDL Inside API"
           },
           response: []
@@ -679,25 +514,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/service-centers/:id/upload/image",
               host: ["{{baseUrl}}"],
               path: ["service-centers", ":id", "upload", "image"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງສູນບໍລິການ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງສູນບໍລິການ" }]
             },
             description: "ອັບໂຫຼດຮູບພາບສຳລັບສູນບໍລິການລູກຄ້າ"
           },
@@ -720,13 +543,7 @@ const collection = {
               raw: "{{baseUrl}}/provinces?includeDistricts=true",
               host: ["{{baseUrl}}"],
               path: ["provinces"],
-              query: [
-                {
-                  key: "includeDistricts",
-                  value: "true",
-                  description: "ຖ້າໃສ່ true ຈະດຶງຂໍ້ມູນເມືອງໃນແຕ່ລະແຂວງມານຳ (optional)"
-                }
-              ]
+              query: [{ key: "includeDistricts", value: "true", description: "ດຶງຂໍ້ມູນເມືອງໃນແຕ່ລະແຂວງມານຳ (optional)" }]
             },
             description: "ດຶງລາຍຊື່ແຂວງທັງໝົດໃນລະບົບ (ຮອງຮັບ param includeDistricts=true)"
           },
@@ -737,11 +554,7 @@ const collection = {
           request: {
             method: "POST",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/provinces/sync",
-              host: ["{{baseUrl}}"],
-              path: ["provinces", "sync"]
-            },
+            url: { raw: "{{baseUrl}}/provinces/sync", host: ["{{baseUrl}}"], path: ["provinces", "sync"] },
             description: "ຊິງຄ໌ຂໍ້ມູນແຂວງຈາກ EDL HRM Address API"
           },
           response: []
@@ -763,13 +576,7 @@ const collection = {
               raw: "{{baseUrl}}/districts?provinceId=1",
               host: ["{{baseUrl}}"],
               path: ["districts"],
-              query: [
-                {
-                  key: "provinceId",
-                  value: "1",
-                  description: "ກັ່ນຕອງຕາມ ID ແຂວງ (optional)"
-                }
-              ]
+              query: [{ key: "provinceId", value: "1", description: "ກັ່ນຕອງຕາມ ID ແຂວງ (optional)" }]
             },
             description: "ດຶງລາຍຊື່ເມືອງທັງໝົດ (ສາມາດ filter ດ້ວຍ ?provinceId=... ໄດ້)"
           },
@@ -784,13 +591,7 @@ const collection = {
               raw: "{{baseUrl}}/districts/province/:provinceId",
               host: ["{{baseUrl}}"],
               path: ["districts", "province", ":provinceId"],
-              variable: [
-                {
-                  key: "provinceId",
-                  value: "1",
-                  description: "ID ຂອງແຂວງ"
-                }
-              ]
+              variable: [{ key: "provinceId", value: "1", description: "ID ຂອງແຂວງ" }]
             },
             description: "ດຶງລາຍຊື່ເມືອງທັງໝົດທີ່ຂຶ້ນກັບແຂວງທີ່ລະບຸ"
           },
@@ -801,11 +602,7 @@ const collection = {
           request: {
             method: "POST",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/districts/sync",
-              host: ["{{baseUrl}}"],
-              path: ["districts", "sync"]
-            },
+            url: { raw: "{{baseUrl}}/districts/sync", host: ["{{baseUrl}}"], path: ["districts", "sync"] },
             description: "ຊິງຄ໌ຂໍ້ມູນເມືອງຈາກ EDL HRM District API"
           },
           response: []
@@ -824,11 +621,27 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/villages",
+              raw: "{{baseUrl}}/villages?districtId=1",
               host: ["{{baseUrl}}"],
-              path: ["villages"]
+              path: ["villages"],
+              query: [{ key: "districtId", value: "1", description: "ກັ່ນຕອງຕາມ ID ເມືອງ (optional)" }]
             },
-            description: "ດຶງລາຍຊື່ບ້ານທັງໝົດ"
+            description: "ດຶງລາຍຊື່ບ້ານທັງໝົດ (ສາມາດ filter ດ້ວຍ ?districtId=... ໄດ້)"
+          },
+          response: []
+        },
+        {
+          name: "Get Villages By District ID (ດຶງບ້ານຕາມ ID ເມືອງ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/villages/district/:districtId",
+              host: ["{{baseUrl}}"],
+              path: ["villages", "district", ":districtId"],
+              variable: [{ key: "districtId", value: "1", description: "ID ຂອງເມືອງ" }]
+            },
+            description: "ດຶງລາຍຊື່ບ້ານທັງໝົດທີ່ຂຶ້ນກັບເມືອງທີ່ລະບຸ"
           },
           response: []
         },
@@ -837,11 +650,7 @@ const collection = {
           request: {
             method: "POST",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/villages/sync",
-              host: ["{{baseUrl}}"],
-              path: ["villages", "sync"]
-            },
+            url: { raw: "{{baseUrl}}/villages/sync", host: ["{{baseUrl}}"], path: ["villages", "sync"] },
             description: "ຊິງຄ໌ຂໍ້ມູນບ້ານຈາກ EDL HRM Village API"
           },
           response: []
@@ -859,11 +668,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/org-structures",
-              host: ["{{baseUrl}}"],
-              path: ["org-structures"]
-            },
+            url: { raw: "{{baseUrl}}/org-structures", host: ["{{baseUrl}}"], path: ["org-structures"] },
             description: "ດຶງຂໍ້ມູນໂຄງຮ່າງການຈັດຕັ້ງທັງໝົດ"
           },
           response: []
@@ -873,11 +678,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/org-structures/dropdown",
-              host: ["{{baseUrl}}"],
-              path: ["org-structures", "dropdown"]
-            },
+            url: { raw: "{{baseUrl}}/org-structures/dropdown", host: ["{{baseUrl}}"], path: ["org-structures", "dropdown"] },
             description: "ດຶງລາຍການໂຄງຮ່າງສຳລັບສະແດງໃນ Dropdown ເມນູ"
           },
           response: []
@@ -886,12 +687,7 @@ const collection = {
           name: "Create Org Structure (ສ້າງໂຄງຮ່າງໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -902,11 +698,7 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/org-structures",
-              host: ["{{baseUrl}}"],
-              path: ["org-structures"]
-            },
+            url: { raw: "{{baseUrl}}/org-structures", host: ["{{baseUrl}}"], path: ["org-structures"] },
             description: "ສ້າງໂຄງຮ່າງອົງກອນໃໝ່\n- structureType: BOARD_OF_DIRECTORS | EXECUTIVE_BOARD | ORG_STRUCTURE\n- status: ACTIVE | INACTIVE"
           },
           response: []
@@ -915,12 +707,7 @@ const collection = {
           name: "Update Org Structure (ແກ້ໄຂໂຄງຮ່າງ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -935,13 +722,7 @@ const collection = {
               raw: "{{baseUrl}}/org-structures/:id",
               host: ["{{baseUrl}}"],
               path: ["org-structures", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໂຄງຮ່າງ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໂຄງຮ່າງ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນໂຄງຮ່າງອົງກອນ"
           },
@@ -956,13 +737,7 @@ const collection = {
               raw: "{{baseUrl}}/org-structures/:id",
               host: ["{{baseUrl}}"],
               path: ["org-structures", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໂຄງຮ່າງທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໂຄງຮ່າງທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບໂຄງຮ່າງອົງກອນອອກຈາກລະບົບ"
           },
@@ -975,25 +750,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/org-structures/:id/upload/image",
               host: ["{{baseUrl}}"],
               path: ["org-structures", ":id", "upload", "image"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໂຄງຮ່າງ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໂຄງຮ່າງ" }]
             },
             description: "ອັບໂຫຼດຮູບພາບໂຄງຮ່າງອົງກອນ"
           },
@@ -1012,11 +775,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/vision-missions",
-              host: ["{{baseUrl}}"],
-              path: ["vision-missions"]
-            },
+            url: { raw: "{{baseUrl}}/vision-missions", host: ["{{baseUrl}}"], path: ["vision-missions"] },
             description: "ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດທັງໝົດ"
           },
           response: []
@@ -1025,12 +784,7 @@ const collection = {
           name: "Create Vision & Mission (ສ້າງຂໍ້ມູນໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1043,11 +797,7 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/vision-missions",
-              host: ["{{baseUrl}}"],
-              path: ["vision-missions"]
-            },
+            url: { raw: "{{baseUrl}}/vision-missions", host: ["{{baseUrl}}"], path: ["vision-missions"] },
             description: "ສ້າງຂໍ້ມູນວິໄສທັດ/ພາລະກິດ\n- entryType: VISION | MISSION | CORE_VALUES | SLOGAN\n- status: ACTIVE | INACTIVE"
           },
           response: []
@@ -1056,12 +806,7 @@ const collection = {
           name: "Update Vision & Mission (ແກ້ໄຂຂໍ້ມູນ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1077,13 +822,7 @@ const collection = {
               raw: "{{baseUrl}}/vision-missions/:id",
               host: ["{{baseUrl}}"],
               path: ["vision-missions", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂໍ້ມູນ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂໍ້ມູນ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ"
           },
@@ -1098,13 +837,7 @@ const collection = {
               raw: "{{baseUrl}}/vision-missions/:id",
               host: ["{{baseUrl}}"],
               path: ["vision-missions", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂໍ້ມູນທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂໍ້ມູນທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຂໍ້ມູນວິໄສທັດ/ພາລະກິດອອກຈາກລະບົບ"
           },
@@ -1117,25 +850,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/vision-missions/:id/upload/image",
               host: ["{{baseUrl}}"],
               path: ["vision-missions", ":id", "upload", "image"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂໍ້ມູນ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂໍ້ມູນ" }]
             },
             description: "ອັບໂຫຼດຮູບພາບສຳລັບວິໄສທັດ/ພາລະກິດ"
           },
@@ -1154,11 +875,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/electrical-knowledge",
-              host: ["{{baseUrl}}"],
-              path: ["electrical-knowledge"]
-            },
+            url: { raw: "{{baseUrl}}/electrical-knowledge", host: ["{{baseUrl}}"], path: ["electrical-knowledge"] },
             description: "ດຶງລາຍຊື່ບົດຄວາມ ແລະ ວິດິໂອຄວາມຮູ້ດ້ານໄຟຟ້າທັງໝົດ"
           },
           response: []
@@ -1172,13 +889,7 @@ const collection = {
               raw: "{{baseUrl}}/electrical-knowledge/:id",
               host: ["{{baseUrl}}"],
               path: ["electrical-knowledge", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງບົດຄວາມ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງບົດຄວາມ" }]
             },
             description: "ດຶງລາຍລະອຽດບົດຄວາມຕາມ ID"
           },
@@ -1188,12 +899,7 @@ const collection = {
           name: "Create Electrical Knowledge (ສ້າງບົດຄວາມໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1204,25 +910,16 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/electrical-knowledge",
-              host: ["{{baseUrl}}"],
-              path: ["electrical-knowledge"]
-            },
-            description: "ສ້າງບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າໃໝ່ (ຮອງຮັບ HTML content ຈາກ Rich Text Editor)\n- status: ACTIVE | DRAFT | ARCHIVED"
+            url: { raw: "{{baseUrl}}/electrical-knowledge", host: ["{{baseUrl}}"], path: ["electrical-knowledge"] },
+            description: "ສ້າງບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າໃໝ່ (ຮອງຮັບ HTML content)\n- status: ACTIVE | DRAFT | ARCHIVED"
           },
           response: []
         },
         {
           name: "Update Electrical Knowledge (ແກ້ໄຂບົດຄວາມ)",
           request: {
-            method: "PATCH",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1235,13 +932,7 @@ const collection = {
               raw: "{{baseUrl}}/electrical-knowledge/:id",
               host: ["{{baseUrl}}"],
               path: ["electrical-knowledge", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງບົດຄວາມ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງບົດຄວາມ" }]
             },
             description: "ແກ້ໄຂບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
           },
@@ -1256,13 +947,7 @@ const collection = {
               raw: "{{baseUrl}}/electrical-knowledge/:id",
               host: ["{{baseUrl}}"],
               path: ["electrical-knowledge", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງບົດຄວາມທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງບົດຄວາມທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຂໍ້ມູນບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
           },
@@ -1275,25 +960,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/electrical-knowledge/:id/upload/cover",
               host: ["{{baseUrl}}"],
               path: ["electrical-knowledge", ":id", "upload", "cover"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງບົດຄວາມ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງບົດຄວາມ" }]
             },
             description: "ອັບໂຫຼດຮູບໜ້າປົກສຳລັບບົດຄວາມຄວາມຮູ້ດ້ານໄຟຟ້າ"
           },
@@ -1305,16 +978,10 @@ const collection = {
             method: "PUT",
             header: [],
             url: {
-              raw: "{{baseUrl}}/electrical-knowledge/:id",
+              raw: "{{baseUrl}}/electrical-knowledge/:id/view",
               host: ["{{baseUrl}}"],
-              path: ["electrical-knowledge", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງບົດຄວາມ"
-                }
-              ]
+              path: ["electrical-knowledge", ":id", "view"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງບົດຄວາມ" }]
             },
             description: "ເພີ່ມຍອດເຂົ້າຊົມ (viewCount) ຂອງບົດຄວາມ"
           },
@@ -1333,11 +1000,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/magazines",
-              host: ["{{baseUrl}}"],
-              path: ["magazines"]
-            },
+            url: { raw: "{{baseUrl}}/magazines", host: ["{{baseUrl}}"], path: ["magazines"] },
             description: "ດຶງລາຍຊື່ວາລະສານທັງໝົດໃນລະບົບ"
           },
           response: []
@@ -1351,13 +1014,7 @@ const collection = {
               raw: "{{baseUrl}}/magazines/:id",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ດຶງລາຍລະອຽດວາລະສານຕາມ ID"
           },
@@ -1367,12 +1024,7 @@ const collection = {
           name: "Create Magazine (ສ້າງວາລະສານໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1384,11 +1036,7 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/magazines",
-              host: ["{{baseUrl}}"],
-              path: ["magazines"]
-            },
+            url: { raw: "{{baseUrl}}/magazines", host: ["{{baseUrl}}"], path: ["magazines"] },
             description: "ສ້າງຂໍ້ມູນວາລະສານໃໝ່\n- status: ACTIVE | INACTIVE"
           },
           response: []
@@ -1397,12 +1045,7 @@ const collection = {
           name: "Update Magazine (ແກ້ໄຂວາລະສານ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1414,13 +1057,7 @@ const collection = {
               raw: "{{baseUrl}}/magazines/:id",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນວາລະສານ"
           },
@@ -1435,13 +1072,7 @@ const collection = {
               raw: "{{baseUrl}}/magazines/:id",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ລຶບວາລະສານອອກຈາກລະບົບ"
           },
@@ -1456,13 +1087,7 @@ const collection = {
               raw: "{{baseUrl}}/magazines/:id/download",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id", "download"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ເພີ່ມຍອດດາວໂຫຼດ (downloadCount) ຂອງວາລະສານ"
           },
@@ -1475,25 +1100,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/magazines/:id/upload/cover",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id", "upload", "cover"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ອັບໂຫຼດຮູບໜ້າປົກວາລະສານ"
           },
@@ -1506,25 +1119,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ເອກະສານ PDF"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ເອກະສານ PDF" }]
             },
             url: {
               raw: "{{baseUrl}}/magazines/:id/upload/document",
               host: ["{{baseUrl}}"],
               path: ["magazines", ":id", "upload", "document"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງວາລະສານ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງວາລະສານ" }]
             },
             description: "ອັບໂຫຼດໄຟລ໌ PDF ຂອງວາລະສານ"
           },
@@ -1543,11 +1144,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/news-categories",
-              host: ["{{baseUrl}}"],
-              path: ["news-categories"]
-            },
+            url: { raw: "{{baseUrl}}/news-categories", host: ["{{baseUrl}}"], path: ["news-categories"] },
             description: "ດຶງລາຍຊື່ໝວດໝູ່ຂ່າວທັງໝົດ"
           },
           response: []
@@ -1561,13 +1158,7 @@ const collection = {
               raw: "{{baseUrl}}/news-categories/:id",
               host: ["{{baseUrl}}"],
               path: ["news-categories", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໝວດໝູ່ຂ່າວ" }]
             },
             description: "ດຶງລາຍລະອຽດໝວດໝູ່ຂ່າວຕາມ ID"
           },
@@ -1577,12 +1168,7 @@ const collection = {
           name: "Create News Category (ສ້າງໝວດໝູ່ຂ່າວໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1592,11 +1178,7 @@ const collection = {
                 status: "ACTIVE"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/news-categories",
-              host: ["{{baseUrl}}"],
-              path: ["news-categories"]
-            },
+            url: { raw: "{{baseUrl}}/news-categories", host: ["{{baseUrl}}"], path: ["news-categories"] },
             description: "ສ້າງໝວດໝູ່ຂ່າວໃໝ່\n- status: ACTIVE | INACTIVE"
           },
           response: []
@@ -1604,13 +1186,8 @@ const collection = {
         {
           name: "Update News Category (ແກ້ໄຂໝວດໝູ່ຂ່າວ)",
           request: {
-            method: "PATCH",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1622,13 +1199,7 @@ const collection = {
               raw: "{{baseUrl}}/news-categories/:id",
               host: ["{{baseUrl}}"],
               path: ["news-categories", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໝວດໝູ່ຂ່າວ" }]
             },
             description: "ແກ້ໄຂໝວດໝູ່ຂ່າວ"
           },
@@ -1643,13 +1214,7 @@ const collection = {
               raw: "{{baseUrl}}/news-categories/:id",
               host: ["{{baseUrl}}"],
               path: ["news-categories", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງໝວດໝູ່ຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງໝວດໝູ່ຂ່າວ" }]
             },
             description: "ລຶບໝວດໝູ່ຂ່າວອອກຈາກລະບົບ"
           },
@@ -1669,11 +1234,16 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/news",
+              raw: "{{baseUrl}}/news?search=&page=1&limit=10",
               host: ["{{baseUrl}}"],
-              path: ["news"]
+              path: ["news"],
+              query: [
+                { key: "search", value: "", description: "ຄຳຄົ້ນຫາຫົວຂໍ້ຂ່າວ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
             },
-            description: "ດຶງລາຍການຂ່າວສານປະຊາສຳພັນທັງໝົດ"
+            description: "ດຶງລາຍການຂ່າວສານປະຊາສຳພັນທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
           },
           response: []
         },
@@ -1686,13 +1256,7 @@ const collection = {
               raw: "{{baseUrl}}/news/:id",
               host: ["{{baseUrl}}"],
               path: ["news", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວ" }]
             },
             description: "ດຶງລາຍລະອຽດຂ່າວສານຕາມ ID"
           },
@@ -1702,12 +1266,7 @@ const collection = {
           name: "Create News (ສ້າງຂ່າວໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1717,10 +1276,7 @@ const collection = {
                 subtitleLa: "ເພື່ອຮອງຮັບການຊົມໃຊ້ໄຟຟ້າທີ່ເພີ່ມຂຶ້ນໃນນະຄອນຫຼວງ",
                 subtitleEn: "To accommodate growing electricity demand",
                 coverImage: "/uploads/news/covers/sample.jpg",
-                galleryImages: [
-                  "/uploads/news/galleries/img1.jpg",
-                  "/uploads/news/galleries/img2.jpg"
-                ],
+                galleryImages: ["/uploads/news/galleries/img1.jpg", "/uploads/news/galleries/img2.jpg"],
                 videoUrl: "https://www.youtube.com/watch?v=sample",
                 contentLa: "<p>ເນື້ອໃນຂ່າວສານພາສາລາວ...</p>",
                 contentEn: "<p>English news content...</p>",
@@ -1728,11 +1284,7 @@ const collection = {
                 status: "PUBLISHED"
               }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/news",
-              host: ["{{baseUrl}}"],
-              path: ["news"]
-            },
+            url: { raw: "{{baseUrl}}/news", host: ["{{baseUrl}}"], path: ["news"] },
             description: "ສ້າງຂ່າວສານໃໝ່\n- status: DRAFT | PUBLISHED | ARCHIVED"
           },
           response: []
@@ -1740,13 +1292,8 @@ const collection = {
         {
           name: "Update News (ແກ້ໄຂຂ່າວ)",
           request: {
-            method: "PATCH",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
               raw: JSON.stringify({
@@ -1758,13 +1305,7 @@ const collection = {
               raw: "{{baseUrl}}/news/:id",
               host: ["{{baseUrl}}"],
               path: ["news", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນຂ່າວສານ"
           },
@@ -1779,13 +1320,7 @@ const collection = {
               raw: "{{baseUrl}}/news/:id",
               host: ["{{baseUrl}}"],
               path: ["news", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວທີ່ຕ້ອງການລຶບ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວທີ່ຕ້ອງການລຶບ" }]
             },
             description: "ລຶບຂ່າວສານອອກຈາກລະບົບ"
           },
@@ -1794,19 +1329,13 @@ const collection = {
         {
           name: "Increment View Count (ເພີ່ມຍອດເຂົ້າຊົມຂ່າວ)",
           request: {
-            method: "PATCH",
+            method: "PUT",
             header: [],
             url: {
               raw: "{{baseUrl}}/news/:id/view",
               host: ["{{baseUrl}}"],
               path: ["news", ":id", "view"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວ" }]
             },
             description: "ເພີ່ມຍອດເຂົ້າຊົມ (viewCount) ຂອງຂ່າວສານ"
           },
@@ -1819,25 +1348,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "file",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)"
-                }
-              ]
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
             },
             url: {
               raw: "{{baseUrl}}/news/:id/upload/cover",
               host: ["{{baseUrl}}"],
               path: ["news", ":id", "upload", "cover"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວ" }]
             },
             description: "ອັບໂຫຼດຮູບໜ້າປົກຂ່າວ (1 ຮູບ)"
           },
@@ -1850,25 +1367,13 @@ const collection = {
             header: [],
             body: {
               mode: "formdata",
-              formdata: [
-                {
-                  key: "files",
-                  type: "file",
-                  description: "ເລືອກໄຟລ໌ຮູບພາບ Gallery ຫຼາຍຮູບ (ສູງສຸດ 10 ຮູບ)"
-                }
-              ]
+              formdata: [{ key: "files", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ Gallery ຫຼາຍຮູບ (ສູງສຸດ 10 ຮູບ)" }]
             },
             url: {
               raw: "{{baseUrl}}/news/:id/upload/gallery",
               host: ["{{baseUrl}}"],
               path: ["news", ":id", "upload", "gallery"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງຂ່າວ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຂ່າວ" }]
             },
             description: "ອັບໂຫຼດຮູບພາບ Gallery ສຳລັບຂ່າວສານ (ຫຼາຍຮູບ, ສູງສຸດ 10 ຮູບ)"
           },
@@ -1887,11 +1392,7 @@ const collection = {
           request: {
             method: "GET",
             header: [],
-            url: {
-              raw: "{{baseUrl}}/news-tags",
-              host: ["{{baseUrl}}"],
-              path: ["news-tags"]
-            },
+            url: { raw: "{{baseUrl}}/news-tags", host: ["{{baseUrl}}"], path: ["news-tags"] },
             description: "ດຶງລາຍຊື່ແທັກຂ່າວສານທັງໝົດ"
           },
           response: []
@@ -1905,13 +1406,7 @@ const collection = {
               raw: "{{baseUrl}}/news-tags/:id",
               host: ["{{baseUrl}}"],
               path: ["news-tags", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງແທັກ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງແທັກ" }]
             },
             description: "ດຶງລາຍລະອຽດແທັກຕາມ ID"
           },
@@ -1921,23 +1416,12 @@ const collection = {
           name: "Create News Tag (ສ້າງແທັກໃໝ່)",
           request: {
             method: "POST",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                tagName: "ພະລັງງານສະອາດ"
-              }, null, 2)
+              raw: JSON.stringify({ tagName: "ພະລັງງານສະອາດ" }, null, 2)
             },
-            url: {
-              raw: "{{baseUrl}}/news-tags",
-              host: ["{{baseUrl}}"],
-              path: ["news-tags"]
-            },
+            url: { raw: "{{baseUrl}}/news-tags", host: ["{{baseUrl}}"], path: ["news-tags"] },
             description: "ສ້າງແທັກຂ່າວສານໃໝ່"
           },
           response: []
@@ -1946,29 +1430,16 @@ const collection = {
           name: "Update News Tag (ແກ້ໄຂແທັກ)",
           request: {
             method: "PUT",
-            header: [
-              {
-                key: "Content-Type",
-                value: "application/json"
-              }
-            ],
+            header: [{ key: "Content-Type", value: "application/json" }],
             body: {
               mode: "raw",
-              raw: JSON.stringify({
-                tagName: "ພະລັງງານສະອາດ (ປັບປຸງ)"
-              }, null, 2)
+              raw: JSON.stringify({ tagName: "ພະລັງງານສະອາດ (ປັບປຸງ)" }, null, 2)
             },
             url: {
               raw: "{{baseUrl}}/news-tags/:id",
               host: ["{{baseUrl}}"],
               path: ["news-tags", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງແທັກ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງແທັກ" }]
             },
             description: "ແກ້ໄຂຂໍ້ມູນແທັກ"
           },
@@ -1983,15 +1454,623 @@ const collection = {
               raw: "{{baseUrl}}/news-tags/:id",
               host: ["{{baseUrl}}"],
               path: ["news-tags", ":id"],
-              variable: [
-                {
-                  key: "id",
-                  value: "1",
-                  description: "ID ຂອງແທັກ"
-                }
-              ]
+              variable: [{ key: "id", value: "1", description: "ID ຂອງແທັກ" }]
             },
             description: "ລຶບແທັກອອກຈາກລະບົບ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 16. Legislations Module
+    {
+      name: "16. Legislations",
+      description: "ໂມດູນຈັດການເອກະສານນິຕິກຳ, ດຳລັດ, ຂໍ້ຕົກລົງ ແລະ ລະບຽບການ ພ້ອມໄຟລ໌ PDF",
+      item: [
+        {
+          name: "Get All Legislations (ດຶງເອກະສານນິຕິກຳທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/legislations?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["legislations"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາເລກທີ ຫຼື ຊື່ເອກະສານ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
+            },
+            description: "ດຶງລາຍການເອກະສານນິຕິກຳທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          response: []
+        },
+        {
+          name: "Get Legislation By ID (ດຶງເອກະສານນິຕິກຳຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/legislations/:id",
+              host: ["{{baseUrl}}"],
+              path: ["legislations", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງນິຕິກຳ" }]
+            },
+            description: "ດຶງລາຍລະອຽດເອກະສານນິຕິກຳຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Legislation (ສ້າງເອກະສານນິຕິກຳໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                documentNumber: "012/ຟຟລ",
+                title: "ຂໍ້ຕົກລົງວ່າດ້ວຍການຄຸ້ມຄອງ ແລະ ນຳໃຊ້ຕາຂ່າຍໄຟຟ້າ",
+                fileUrl: "/uploads/legislations/sample.pdf",
+                issueDate: "2026-09-01T00:00:00.000Z",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/legislations", host: ["{{baseUrl}}"], path: ["legislations"] },
+            description: "ສ້າງເອກະສານນິຕິກຳໃໝ່\n- status: ACTIVE | INACTIVE | ARCHIVED"
+          },
+          response: []
+        },
+        {
+          name: "Update Legislation (ແກ້ໄຂເອກະສານນິຕິກຳ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ຂໍ້ຕົກລົງວ່າດ້ວຍການຄຸ້ມຄອງ ແລະ ນຳໃຊ້ຕາຂ່າຍໄຟຟ້າ (ສະບັບປັບປຸງ)",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/legislations/:id",
+              host: ["{{baseUrl}}"],
+              path: ["legislations", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງນິຕິກຳ" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນເອກະສານນິຕິກຳ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Legislation (ລຶບເອກະສານນິຕິກຳ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/legislations/:id",
+              host: ["{{baseUrl}}"],
+              path: ["legislations", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງນິຕິກຳທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບເອກະສານນິຕິກຳອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Legislation Document (ອັບໂຫຼດໄຟລ໌ PDF ນິຕິກຳ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ເອກະສານ PDF" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/legislations/:id/upload/document",
+              host: ["{{baseUrl}}"],
+              path: ["legislations", ":id", "upload", "document"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງນິຕິກຳ" }]
+            },
+            description: "ອັບໂຫຼດໄຟລ໌ PDF ສຳລັບເອກະສານນິຕິກຳ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 17. Electricity Tariffs Module
+    {
+      name: "17. Electricity Tariffs",
+      description: "ໂມດູນຈັດການໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ (ທີ່ຢູ່ອາໄສ, ທຸລະກິດ, ອຸດສາຫະກຳ) ພ້ອມໄຟລ໌ PDF ແລະ ຮູບພາບ",
+      item: [
+        {
+          name: "Get All Tariffs (ດຶງອັດຕາຄ່າໄຟຟ້າທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາຊື່ໂຄງສ້າງອັດຕາ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
+            },
+            description: "ດຶງລາຍການອັດຕາຄ່າໄຟຟ້າທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          response: []
+        },
+        {
+          name: "Get Tariff By ID (ດຶງອັດຕາຄ່າໄຟຟ້າຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງອັດຕາຄ່າໄຟຟ້າ" }]
+            },
+            description: "ດຶງລາຍລະອຽດອັດຕາຄ່າໄຟຟ້າຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Tariff (ສ້າງອັດຕາຄ່າໄຟຟ້າໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ ສຳລັບທີ່ຢູ່ອາໄສ ປີ 2026",
+                tariffType: "RESIDENTIAL",
+                imageUrl: "/uploads/electricity-tariffs/images/sample.jpg",
+                pdfUrl: "/uploads/electricity-tariffs/documents/sample.pdf",
+                effectiveDate: "2026-01-01T00:00:00.000Z",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/electricity-tariffs", host: ["{{baseUrl}}"], path: ["electricity-tariffs"] },
+            description: "ສ້າງໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າໃໝ່\n- tariffType: RESIDENTIAL | COMMERCIAL | INDUSTRIAL\n- status: ACTIVE | INACTIVE | HISTORICAL"
+          },
+          response: []
+        },
+        {
+          name: "Update Tariff (ແກ້ໄຂອັດຕາຄ່າໄຟຟ້າ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ ສຳລັບທີ່ຢູ່ອາໄສ ປີ 2026 (ສະບັບປັບປຸງ)",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງອັດຕາຄ່າໄຟຟ້າ" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Tariff (ລຶບອັດຕາຄ່າໄຟຟ້າ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs/:id",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງອັດຕາຄ່າໄຟຟ້າທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບອັດຕາຄ່າໄຟຟ້າອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Tariff Image (ອັບໂຫຼດຮູບພາບປະກອບ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs/:id/upload/image",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs", ":id", "upload", "image"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງອັດຕາຄ່າໄຟຟ້າ" }]
+            },
+            description: "ອັບໂຫຼດຮູບພາບຕາຕະລາງອັດຕາຄ່າໄຟຟ້າ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Tariff Document (ອັບໂຫຼດໄຟລ໌ PDF ອັດຕາຄ່າໄຟ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ເອກະສານ PDF" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/electricity-tariffs/:id/upload/document",
+              host: ["{{baseUrl}}"],
+              path: ["electricity-tariffs", ":id", "upload", "document"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງອັດຕາຄ່າໄຟຟ້າ" }]
+            },
+            description: "ອັບໂຫຼດໄຟລ໌ PDF ລາຍລະອຽດອັດຕາຄ່າໄຟຟ້າ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 18. Procurements Module
+    {
+      name: "18. Procurements",
+      description: "ໂມດູນຈັດການປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງ, ເອກະສານ TOR ພ້ອມໄຟລ໌ PDF",
+      item: [
+        {
+          name: "Get All Procurements (ດຶງການປະມູນທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/procurements?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["procurements"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາເລກທີປະມູນ ຫຼື ຫົວຂໍ້ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
+            },
+            description: "ດຶງລາຍການປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          response: []
+        },
+        {
+          name: "Get Procurement By ID (ດຶງການປະມູນຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/procurements/:id",
+              host: ["{{baseUrl}}"],
+              path: ["procurements", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງການປະມູນ" }]
+            },
+            description: "ດຶງລາຍລະອຽດການປະມູນຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Procurement (ສ້າງການປະມູນໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                tenderNumber: "EDL-PROC-2026-001",
+                title: "ປະກາດປະມູນຈັດຊື້ອຸປະກອນໝໍ້ແປງໄຟຟ້າ",
+                fileUrl: "/uploads/procurements/documents/tor.pdf",
+                imageUrl: "/uploads/procurements/images/sample.jpg",
+                startDate: "2026-10-01T00:00:00.000Z",
+                endDate: "2026-10-31T17:00:00.000Z",
+                description: "<p>ລາຍລະອຽດການປະມູນຈັດຊື້ອຸປະກອນໄຟຟ້າ...</p>",
+                status: "OPEN"
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/procurements", host: ["{{baseUrl}}"], path: ["procurements"] },
+            description: "ສ້າງປະກາດປະມູນໃໝ່\n- status: DRAFT | OPEN | CLOSED | CANCELLED | AWARDED"
+          },
+          response: []
+        },
+        {
+          name: "Update Procurement (ແກ້ໄຂການປະມູນ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ປະກາດປະມູນຈັດຊື້ອຸປະກອນໝໍ້ແປງໄຟຟ້າ (ຂະຫຍາຍເວລາ)",
+                status: "OPEN"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/procurements/:id",
+              host: ["{{baseUrl}}"],
+              path: ["procurements", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງການປະມູນ" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນການປະມູນ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Procurement (ລຶບການປະມູນ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/procurements/:id",
+              host: ["{{baseUrl}}"],
+              path: ["procurements", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງການປະມູນທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບການປະມູນອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Procurement Image (ອັບໂຫຼດຮູບປະກອບການປະມູນ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/procurements/:id/upload/image",
+              host: ["{{baseUrl}}"],
+              path: ["procurements", ":id", "upload", "image"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງການປະມູນ" }]
+            },
+            description: "ອັບໂຫຼດຮູບພາບປະກອບການປະກາດປະມູນ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Procurement Document (ອັບໂຫຼດໄຟລ໌ TOR/PDF)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ເອກະສານ PDF (TOR)" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/procurements/:id/upload/document",
+              host: ["{{baseUrl}}"],
+              path: ["procurements", ":id", "upload", "document"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງການປະມູນ" }]
+            },
+            description: "ອັບໂຫຼດໄຟລ໌ PDF ລາຍລະອຽດການປະມູນ (TOR)"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 19. Positions Module
+    {
+      name: "19. Positions",
+      description: "ໂມດູນຈັດການຂໍ້ມູນຕຳແໜ່ງງານ (Master Data)",
+      item: [
+        {
+          name: "Get All Positions (ດຶງຕຳແໜ່ງງານທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/positions?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["positions"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາຊື່ຕຳແໜ່ງ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
+            },
+            description: "ດຶງລາຍຊື່ຕຳແໜ່ງງານທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          response: []
+        },
+        {
+          name: "Get Position By ID (ດຶງຕຳແໜ່ງຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/positions/:id",
+              host: ["{{baseUrl}}"],
+              path: ["positions", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຕຳແໜ່ງ" }]
+            },
+            description: "ດຶງລາຍລະອຽດຕຳແໜ່ງງານຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Position (ສ້າງຕຳແໜ່ງງານໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                positionName: "ວິສະວະກອນໄຟຟ້າ",
+                description: "ຮັບຜິດຊອບລະບົບສາຍສົ່ງ ແລະ ສະຖານີໄຟຟ້າ",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/positions", host: ["{{baseUrl}}"], path: ["positions"] },
+            description: "ສ້າງຕຳແໜ່ງງານໃໝ່\n- status: ACTIVE | INACTIVE"
+          },
+          response: []
+        },
+        {
+          name: "Update Position (ແກ້ໄຂຕຳແໜ່ງງານ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                positionName: "ວິສະວະກອນໄຟຟ້າອາວຸໂສ",
+                status: "ACTIVE"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/positions/:id",
+              host: ["{{baseUrl}}"],
+              path: ["positions", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຕຳແໜ່ງ" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນຕຳແໜ່ງງານ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Position (ລຶບຕຳແໜ່ງງານ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/positions/:id",
+              host: ["{{baseUrl}}"],
+              path: ["positions", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຕຳແໜ່ງທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບຕຳແໜ່ງງານອອກຈາກລະບົບ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 20. Job Postings Module
+    {
+      name: "20. Job Postings",
+      description: "ໂມດູນຈັດການປະກາດຮັບສະໝັກພະນັກງານໃໝ່ ພ້ອມກຳນົດວັນທີ ແລະ ຮູບພາບ",
+      item: [
+        {
+          name: "Get All Job Postings (ດຶງປະກາດຮັບສະໝັກທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/job-postings?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["job-postings"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາຫົວຂໍ້ປະກາດ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
+            },
+            description: "ດຶງລາຍການປະກາດຮັບສະໝັກພະນັກງານທັງໝົດ (ຮອງຮັບ pagination ແລະ search)"
+          },
+          response: []
+        },
+        {
+          name: "Get Job Posting By ID (ດຶງປະກາດຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/job-postings/:id",
+              host: ["{{baseUrl}}"],
+              path: ["job-postings", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງປະກາດ" }]
+            },
+            description: "ດຶງລາຍລະອຽດປະກາດຮັບສະໝັກຕາມ ID"
+          },
+          response: []
+        },
+        {
+          name: "Create Job Posting (ສ້າງປະກາດຮັບສະໝັກໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                positionId: 1,
+                title: "ຮັບສະໝັກພະນັກງານ ຕຳແໜ່ງ ວິສະວະກອນໄຟຟ້າ",
+                subtitle: "ປະຈຳສາຂານະຄອນຫຼວງ 1",
+                imageUrl: "/uploads/job-postings/sample.jpg",
+                startDate: "2026-10-01T00:00:00.000Z",
+                endDate: "2026-10-25T17:00:00.000Z",
+                description: "<p>ເງື່ອນໄຂຜູ້ສະໝັກ: ຈົບປະລິນຍາຕີຂະແໜງວິສະວະກຳໄຟຟ້າ...</p>",
+                status: "OPEN"
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/job-postings", host: ["{{baseUrl}}"], path: ["job-postings"] },
+            description: "ສ້າງປະກາດຮັບສະໝັກງານໃໝ່\n- status: OPEN | CLOSED | CANCELLED"
+          },
+          response: []
+        },
+        {
+          name: "Update Job Posting (ແກ້ໄຂປະກາດຮັບສະໝັກ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                title: "ຮັບສະໝັກພະນັກງານ ຕຳແໜ່ງ ວິສະວະກອນໄຟຟ້າ (ຂະຫຍາຍເວລາ)",
+                status: "OPEN"
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/job-postings/:id",
+              host: ["{{baseUrl}}"],
+              path: ["job-postings", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງປະກາດ" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນປະກາດຮັບສະໝັກງານ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Job Posting (ລຶບປະກາດຮັບສະໝັກ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/job-postings/:id",
+              host: ["{{baseUrl}}"],
+              path: ["job-postings", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງປະກາດທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບປະກາດຮັບສະໝັກງານອອກຈາກລະບົບ"
+          },
+          response: []
+        },
+        {
+          name: "Upload Job Posting Image (ອັບໂຫຼດຮູບພາບປະກາດ)",
+          request: {
+            method: "POST",
+            header: [],
+            body: {
+              mode: "formdata",
+              formdata: [{ key: "file", type: "file", description: "ເລືອກໄຟລ໌ຮູບພາບ (JPG, PNG, WEBP)" }]
+            },
+            url: {
+              raw: "{{baseUrl}}/job-postings/:id/upload/image",
+              host: ["{{baseUrl}}"],
+              path: ["job-postings", ":id", "upload", "image"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງປະກາດ" }]
+            },
+            description: "ອັບໂຫຼດຮູບພາບສຳລັບປະກາດຮັບສະໝັກງານ"
           },
           response: []
         }

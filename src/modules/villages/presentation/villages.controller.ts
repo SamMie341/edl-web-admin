@@ -1,4 +1,4 @@
-import { Controller, Get, Post, UseGuards } from "@nestjs/common";
+import { Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
 import { SyncVillagesUseCase } from "../application/use-cases/sync-villages.use-case.js";
 import { GetVillagesUseCase } from "../application/use-cases/get-villages.use-case.js";
@@ -22,7 +22,13 @@ export class VillagesController {
     }
 
     @Get()
-    findAll() {
-        return this.getVillagesUseCase.execute();
+    async findAll(@Query('districtId') districtId?: string) {
+        const parsedDistrictId = districtId ? parseInt(districtId, 10) : undefined;
+        return await this.getVillagesUseCase.execute(parsedDistrictId);
+    }
+
+    @Get('district/:districtId')
+    async findByDistrict(@Param('districtId', ParseIntPipe) districtId: number) {
+        return await this.getVillagesUseCase.execute(districtId);
     }
 }

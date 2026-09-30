@@ -7,8 +7,9 @@ import { PrismaService } from "../../../../core/database/prisma.service.js";
 export class PrismaVillageRepository implements IVillageRepository {
     constructor(private readonly prisma: PrismaService) { }
 
-    async findAll(): Promise<Village[]> {
+    async findAll(districtId?: number): Promise<Village[]> {
         return this.prisma.village.findMany({
+            where: districtId ? { districtId } : undefined,
             include: { district: true },
             orderBy: { id: 'asc' }
         });

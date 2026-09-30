@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -32,18 +32,26 @@ export class NewsController {
     create(@Body() createDto: CreateNewsDto) { return this.createUseCase.execute(createDto); }
 
     @Get()
-    findAll() { return this.getAllUseCase.execute(); }
+    findAll(
+        @Query('search') search?: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+    ) {
+        const pageNum = page ? parseInt(page, 10) : 1;
+        const limitNum = limit ? parseInt(limit, 10) : 10;
+        return this.getAllUseCase.execute(search, pageNum, limitNum);
+    }
 
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 
-    @Patch(':id')
+    @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateNewsDto) { return this.updateUseCase.execute(id, updateDto); }
 
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
 
-    @Patch(':id/view')
+    @Put(':id/view')
     async incrementViewCount(@Param('id', ParseIntPipe) id: number) {
         const updated = await this.incrementViewUseCase.execute(id);
         return { message: 'ເພີ່ມຍອດເຂົ້າຊົມສຳເລັດ', viewCount: updated.viewCount };

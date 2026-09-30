@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
 import { CreateNewsCategoryDto } from '../application/dtos/create-news-category.dto.js';
 import { UpdateNewsCategoryDto } from '../application/dtos/update-news-category.dto.js';
@@ -34,7 +34,7 @@ export class NewsCategoriesController {
         return this.getByIdUseCase.execute(id);
     }
 
-    @Patch(':id')
+    @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateNewsCategoryDto) {
         return this.updateUseCase.execute(id, updateDto);
     }

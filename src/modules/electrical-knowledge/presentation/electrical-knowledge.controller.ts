@@ -43,7 +43,7 @@ export class ElectricalKnowledgeController {
         return this.getByIdUseCase.execute(id);
     }
 
-    @Patch(':id')
+    @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateElectricalKnowledgeDto) {
         return this.updateUseCase.execute(id, updateDto);
     }
@@ -75,7 +75,7 @@ export class ElectricalKnowledgeController {
         return { message: 'ອັບໂຫຼດຮູບປົກສຳເລັດ', imagePath, data: updatedRecord };
     }
 
-    @Put(':id')
+    @Put(':id/view')
     async incrementViewCount(@Param('id', ParseIntPipe) id: number) {
         const updatedArticle = await this.incrementViewUseCase.execute(id);
         return {

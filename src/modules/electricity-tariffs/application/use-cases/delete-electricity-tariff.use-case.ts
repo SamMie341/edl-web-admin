@@ -1,0 +1,12 @@
+import { Injectable, Inject, NotFoundException } from '@nestjs/common';
+import * as electricityTariffRepositoryInterface from '../../domain/repositories/electricity-tariff.repository.interface.js';
+
+@Injectable()
+export class DeleteElectricityTariffUseCase {
+    constructor(@Inject(electricityTariffRepositoryInterface.ELECTRICITY_TARIFF_REPOSITORY) private readonly repository: electricityTariffRepositoryInterface.IElectricityTariffRepository) { }
+    async execute(id: number) {
+        const existing = await this.repository.findById(id);
+        if (!existing) throw new NotFoundException('ບໍ່ພົບຂໍ້ມູນລາຄາໄຟຟ້າ');
+        return this.repository.delete(id);
+    }
+}

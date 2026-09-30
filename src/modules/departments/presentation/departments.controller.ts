@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
 import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
 import { CreateDepartmentDto } from '../application/dtos/create-department.dto.js';
 import { UpdateDepartmentDto } from '../application/dtos/update-department.dto.js';
@@ -34,7 +34,7 @@ export class DepartmentsController {
         return this.getByIdUseCase.execute(id);
     }
 
-    @Patch(':id')
+    @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDepartmentDto: UpdateDepartmentDto) {
         return this.updateUseCase.execute(id, updateDepartmentDto);
     }

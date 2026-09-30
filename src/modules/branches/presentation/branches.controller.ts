@@ -1,4 +1,4 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -83,8 +83,14 @@ export class BranchesController {
 
     // GET /api/v1/branches
     @Get()
-    findAll() {
-        return this.getBranchesUseCase.execute();
+    findAll(@Query('departmentId') departmentId?: string) {
+        const parsedDepartmentId = departmentId ? parseInt(departmentId, 10) : undefined;
+        return this.getBranchesUseCase.execute(parsedDepartmentId);
+    }
+
+    @Get('department/:departmentId')
+    findByDepartment(@Param('departmentId', ParseIntPipe) departmentId: number) {
+        return this.getBranchesUseCase.execute(departmentId);
     }
 
     @Post()

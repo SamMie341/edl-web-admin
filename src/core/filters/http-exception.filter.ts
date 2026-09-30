@@ -23,9 +23,12 @@ export class HttpExceptionFilter implements ExceptionFilter {
         } else if (exception?.code === 'P2025') {
             status = HttpStatus.NOT_FOUND;
             message = exception.meta?.cause || 'ບໍ່ພົບຂໍ້ມູນທີ່ຕ້ອງການໃນລະບົບ';
+        } else if (exception?.code === 'ECONNREFUSED' || exception?.code === 'P1001' || exception?.name === 'PrismaClientInitializationError') {
+            status = HttpStatus.SERVICE_UNAVAILABLE;
+            message = 'ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບຖານຂໍ້ມູນໄດ້ (Database connection refused). ກະລຸນາກວດສອບວ່າ PostgreSQL ກຳລັງເຮັດວຽກຢູ່';
         }
 
-        if (!(exception instanceof HttpException) && !['P2002', 'P2003', 'P2025'].includes(exception?.code)) {
+        if (!(exception instanceof HttpException) && !['P2002', 'P2003', 'P2025', 'ECONNREFUSED', 'P1001'].includes(exception?.code)) {
             console.error('[HttpExceptionFilter] Unhandled Error:', exception);
         }
 

@@ -5,7 +5,7 @@ import * as villageRepositoryInterface from "../../domain/repositories/village.r
 export class GetVillagesUseCase {
     constructor(@Inject(villageRepositoryInterface.VILLAGE_REPOSITORY) private readonly villageRepository: villageRepositoryInterface.IVillageRepository,) { }
 
-    async execute() {
-        return this.villageRepository.findAll();
+    async execute(districtId?: number) {
+        return this.villageRepository.findAll(districtId);
     }
 }

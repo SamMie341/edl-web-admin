@@ -5,7 +5,7 @@ import * as branchRepositoryInterface from '../../domain/repositories/branch.rep
 export class GetBranchesUseCase {
     constructor(@Inject(branchRepositoryInterface.BRANCH_REPOSITORY) private readonly branchRepository: branchRepositoryInterface.IBranchRepository) { }
 
-    async execute() {
-        return this.branchRepository.findAll();
+    async execute(departmentId?: number) {
+        return this.branchRepository.findAll(departmentId);
     }
 }
