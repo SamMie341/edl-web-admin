@@ -8,6 +8,7 @@ import { GetVisionMissionUseCase } from "./application/use-cases/get-vision-miss
 import { UploadVisionMissionImageUseCase } from "./application/use-cases/upload-vision-mission-image.use-case.js";
 import { VISION_MISSION_REPOSITORY } from "./domain/repositories/vision-mission.repository.interface.js";
 import { PrismaVisionMissionRepository } from "./infrastructure/database/prisma-vision-mission.repository.js";
+import { GetVisionMissionByIdUseCase } from "./application/use-cases/get-vision-mission-by-id.use-case.js";
 
 @Module({
     imports: [PrismaModule],
@@ -18,6 +19,7 @@ import { PrismaVisionMissionRepository } from "./infrastructure/database/prisma-
         DeleteVisionMissionUseCase,
         GetVisionMissionUseCase,
         UploadVisionMissionImageUseCase,
+        GetVisionMissionByIdUseCase,
         {
             provide: VISION_MISSION_REPOSITORY,
             useClass: PrismaVisionMissionRepository,

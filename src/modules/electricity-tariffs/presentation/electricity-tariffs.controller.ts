@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateElectricityTariffDto } from '../application/dtos/create-electricity-tariff.dto.js';
 import { UpdateElectricityTariffDto } from '../application/dtos/update-electricity-tariff.dto.js';
 import { CreateElectricityTariffUseCase } from '../application/use-cases/create-electricity-tariff.use-case.js';
@@ -29,6 +30,7 @@ export class ElectricityTariffsController {
     @Post()
     create(@Body() createDto: CreateElectricityTariffDto) { return this.createUseCase.execute(createDto); }
 
+    @Public()
     @Get()
     findAll(
         @Query('search') search?: string,
@@ -40,6 +42,7 @@ export class ElectricityTariffsController {
         return this.getAllUseCase.execute(search, pageNum, limitNum);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 

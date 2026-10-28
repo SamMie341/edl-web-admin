@@ -1,5 +1,6 @@
-import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { Public } from "../../../core/decorators/public.decorator.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { SyncServiceCenterUseCase } from "../application/use-cases/sync-service-center.use-case.js";
 import { GetServiceUseCase } from "../application/use-cases/get-service-center.use-case.js";
 import { GetServiceByIdUseCase } from "../application/use-cases/get-service-center-by-id.use-case.js";
@@ -88,11 +89,20 @@ export class ServiceCenterController {
         };
     }
 
+    @Public()
     @Get()
-    async findAll() {
-        return await this.getUseCase.execute();
+    async findAll(@Query('provinceId') provinceId?: string) {
+        const parsedProvinceId = provinceId ? parseInt(provinceId, 10) : undefined;
+        return await this.getUseCase.execute(parsedProvinceId);
     }
 
+    @Public()
+    @Get('province/:provinceId')
+    async findByProvince(@Param('provinceId', ParseIntPipe) provinceId: number) {
+        return await this.getUseCase.execute(provinceId);
+    }
+
+    @Public()
     @Get(':id')
     async findOne(@Param('id', ParseIntPipe) id: number) {
         return await this.getByIdUseCase.execute(id);

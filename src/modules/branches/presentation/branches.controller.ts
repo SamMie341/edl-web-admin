@@ -3,13 +3,15 @@ import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { SyncBranchesUseCase } from '../application/use-cases/sync-branches.use-case.js';
 import { GetBranchesUseCase } from '../application/use-cases/get-branches.use-case.js';
 import { CreateBranchUseCase } from '../application/use-cases/create-branch.use-case.js';
 import { UpdateBranchUseCase } from '../application/use-cases/update-branch.use-case.js';
 import { DeleteBranchUseCase } from '../application/use-cases/delete-branch.use-case.js';
 import { GetBranchByIdUseCase } from '../application/use-cases/get-branch-by-id.use-case.js';
+import { GetBranchesDropdownUseCase } from '../application/use-cases/get-branches-dropdown.use-case.js';
 import { CreateBranchDto } from '../application/dtos/create-branch.dto.js';
 import { UpdateBranchDto } from '../application/dtos/update-branch.dto.js';
 import { UploadBranchImageUseCase } from '../application/use-cases/upload-branch-image.use-case.js';
@@ -26,6 +28,7 @@ export class BranchesController {
         private readonly updateUseCase: UpdateBranchUseCase,
         private readonly deleteUseCase: DeleteBranchUseCase,
         private readonly getByIdUseCase: GetBranchByIdUseCase,
+        private readonly getBranchesDropdownUseCase: GetBranchesDropdownUseCase,
 
         private readonly uploadBranchImageUseCase: UploadBranchImageUseCase,
     ) { }
@@ -82,12 +85,22 @@ export class BranchesController {
     }
 
     // GET /api/v1/branches
+    @Public()
     @Get()
     findAll(@Query('departmentId') departmentId?: string) {
         const parsedDepartmentId = departmentId ? parseInt(departmentId, 10) : undefined;
         return this.getBranchesUseCase.execute(parsedDepartmentId);
     }
 
+    // GET /api/v1/branches/dropdown
+    @Public()
+    @Get('dropdown')
+    dropdown(@Query('departmentId') departmentId?: string) {
+        const parsedDepartmentId = departmentId ? parseInt(departmentId, 10) : undefined;
+        return this.getBranchesDropdownUseCase.execute(parsedDepartmentId);
+    }
+
+    @Public()
     @Get('department/:departmentId')
     findByDepartment(@Param('departmentId', ParseIntPipe) departmentId: number) {
         return this.getBranchesUseCase.execute(departmentId);
@@ -98,6 +111,7 @@ export class BranchesController {
         return this.createUseCase.execute(createBranchDto);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.getByIdUseCase.execute(id);

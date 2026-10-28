@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query, Put } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreatePositionDto } from '../application/dtos/create-position.dto.js';
 import { UpdatePositionDto } from '../application/dtos/update-position.dto.js';
 import { CreatePositionUseCase } from '../application/use-cases/create-position.use-case.js';
@@ -22,6 +23,7 @@ export class PositionsController {
     @Post()
     create(@Body() createDto: CreatePositionDto) { return this.createUseCase.execute(createDto); }
 
+    @Public()
     @Get()
     findAll(
         @Query('search') search?: string,
@@ -33,6 +35,7 @@ export class PositionsController {
         return this.getAllUseCase.execute(search, pageNum, limitNum);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 

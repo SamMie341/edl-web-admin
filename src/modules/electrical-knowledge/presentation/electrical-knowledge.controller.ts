@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateElectricalKnowledgeDto } from '../application/dtos/create-electrical-knowledge.dto.js';
 import { UpdateElectricalKnowledgeDto } from '../application/dtos/update-electrical-knowledge.dto.js';
 import { CreateElectricalKnowledgeUseCase } from '../application/use-cases/create-electrical-knowledge.use-case.js';
@@ -33,11 +34,13 @@ export class ElectricalKnowledgeController {
         return this.createUseCase.execute(createDto);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getAllUseCase.execute();
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.getByIdUseCase.execute(id);
@@ -75,6 +78,7 @@ export class ElectricalKnowledgeController {
         return { message: 'ອັບໂຫຼດຮູບປົກສຳເລັດ', imagePath, data: updatedRecord };
     }
 
+    @Public()
     @Put(':id/view')
     async incrementViewCount(@Param('id', ParseIntPipe) id: number) {
         const updatedArticle = await this.incrementViewUseCase.execute(id);

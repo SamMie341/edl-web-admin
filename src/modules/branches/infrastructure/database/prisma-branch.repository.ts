@@ -46,6 +46,26 @@ export class PrismaBranchRepository implements IBranchRepository {
             orderBy: { orderIndex: 'asc' },
         });
     }
+    async findForDropdown(departmentId?: number): Promise<Partial<Branch>[]> {
+        return this.prisma.branch.findMany({
+            where: {
+                status: 'ACTIVE',
+                ...(departmentId ? { departmentId } : {}),
+            },
+            select: {
+                id: true,
+                branchName: true,
+                departmentId: true,
+                department: {
+                    select: {
+                        id: true,
+                        name: true,
+                    },
+                },
+            },
+            orderBy: { orderIndex: 'asc' },
+        });
+    }
 
     async upsert(id: number, data: any): Promise<Branch> {
         // ໃຊ້ upsert ເພື່ອສ້າງໃໝ່ຖ້າຍັງບໍ່ມີ (ໂດຍອ້າງອີງ id ເດີມ) ຫຼື ອັບເດດຖ້າມີແລ້ວ

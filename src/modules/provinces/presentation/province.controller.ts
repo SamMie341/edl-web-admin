@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Query, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { Public } from "../../../core/decorators/public.decorator.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { GetProvincesUseCase } from "../application/use-cases/get-provinces.use-case.js";
 import { SyncProvinceUseCase } from "../application/use-cases/sync-provinces.use-case.js";
 
@@ -21,6 +22,7 @@ export class ProvinceController {
         };
     }
 
+    @Public()
     @Get()
     async findAll(@Query('includeDistricts') includeDistricts?: string) {
         return this.getUseCase.execute(includeDistricts === 'true');

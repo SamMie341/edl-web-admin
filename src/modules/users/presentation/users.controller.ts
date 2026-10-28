@@ -1,5 +1,5 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Patch, Post, Put, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { GetUsersUseCase } from "../application/use-cases/get-users.use-case.js";
 import { SyncUserUseCase } from "../application/use-cases/sync-user.use-case.js";
 import { UpdateUserUseCase } from "../application/use-cases/update-users.use-case.js";

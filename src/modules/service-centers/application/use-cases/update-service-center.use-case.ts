@@ -3,6 +3,25 @@ import * as serviceCenterRepositoryInterface from "../../domain/repositories/ser
 import { UpdateServiceCenterDto } from "../dtos/update-service-center.dto.js";
 import { PrismaService } from "../../../../core/database/prisma.service.js";
 
+function parseCoordinate(val: any): number | null | undefined {
+    if (val === undefined) return undefined;
+    if (val === null) return null;
+    if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (trimmed === '') return null;
+        const num = parseFloat(trimmed);
+        if (isNaN(num)) {
+            throw new BadRequestException('ຄ່າພິກັດແຜນທີ່ບໍ່ຖືກຕ້ອງ (ຕ້ອງເປັນຕົວເລກ)');
+        }
+        return num;
+    }
+    if (typeof val === 'number') {
+        if (isNaN(val)) return null;
+        return val;
+    }
+    return null;
+}
+
 @Injectable()
 export class UpdateServiceCenterUseCase {
     constructor(
@@ -28,12 +47,18 @@ export class UpdateServiceCenterUseCase {
             if (!dept) throw new BadRequestException(`ບໍ່ພົບຂໍ້ມູນຝ່າຍ (Department ID: ${departmentId})`);
         }
 
-        const dataToUpdate = {
+        const dataToUpdate: any = {
             ...dto,
             ...(departmentId && { departmentId }),
-            ...(dto.latitude && { latitude: parseFloat(dto.latitude.toString()) }),
-            ...(dto.longitude && { longitude: parseFloat(dto.longitude.toString()) })
         };
+
+        if (dto.latitude !== undefined) {
+            dataToUpdate.latitude = parseCoordinate(dto.latitude);
+        }
+        if (dto.longitude !== undefined) {
+            dataToUpdate.longitude = parseCoordinate(dto.longitude);
+        }
+
         return this.repo.update(id, dataToUpdate);
     }
 }

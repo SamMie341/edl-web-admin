@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateProcurementDto } from '../application/dtos/create-procurement.dto.js';
 import { UpdateProcurementDto } from '../application/dtos/update-procurement.dto.js';
 import { CreateProcurementUseCase } from '../application/use-cases/create-procurement.use-case.js';
@@ -29,6 +30,7 @@ export class ProcurementsController {
     @Post()
     create(@Body() createDto: CreateProcurementDto) { return this.createUseCase.execute(createDto); }
 
+    @Public()
     @Get()
     findAll(
         @Query('search') search?: string,
@@ -40,6 +42,7 @@ export class ProcurementsController {
         return this.getAllUseCase.execute(search, pageNum, limitNum);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 

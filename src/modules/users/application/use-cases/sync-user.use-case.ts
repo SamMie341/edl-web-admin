@@ -1,5 +1,6 @@
 import { Injectable, Inject, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
-import { AuthService } from '../../../auth/auth.service.js';
+import { PASSWORD_HASHER } from '../../../auth/domain/services/password-hasher.interface.js';
+import type { IPasswordHasher } from '../../../auth/domain/services/password-hasher.interface.js';
 import * as hrmServiceInterface from '../../domain/repositories/hrm.service.interface.js';
 import * as userRepositoryInterface from '../../domain/repositories/user.repository.interface.js';
 import { PrismaService } from '../../../../core/database/prisma.service.js';
@@ -10,7 +11,8 @@ export class SyncUserUseCase {
     constructor(
         @Inject(hrmServiceInterface.HRM_SERVICE)
         private readonly hrmService: hrmServiceInterface.IHrmService,
-        private readonly authService: AuthService,
+        @Inject(PASSWORD_HASHER)
+        private readonly passwordHasher: IPasswordHasher,
         @Inject(userRepositoryInterface.USER_REPOSITORY)
         private readonly userRepository: userRepositoryInterface.IUserRepository,
         private readonly prismaService: PrismaService,
@@ -42,7 +44,7 @@ export class SyncUserUseCase {
                 });
             } else {
                 const defaultPassword = `EDL${emp.emp_code}`;
-                const passwordHash = await this.authService.hashPassword(defaultPassword);
+                const passwordHash = await this.passwordHasher.hash(defaultPassword);
 
                 user = await this.userRepository.create({
                     employeeCode: emp.emp_code.toString(),

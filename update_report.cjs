@@ -5,7 +5,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 > **ລະບົບບໍລິຫານຈັດການຂໍ້ມູນ ລັດວິສາຫະກິດໄຟຟ້າລາວ (EDL Admin Management System)**  
 > **ພາສາ/ເທັກໂນໂລຢີ:** NestJS (TypeScript), Prisma ORM, PostgreSQL  
 > **ສະຖາປັດຕະຍະກຳ:** Clean Architecture / Domain-Driven Design (DDD)  
-> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 20 ໂມດູນ (109 Endpoints)  
+> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 20 ໂມດູນ (110 Endpoints)  
 > **ອັບເດດຫຼ້າສຸດ:** 2026-09-30
 
 ---
@@ -186,16 +186,18 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 #### Use Cases ໃນລະບົບ:
 1. **\`SyncBranchesUseCase\`**: ດຶງຂໍ້ມູນຈາກ Legacy API, ດາວໂຫຼດຮູບພາບອັດຕະໂນມັດ ແລະ Upsert ລົງຖານຂໍ້ມູນ.
 2. **\`GetBranchesUseCase\`**: ດຶງລາຍຊື່ສາຂາທັງໝົດ (ຮອງຮັບ Filter ຕາມ \`departmentId\`).
-3. **\`GetBranchByIdUseCase\`**: ດຶງລາຍລະອຽດສາຂາຕາມ ID ພ້ອມຂໍ້ມູນຝ່າຍສັງກັດ.
-4. **\`CreateBranchUseCase\`**: ສ້າງຂໍ້ມູນສາຂາໃໝ່.
-5. **\`UpdateBranchUseCase\`**: ແກ້ໄຂຂໍ້ມູນສາຂາ ແລະ ສະຖານະ (\`ACTIVE\`, \`INACTIVE\`, \`UNDER_MAINTENANCE\`).
-6. **\`DeleteBranchUseCase\`**: ລຶບສາຂາອອກຈາກລະບົບ.
-7. **\`UploadBranchImageUseCase\`**: ອັບໂຫຼດຮູບພາບສາຂາ (\`BRANCH\`, \`COVER\`, \`STRUCTURE\`).
+3. **\`GetBranchesDropdownUseCase\`**: ດຶງລາຍຊື່ສາຂາສຳລັບສະແດງໃນ Dropdown (ສະເພາະ ACTIVE, ຮອງຮັບ Filter ຕາມ \`departmentId\`).
+4. **\`GetBranchByIdUseCase\`**: ດຶງລາຍລະອຽດສາຂາຕາມ ID ພ້ອມຂໍ້ມູນຝ່າຍສັງກັດ.
+5. **\`CreateBranchUseCase\`**: ສ້າງຂໍ້ມູນສາຂາໃໝ່.
+6. **\`UpdateBranchUseCase\`**: ແກ້ໄຂຂໍ້ມູນສາຂາ ແລະ ສະຖານະ (\`ACTIVE\`, \`INACTIVE\`, \`UNDER_MAINTENANCE\`).
+7. **\`DeleteBranchUseCase\`**: ລຶບສາຂາອອກຈາກລະບົບ.
+8. **\`UploadBranchImageUseCase\`**: ອັບໂຫຼດຮູບພາບສາຂາ (\`BRANCH\`, \`COVER\`, \`STRUCTURE\`).
 
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
 | \`GET\` | \`/api/v1/branches\` | JWT | ດຶງລາຍຊື່ສາຂາທັງໝົດ (ຮອງຮັບ \`?departmentId=\`) |
+| \`GET\` | \`/api/v1/branches/dropdown\` | JWT | ດຶງລາຍການສາຂາສຳລັບ Dropdown (ຮອງຮັບ \`?departmentId=\`) |
 | \`GET\` | \`/api/v1/branches/department/:departmentId\` | JWT | ດຶງສາຂາທີ່ຂຶ້ນກັບຝ່າຍຕາມ ID |
 | \`GET\` | \`/api/v1/branches/:id\` | JWT | ດຶງຂໍ້ມູນສາຂາຕາມ ID |
 | \`POST\` | \`/api/v1/branches\` | JWT | ສ້າງສາຂາໃໝ່ |

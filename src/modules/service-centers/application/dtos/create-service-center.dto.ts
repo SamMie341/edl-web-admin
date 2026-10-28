@@ -31,11 +31,9 @@ export class CreateServiceCenterDto {
     phoneNumber?: string;
 
     @IsOptional()
-    @IsString() // ຖ້າສົ່ງມາເປັນ string ແລ້ວຄ່ອຍແປງເປັນ Decimal ຕອນ save, ຫຼືໃຊ້ @IsNumber ຖ້າສົ່ງມາເປັນ number ແລ້ວ
     longitude?: string | number;
 
     @IsOptional()
-    @IsString()
     latitude?: string | number;
 
     @IsOptional()

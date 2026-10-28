@@ -12,7 +12,7 @@ export class CreateOrgStructureDto {
 
     @IsOptional() // ຫຼື IsOptional() ຖ້າອະນຸຍາດໃຫ້ບໍ່ມີຮູບຕອນສ້າງ
     @IsString()
-    imageUrl: string;
+    imageUrl?: string;
 
     @IsOptional()
     @IsInt()

@@ -6,6 +6,7 @@ export const BRANCH_REPOSITORY = 'BRANCH_REPOSITORY';
 export interface IBranchRepository {
     findAll(departmentId?: number): Promise<Branch[]>;
     findById(id: number): Promise<Branch | null>;
+    findForDropdown(departmentId?: number): Promise<Partial<Branch>[]>;
     create(data: any): Promise<Branch>;
     update(id: number, data: any): Promise<Branch>;
     delete(id: number): Promise<Branch>;

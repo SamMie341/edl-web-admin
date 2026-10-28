@@ -24,6 +24,25 @@ const DEFAULT_PROVINCE_BRANCH_MAP: Record<number, { branchId: number; department
     18: { branchId: 31, departmentId: 5 },
 };
 
+function parseCoordinate(val: any): number | null | undefined {
+    if (val === undefined) return undefined;
+    if (val === null) return null;
+    if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (trimmed === '') return null;
+        const num = parseFloat(trimmed);
+        if (isNaN(num)) {
+            throw new BadRequestException('ຄ່າພິກັດແຜນທີ່ບໍ່ຖືກຕ້ອງ (ຕ້ອງເປັນຕົວເລກ)');
+        }
+        return num;
+    }
+    if (typeof val === 'number') {
+        if (isNaN(val)) return null;
+        return val;
+    }
+    return null;
+}
+
 @Injectable()
 export class CreateServiceCenterUseCase {
     constructor(
@@ -106,8 +125,8 @@ export class CreateServiceCenterUseCase {
             ...dto,
             branchId,
             departmentId,
-            latitude: dto.latitude ? parseFloat(dto.latitude.toString()) : null,
-            longitude: dto.longitude ? parseFloat(dto.longitude.toString()) : null,
+            latitude: parseCoordinate(dto.latitude) ?? null,
+            longitude: parseCoordinate(dto.longitude) ?? null,
         };
 
         return this.repo.create(dataToSave);

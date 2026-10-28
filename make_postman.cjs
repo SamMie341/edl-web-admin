@@ -286,6 +286,21 @@ const collection = {
           response: []
         },
         {
+          name: "Get Branches Dropdown (ດຶງ Dropdown ສາຂາ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/branches/dropdown?departmentId=1",
+              host: ["{{baseUrl}}"],
+              path: ["branches", "dropdown"],
+              query: [{ key: "departmentId", value: "1", description: "ກັ່ນຕອງຕາມ ID ຝ່າຍ (optional)" }]
+            },
+            description: "ດຶງລາຍຊື່ສາຂາສຳລັບສະແດງໃນ Dropdown (ສະເພາະ ACTIVE, ຮອງຮັບ ?departmentId=...)"
+          },
+          response: []
+        },
+        {
           name: "Get Branch By ID (ດຶງຂໍ້ມູນສາຂາຕາມ ID)",
           request: {
             method: "GET",

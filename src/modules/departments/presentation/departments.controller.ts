@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateDepartmentDto } from '../application/dtos/create-department.dto.js';
 import { UpdateDepartmentDto } from '../application/dtos/update-department.dto.js';
 import { CreateDepartmentUseCase } from '../application/use-cases/create-department.use-case.js';
@@ -24,11 +25,13 @@ export class DepartmentsController {
         return this.createUseCase.execute(createDepartmentDto);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getDepartmentsUseCase.execute();
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.getByIdUseCase.execute(id);

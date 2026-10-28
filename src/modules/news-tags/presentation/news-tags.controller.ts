@@ -1,5 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { Public } from "../../../core/decorators/public.decorator.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { CreateNewsTagUseCase } from "../application/use-cases/create-news-tag.use-case.js";
 import { UpdateNewsTagUseCase } from "../application/use-cases/update-news-tag.use-case.js";
 import { DeleteNewsTagUseCase } from "../application/use-cases/delete-news-tag-use-case.js";
@@ -34,11 +35,13 @@ export class NewsTagsController {
         return this.deleteUseCase.execute(id);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getAllUseCase.execute();
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.getByIdUseCase.execute(id);

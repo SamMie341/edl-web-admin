@@ -7,7 +7,7 @@ export class GetServiceUseCase {
         @Inject(serviceCenterRepositoryInterface.SERVICE_CENTER_REPOSITORY) private readonly repo: serviceCenterRepositoryInterface.IServiceCenterRepository,
     ) { }
 
-    async execute() {
-        return this.repo.findAll();
+    async execute(provinceId?: number) {
+        return this.repo.findAll(provinceId);
     }
 }

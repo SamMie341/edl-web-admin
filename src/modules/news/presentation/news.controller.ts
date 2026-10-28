@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateNewsDto } from '../application/dtos/create-news.dto.js';
 import { UpdateNewsDto } from '../application/dtos/update-news.dto.js';
 import { CreateNewsUseCase } from '../application/use-cases/create-news.use-case.js';
@@ -31,6 +32,7 @@ export class NewsController {
     @Post()
     create(@Body() createDto: CreateNewsDto) { return this.createUseCase.execute(createDto); }
 
+    @Public()
     @Get()
     findAll(
         @Query('search') search?: string,
@@ -42,6 +44,7 @@ export class NewsController {
         return this.getAllUseCase.execute(search, pageNum, limitNum);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 
@@ -51,6 +54,7 @@ export class NewsController {
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
 
+    @Public()
     @Put(':id/view')
     async incrementViewCount(@Param('id', ParseIntPipe) id: number) {
         const updated = await this.incrementViewUseCase.execute(id);

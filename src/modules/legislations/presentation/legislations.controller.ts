@@ -4,7 +4,8 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import * as fs from 'fs';
 import { editFileName, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateLegislationDto } from '../application/dto/create-legislation.dto.js';
 import { UpdateLegislationDto } from '../application/dto/update-legislation.dto.js';
 import { CreateLegislationUseCase } from '../application/use-cases/create-legislation.use-case.js';
@@ -29,6 +30,7 @@ export class LegislationsController {
   @Post()
   create(@Body() createDto: CreateLegislationDto) { return this.createUseCase.execute(createDto); }
 
+  @Public()
   @Get()
   findAll(@Query('search') search?: string,
     @Query('page') page?: string,
@@ -39,6 +41,7 @@ export class LegislationsController {
     return this.getAllUseCase.execute(search, pageNum, limitNum);
   }
 
+  @Public()
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 

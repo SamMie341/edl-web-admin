@@ -12,6 +12,7 @@ import { CreateBranchUseCase } from './application/use-cases/create-branch.use-c
 import { UpdateBranchUseCase } from './application/use-cases/update-branch.use-case.js';
 import { DeleteBranchUseCase } from './application/use-cases/delete-branch.use-case.js';
 import { GetBranchByIdUseCase } from './application/use-cases/get-branch-by-id.use-case.js';
+import { GetBranchesDropdownUseCase } from './application/use-cases/get-branches-dropdown.use-case.js';
 import { UploadBranchImageUseCase } from './application/use-cases/upload-branch-image.use-case.js';
 
 @Module({
@@ -20,6 +21,7 @@ import { UploadBranchImageUseCase } from './application/use-cases/upload-branch-
     providers: [
         SyncBranchesUseCase,
         GetBranchesUseCase,
+        GetBranchesDropdownUseCase,
         CreateBranchUseCase,
         UpdateBranchUseCase,
         DeleteBranchUseCase,

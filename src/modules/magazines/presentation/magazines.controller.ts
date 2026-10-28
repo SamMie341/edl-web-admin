@@ -1,6 +1,7 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import * as fs from 'fs';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateMagazineUseCase } from '../application/use-cases/create-magazine.use-case.js';
 import { UpdateMagazineUseCase } from '../application/use-cases/update-magazine.use-case.js';
 import { DeleteMagazinUseCase } from '../application/use-cases/delete-magazine.use-case.js';
@@ -43,16 +44,19 @@ export class MagazinesController {
         return this.deleteUseCase.execute(id);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getUseCase.execute();
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) {
         return this.getByIdUseCase.execute(id);
     }
 
+    @Public()
     @Put(':id/download')
     async incrementDownloadCount(@Param('id', ParseIntPipe) id: number) {
         const updated = await this.incrementDownloadUseCase.execute(id);

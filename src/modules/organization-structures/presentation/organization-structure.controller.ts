@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { Public } from "../../../core/decorators/public.decorator.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { CreateOrgStructureUseCase } from "../application/use-cases/create-org-structure.use-case.js";
 import { UpdateOrgStructureUseCase } from "../application/use-cases/update-org-structure.use-case.js";
 import { DeleteOrgStructureUseCase } from "../application/use-cases/delete-org-strcuture.use-case.js";
@@ -41,11 +42,13 @@ export class OrganizationStructureController {
         return this.deleteUseCase.execute(id);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getUseCase.execute();
     }
 
+    @Public()
     @Get('dropdown')
     dropdown() {
         return this.getDroddownUseCase.execute();

@@ -1,5 +1,6 @@
 import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query, Put, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
-import { JwtAuthGuard } from '../../auth/guards/jwt-auth.guard.js';
+import { Public } from '../../../core/decorators/public.decorator.js';
+import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { CreateJobPostingDto } from '../application/dtos/create-job-posting.dto.js';
 import { UpdateJobPostingDto } from '../application/dtos/update-job-posting.dto.js';
 import { CreateJobPostingUseCase } from '../application/use-cases/create-job-posting.use-case.js';
@@ -29,6 +30,7 @@ export class JobPostingsController {
     @Post()
     create(@Body() createDto: CreateJobPostingDto) { return this.createUseCase.execute(createDto); }
 
+    @Public()
     @Get()
     findAll(
         @Query('search') search?: string,
@@ -40,6 +42,7 @@ export class JobPostingsController {
         return this.getAllUseCase.execute(search, pageNum, limitNum);
     }
 
+    @Public()
     @Get(':id')
     findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
 

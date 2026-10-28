@@ -1,5 +1,6 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
-import { JwtAuthGuard } from "../../auth/guards/jwt-auth.guard.js";
+import { Public } from "../../../core/decorators/public.decorator.js";
+import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { CreateVisionMissionUseCase } from "../application/use-cases/create-vision-mission.use-case.js";
 import { UpdateVisionMissionUseCase } from "../application/use-cases/update-vision-mission.use-case.js";
 import { DeleteVisionMissionUseCase } from "../application/use-cases/delete-vision-mission.use-case.js";
@@ -12,6 +13,7 @@ import { diskStorage } from "multer";
 import { join } from "path";
 import * as fs from 'fs';
 import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
+import { GetVisionMissionByIdUseCase } from "../application/use-cases/get-vision-mission-by-id.use-case.js";
 
 @UseGuards(JwtAuthGuard)
 @Controller('vision-missions')
@@ -22,6 +24,7 @@ export class VisionMissionController {
         private readonly deleteUseCase: DeleteVisionMissionUseCase,
         private readonly getUseCase: GetVisionMissionUseCase,
         private readonly uploadImageUseCase: UploadVisionMissionImageUseCase,
+        private readonly getById: GetVisionMissionByIdUseCase,
     ) { }
 
     @Post()
@@ -39,9 +42,16 @@ export class VisionMissionController {
         return this.deleteUseCase.execute(id);
     }
 
+    @Public()
     @Get()
     findAll() {
         return this.getUseCase.execute();
+    }
+
+    @Public()
+    @Get(':id')
+    async findOne(@Param('id', ParseIntPipe) id: number) {
+        return await this.getById.execute(id);
     }
 
     @Post(':id/upload/image')
