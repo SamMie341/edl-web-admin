@@ -5,7 +5,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 > **ລະບົບບໍລິຫານຈັດການຂໍ້ມູນ ລັດວິສາຫະກິດໄຟຟ້າລາວ (EDL Admin Management System)**  
 > **ພາສາ/ເທັກໂນໂລຢີ:** NestJS (TypeScript), Prisma ORM, PostgreSQL  
 > **ສະຖາປັດຕະຍະກຳ:** Clean Architecture / Domain-Driven Design (DDD)  
-> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 20 ໂມດູນ (110 Endpoints)  
+> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 20 ໂມດູນ (112 Endpoints)  
 > **ອັບເດດຫຼ້າສຸດ:** 2026-09-30
 
 ---
@@ -82,13 +82,13 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 | **1. Auth** | \`/api/v1/auth\` | 1 | ລະບົບ Hash ລະຫັດຜ່ານ (Bcrypt), JWT Auth | ພ້ອມໃຊ້ງານ |
 | **2. Users** | \`/api/v1/users\` | 5 | EDL HRM API (Sync ພະນັກງານ) | ພ້ອມໃຊ້ງານ |
 | **3. Departments** | \`/api/v1/departments\` | 5 | - | ພ້ອມໃຊ້ງານ |
-| **4. Branches** | \`/api/v1/branches\` | 8 | EDL Inside API (Sync ສາຂາ & ຮູບພາບ) | ພ້ອມໃຊ້ງານ |
-| **5. Service Centers** | \`/api/v1/service-centers\` | 7 | EDL Inside API (Sync ສູນບໍລິການ & ຮູບພາບ) | ພ້ອມໃຊ້ງານ |
+| **4. Branches** | \`/api/v1/branches\` | 9 | EDL Inside API (Sync ສາຂາ & ຮູບພາບ) | ພ້ອມໃຊ້ງານ |
+| **5. Service Centers** | \`/api/v1/service-centers\` | 8 | EDL Inside API (Sync ສູນບໍລິການ & ຮູບພາບ) | ພ້ອມໃຊ້ງານ |
 | **6. Provinces** | \`/api/v1/provinces\` | 2 | EDL HRM Address API | ພ້ອມໃຊ້ງານ |
 | **7. Districts** | \`/api/v1/districts\` | 3 | EDL HRM District API | ພ້ອມໃຊ້ງານ |
 | **8. Villages** | \`/api/v1/villages\` | 3 | EDL HRM Village API | ພ້ອມໃຊ້ງານ |
 | **9. Organization Structures** | \`/api/v1/org-structures\` | 6 | File System (/uploads/org-structures) | ພ້ອມໃຊ້ງານ |
-| **10. Vision & Missions** | \`/api/v1/vision-missions\` | 5 | File System (/uploads/vision-missions) | ພ້ອມໃຊ້ງານ |
+| **10. Vision & Missions** | \`/api/v1/vision-missions\` | 6 | File System (/uploads/vision-missions) | ພ້ອມໃຊ້ງານ |
 | **11. Electrical Knowledge** | \`/api/v1/electrical-knowledge\` | 7 | File System (/uploads/electrical-knowledge) | ພ້ອມໃຊ້ງານ |
 | **12. Magazines** | \`/api/v1/magazines\` | 8 | File System (/uploads/magazines) | ພ້ອມໃຊ້ງານ |
 | **13. News Categories** | \`/api/v1/news-categories\` | 5 | - | ພ້ອມໃຊ້ງານ |
@@ -99,7 +99,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 | **18. Procurements** | \`/api/v1/procurements\` | 7 | File System (/uploads/procurements) | ພ້ອມໃຊ້ງານ |
 | **19. Positions** | \`/api/v1/positions\` | 5 | Master Data ຕຳແໜ່ງງານ | ພ້ອມໃຊ້ງານ |
 | **20. Job Postings** | \`/api/v1/job-postings\` | 6 | File System (/uploads/job-postings) | ພ້ອມໃຊ້ງານ |
-| **ລວມທັງໝົດ (Total)** | **20 Modules** | **109 Endpoints** | | |
+| **ລວມທັງໝົດ (Total)** | **20 Modules** | **112 Endpoints** | | |
 
 ---
 
@@ -217,7 +217,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 
 #### Use Cases ໃນລະບົບ:
 1. **\`SyncServiceCenterUseCase\`**: ຊິ້ງຂໍ້ມູນຈາກ Inside API, Map ທີ່ຕັ້ງ, ດາວໂຫຼດຮູບພາບ.
-2. **\`GetServiceUseCase\`**: ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ ພ້ອມຂໍ້ມູນ Relation ສາຂາ ແລະ ທີ່ຕັ້ງ.
+2. **\`GetServiceUseCase\`**: ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ ພ້ອມຂໍ້ມູນ Relation ສາຂາ ແລະ ທີ່ຕັ້ງ (ຮອງຮັບ Filter ຕາມ \`provinceId\`).
 3. **\`GetServiceByIdUseCase\`**: ດຶງຂໍ້ມູນສູນບໍລິການຕາມ ID.
 4. **\`CreateServiceCenterUseCase\`**: ສ້າງສູນບໍລິການໃໝ່.
 5. **\`UpdateServiceCenterUseCase\`**: ແກ້ໄຂຂໍ້ມູນສູນບໍລິການ.
@@ -227,8 +227,9 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| \`GET\` | \`/api/v1/service-centers\` | JWT | ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ |
-| \`GET\` | \`/api/v1/service-centers/:id\` | JWT | ດຶງຂໍ້ມູນສູນບໍລິການຕາມ ID |
+| \`GET\` | \`/api/v1/service-centers\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ (ຮອງຮັບ \`?provinceId=\`) |
+| \`GET\` | \`/api/v1/service-centers/province/:provinceId\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທີ່ຂຶ້ນກັບແຂວງຕາມ ID |
+| \`GET\` | \`/api/v1/service-centers/:id\` | Public | ດຶງຂໍ້ມູນສູນບໍລິການຕາມ ID |
 | \`POST\` | \`/api/v1/service-centers\` | JWT | ສ້າງສູນບໍລິການໃໝ່ |
 | \`PUT\` | \`/api/v1/service-centers/:id\` | JWT | ແກ້ໄຂຂໍ້ມູນສູນບໍລິການ |
 | \`DELETE\` | \`/api/v1/service-centers/:id\` | JWT | ລຶບສູນບໍລິການ |
@@ -295,10 +296,19 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 * **ທີ່ຕັ້ງໂຟນເດີ:** \`src/modules/vision-missions/\`
 * **ຄວາມຮັບຜິດຊອບ:** ຄຸ້ມຄອງຂໍ້ມູນວິໄສທັດ (Vision), ພາລະກິດ (Mission), ຄ່ານິຍົມຫຼັກ (Core Values), ແລະ ສະໂລແກນ (Slogan).
 
+#### Use Cases ໃນລະບົບ:
+1. **\`GetVisionMissionUseCase\`**: ດຶງຂໍ້ມູນວິໄສທັດ, ພາລະກິດ, ຄ່ານິຍົມຫຼັກ ແລະ ສະໂລແກນທັງໝົດ.
+2. **\`GetVisionMissionByIdUseCase\`**: ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ ຕາມ ID.
+3. **\`CreateVisionMissionUseCase\`**: ສ້າງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດໃໝ່.
+4. **\`UpdateVisionMissionUseCase\`**: ແກ້ໄຂຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ.
+5. **\`DeleteVisionMissionUseCase\`**: ລຶບຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ.
+6. **\`UploadVisionMissionImageUseCase\`**: ອັບໂຫຼດຮູບພາບປະກອບວິໄສທັດ ແລະ ພາລະກິດ.
+
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| \`GET\` | \`/api/v1/vision-missions\` | JWT | ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດທັງໝົດ |
+| \`GET\` | \`/api/v1/vision-missions\` | Public | ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດທັງໝົດ |
+| \`GET\` | \`/api/v1/vision-missions/:id\` | Public | ດຶງຂໍ້ມູນວິໄສທັດ ແລະ ພາລະກິດ ຕາມ ID |
 | \`POST\` | \`/api/v1/vision-missions\` | JWT | ສ້າງຂໍ້ມູນໃໝ່ |
 | \`PUT\` | \`/api/v1/vision-missions/:id\` | JWT | ແກ້ໄຂຂໍ້ມູນ |
 | \`DELETE\` | \`/api/v1/vision-missions/:id\` | JWT | ລຶບຂໍ້ມູນ |

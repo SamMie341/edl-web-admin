@@ -134,7 +134,8 @@ model OrganizationStructure {
   id            Int           @id @default(autoincrement())
   structureType StructureType @map("structure_type")
   structureName String        @map("structure_name")
-  imageUrl      String        @map("image_url")
+  imageUrl      String        @default("") @map("image_url")
+  chartData     Json?         @map("chart_data")
   orderIndex    Int           @default(0) @map("order_index")
   status        CommonStatus  @default(ACTIVE)
   createdAt     DateTime      @default(now()) @map("created_at") @db.Timestamptz

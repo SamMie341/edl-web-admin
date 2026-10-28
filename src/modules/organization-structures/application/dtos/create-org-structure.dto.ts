@@ -1,4 +1,4 @@
-import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';// Import Enum ຈາກ Prisma
+import { IsEnum, IsInt, IsNotEmpty, IsOptional, IsString } from 'class-validator';
 import { CommonStatus, StructureType } from '../../../../generated/prisma/enums.js';
 
 export class CreateOrgStructureDto {
@@ -10,9 +10,12 @@ export class CreateOrgStructureDto {
     @IsString()
     structureName: string;
 
-    @IsOptional() // ຫຼື IsOptional() ຖ້າອະນຸຍາດໃຫ້ບໍ່ມີຮູບຕອນສ້າງ
+    @IsOptional()
     @IsString()
     imageUrl?: string;
+
+    @IsOptional()
+    chartData?: any;
 
     @IsOptional()
     @IsInt()

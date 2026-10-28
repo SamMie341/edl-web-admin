@@ -16,12 +16,12 @@ export class PrismaOrgStructureRepository implements IOrgStructureRepository {
                 structureType: true,
             },
             orderBy: { orderIndex: 'asc' }
-        })
+        });
     }
 
     async findAll(): Promise<OrganizationStructure[]> {
         return this.prisma.organizationStructure.findMany({
-            orderBy: { orderIndex: 'asc' }, // ລຽງລຳດັບຕາມ orderIndex
+            orderBy: { orderIndex: 'asc' },
         });
     }
 
@@ -32,13 +32,18 @@ export class PrismaOrgStructureRepository implements IOrgStructureRepository {
     }
 
     async create(data: any): Promise<OrganizationStructure> {
-        return this.prisma.organizationStructure.create({ data });
+        return this.prisma.organizationStructure.create({
+            data: {
+                ...data,
+                imageUrl: data.imageUrl ?? '',
+            },
+        });
     }
 
     async update(id: number, data: any): Promise<OrganizationStructure> {
         return this.prisma.organizationStructure.update({
             where: { id },
-            data
+            data,
         });
     }
 
