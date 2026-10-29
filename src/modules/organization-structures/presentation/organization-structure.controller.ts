@@ -32,6 +32,34 @@ export class OrganizationStructureController {
         return this.createUseCase.execute(dto);
     }
 
+    @Post('upload-avatar')
+    @UseInterceptors(
+        FileInterceptor('file', {
+            storage: diskStorage({
+                destination(req, file, callback) {
+                    const dest = join(process.cwd(), '..', 'uploads', 'org-structures', 'avatars');
+                    if (!fs.existsSync(dest)) {
+                        fs.mkdirSync(dest, { recursive: true });
+                    }
+                    callback(null, dest);
+                },
+                filename: editFileName,
+            }),
+            fileFilter: imageFileFilter,
+        })
+    )
+    async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
+        if (!file) {
+            throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
+        }
+        const imagePath = `/uploads/org-structures/avatars/${file.filename}`;
+
+        return {
+            message: 'ອັບໂຫຼດຮູບພາບປະຈຳຕົວສຳເລັດ',
+            imagePath: imagePath,
+        };
+    }
+
     @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrgStructureDto) {
         return this.updateUseCase.execute(id, dto);

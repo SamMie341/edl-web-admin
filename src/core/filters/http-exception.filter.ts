@@ -11,8 +11,13 @@ export class HttpExceptionFilter implements ExceptionFilter {
         let status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
         let message = exception instanceof HttpException ? exception.getResponse() : 'Internal server error';
 
+        // Friendly handling for payload too large
+        if (exception?.type === 'entity.too.large' || exception?.status === 413 || exception?.name === 'PayloadTooLargeError') {
+            status = HttpStatus.PAYLOAD_TOO_LARGE;
+            message = 'ຂະໜາດຂໍ້ມູນໃຫຍ່ເກີນກຳນົດ (Payload Too Large: ສູງສຸດ 50MB)';
+        }
         // Friendly handling for Prisma Known Request Errors
-        if (exception?.code === 'P2003') {
+        else if (exception?.code === 'P2003') {
             status = HttpStatus.BAD_REQUEST;
             const field = exception.meta?.field_name || exception.meta?.target || 'foreign key';
             message = `Foreign key constraint failed: ຂໍ້ມູນອ້າງອີງ (${field}) ບໍ່ຖືກຕ້ອງ ຫຼື ບໍ່ມີໃນລະບົບ`;
@@ -28,7 +33,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
             message = 'ບໍ່ສາມາດເຊື່ອມຕໍ່ກັບຖານຂໍ້ມູນໄດ້ (Database connection refused). ກະລຸນາກວດສອບວ່າ PostgreSQL ກຳລັງເຮັດວຽກຢູ່';
         }
 
-        if (!(exception instanceof HttpException) && !['P2002', 'P2003', 'P2025', 'ECONNREFUSED', 'P1001'].includes(exception?.code)) {
+        if (!(exception instanceof HttpException) && !['P2002', 'P2003', 'P2025', 'ECONNREFUSED', 'P1001'].includes(exception?.code) && exception?.type !== 'entity.too.large') {
             console.error('[HttpExceptionFilter] Unhandled Error:', exception);
         }
 
@@ -37,6 +42,6 @@ export class HttpExceptionFilter implements ExceptionFilter {
             timestamp: new Date().toISOString(),
             path: request.url,
             message: typeof message === 'string' ? message : (message as any).message || message,
-        })
+        });
     }
 }
