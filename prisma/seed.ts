@@ -14,77 +14,10 @@ const pool = new pg.Pool({ connectionString, idleTimeoutMillis: 5000, connection
 const adapter = new PrismaPg(pool);
 const prisma = new PrismaClient({ adapter });
 
-/**
- * ຮັບປະກັນວ່າຕາຕະລາງພື້ນຖານທີ່ຈຳເປັນ (roles, permissions, role_permissions, users.role_id)
- * ມີຢູ່ແລ້ວໃນຖານຂໍ້ມູນ ກ່ອນທີ່ Prisma Client ຈະດຳເນີນການ Seed.
- * ວິທີນີ້ປ້ອງກັນຂໍ້ຜິດພາດ P2021 (Table does not exist) ເຖິງແມ່ນວ່າຍັງບໍ່ໄດ້ run migration ກໍຕາມ.
- */
-async function ensureDatabaseSchema() {
-    console.log('Checking and preparing database schema...');
-    const ddl = `
-        CREATE TABLE IF NOT EXISTS "roles" (
-            "id" SERIAL NOT NULL,
-            "name" TEXT NOT NULL,
-            "description" TEXT,
-            "created_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            "updated_at" TIMESTAMPTZ NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT "roles_pkey" PRIMARY KEY ("id")
-        );
-        CREATE UNIQUE INDEX IF NOT EXISTS "roles_name_key" ON "roles"("name");
-
-        CREATE TABLE IF NOT EXISTS "permissions" (
-            "id" SERIAL NOT NULL,
-            "module" TEXT NOT NULL,
-            "action" TEXT NOT NULL,
-            "created_at" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-            CONSTRAINT "permissions_pkey" PRIMARY KEY ("id")
-        );
-        CREATE UNIQUE INDEX IF NOT EXISTS "permissions_module_action_key" ON "permissions"("module", "action");
-
-        CREATE TABLE IF NOT EXISTS "role_permissions" (
-            "role_id" INTEGER NOT NULL,
-            "permission_id" INTEGER NOT NULL,
-            CONSTRAINT "role_permissions_pkey" PRIMARY KEY ("role_id", "permission_id")
-        );
-
-        CREATE TABLE IF NOT EXISTS "user_permissions" (
-            "user_id" INTEGER NOT NULL,
-            "permission_id" INTEGER NOT NULL,
-            CONSTRAINT "user_permissions_pkey" PRIMARY KEY ("user_id", "permission_id")
-        );
-
-        ALTER TABLE "users" ADD COLUMN IF NOT EXISTS "role_id" INTEGER;
-
-        DO $$ 
-        BEGIN 
-            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'role_permissions_role_id_fkey') THEN 
-                ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'role_permissions_permission_id_fkey') THEN 
-                ALTER TABLE "role_permissions" ADD CONSTRAINT "role_permissions_permission_id_fkey" FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'user_permissions_user_id_fkey') THEN 
-                ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_user_id_fkey" FOREIGN KEY ("user_id") REFERENCES "users"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'user_permissions_permission_id_fkey') THEN 
-                ALTER TABLE "user_permissions" ADD CONSTRAINT "user_permissions_permission_id_fkey" FOREIGN KEY ("permission_id") REFERENCES "permissions"("id") ON DELETE CASCADE ON UPDATE CASCADE;
-            END IF;
-            IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'users_role_id_fkey') THEN 
-                ALTER TABLE "users" ADD CONSTRAINT "users_role_id_fkey" FOREIGN KEY ("role_id") REFERENCES "roles"("id") ON DELETE SET NULL ON UPDATE CASCADE;
-            END IF;
-        END $$;
-    `;
-    await pool.query(ddl);
-    console.log('Database schema verified.');
-}
-
 async function main() {
-    console.log('Start seeding...');
+    console.log('==> [Prisma Seed] Starting data seeding...');
 
-    // 0. ກວດສອບ ແລະ ສ້າງຕາຕະລາງທີ່ຈຳເປັນອັດຕະໂນມັດຖ້າຍັງບໍ່ມີ
-    await ensureDatabaseSchema();
-
-    // 1. Seed Roles ມາດຕະຖານ
+    // 1. Seed Roles ມາດຕະຖານ (Standard Roles)
     const standardRoles = [
         { name: 'SUPERADMIN', description: 'ຜູ້ດູແລລະບົບສູງສຸດ (Super Administrator)' },
         { name: 'ADMIN', description: 'ຜູ້ດູແລລະບົບ (Administrator)' },
@@ -101,9 +34,9 @@ async function main() {
         });
         roleMap[r.name] = role.id;
     }
-    console.log('Seeded standard roles:', Object.keys(roleMap).join(', '));
+    console.log(`==> [Prisma Seed] Seeded standard roles: ${Object.keys(roleMap).join(', ')}`);
 
-    // 2. Seed Master Permissions ສຳລັບທຸກໆໂມດູນໃນລະບົບ (ລວມ 20 ໂມດູນ)
+    // 2. Seed Master Permissions ສຳລັບທຸກໆໂມດູນໃນລະບົບ (20 ໂມດູນ)
     const modules = [
         'DEPARTMENTS',
         'BRANCHES',
@@ -129,7 +62,7 @@ async function main() {
 
     const actions = ['READ', 'CREATE', 'UPDATE', 'DELETE'];
 
-    let seededCount = 0;
+    let seededPermCount = 0;
     for (const mod of modules) {
         for (const act of actions) {
             await prisma.permission.upsert({
@@ -145,17 +78,13 @@ async function main() {
                     action: act,
                 },
             });
-            seededCount++;
+            seededPermCount++;
         }
     }
-    console.log(`Seeded ${seededCount} master permissions across ${modules.length} modules.`);
+    console.log(`==> [Prisma Seed] Seeded ${seededPermCount} master permissions across ${modules.length} modules.`);
 
-    // 3. ດຶງ Permissions ທັງໝົດມາກຳນົດໃຫ້ Roles (RolePermission)
+    // 3. ກຳນົດ Permissions ໃຫ້ແຕ່ລະ Role (RolePermission)
     const allPermissions = await prisma.permission.findMany();
-    const permMap: Record<string, number> = {};
-    for (const p of allPermissions) {
-        permMap[`${p.module}:${p.action}`] = p.id;
-    }
 
     // 3.1 SUPERADMIN: ໄດ້ສິດທັງໝົດ 100%
     if (roleMap['SUPERADMIN']) {
@@ -174,7 +103,7 @@ async function main() {
                 },
             });
         }
-        console.log(`Assigned all ${allPermissions.length} permissions to SUPERADMIN.`);
+        console.log(`==> [Prisma Seed] Assigned all ${allPermissions.length} permissions to SUPERADMIN.`);
     }
 
     // 3.2 ADMIN: ໄດ້ສິດທັງໝົດ
@@ -194,10 +123,10 @@ async function main() {
                 },
             });
         }
-        console.log(`Assigned all ${allPermissions.length} permissions to ADMIN.`);
+        console.log(`==> [Prisma Seed] Assigned all ${allPermissions.length} permissions to ADMIN.`);
     }
 
-    // 3.3 EDITOR: ໄດ້ສິດຈັດການເນື້ອຫາ (Content Modules: CREATE, READ, UPDATE, DELETE) ແລະ READ ໂມດູນອື່ນໆ
+    // 3.3 EDITOR: ໄດ້ສິດຈັດການເນື້ອຫາ (Content Modules: CRUD) ແລະ READ ໂມດູນອື່ນໆ
     if (roleMap['EDITOR']) {
         const editorContentModules = [
             'NEWS',
@@ -235,7 +164,7 @@ async function main() {
                 editorPermCount++;
             }
         }
-        console.log(`Assigned ${editorPermCount} permissions to EDITOR.`);
+        console.log(`==> [Prisma Seed] Assigned ${editorPermCount} permissions to EDITOR.`);
     }
 
     // 3.4 STAFF: ໄດ້ສິດ READ ທຸກໆໂມດູນ
@@ -259,7 +188,7 @@ async function main() {
                 staffPermCount++;
             }
         }
-        console.log(`Assigned ${staffPermCount} permissions to STAFF.`);
+        console.log(`==> [Prisma Seed] Assigned ${staffPermCount} permissions to STAFF.`);
     }
 
     // 4. ສ້າງ/ອັບເດດ SuperAdmin User
@@ -282,35 +211,18 @@ async function main() {
             status: 'ACTIVE',
         },
     });
-    console.log('Created/Updated Super Admin User:', superAdmin.email);
+    console.log(`==> [Prisma Seed] Created/Updated Super Admin User: ${superAdmin.email}`);
 
-    // 5. ຖ້າມີ users ເດີມທີ່ຍັງບໍ່ມີ role_id ໃຫ້ sync ກັບ Roles ຕາມ default
-    try {
-        await pool.query(`
-            DO $$
-            BEGIN
-                IF EXISTS (
-                    SELECT 1 FROM information_schema.columns 
-                    WHERE table_name = 'users' AND column_name = 'role'
-                ) THEN
-                    UPDATE "users" u
-                    SET "role_id" = r."id"
-                    FROM "roles" r
-                    WHERE u."role"::text = r."name"
-                      AND u."role_id" IS NULL;
-                END IF;
-            END $$;
-        `);
-    } catch {
-        // Ignore if column 'role' does not exist
-    }
-
-    console.log('Seeding finished successfully.');
+    console.log('==> [Prisma Seed] Seeding finished successfully.');
 }
 
 main()
-    .catch((e) => {
-        console.error('Error during seeding:', e);
+    .catch((e: any) => {
+        console.error('==> [Prisma Seed] Error during seeding:', e);
+        if (e.code === 'P2021') {
+            console.error('\n⚠️ HINT: The required database tables do not exist yet.');
+            console.error('Please run database migrations first using:\n  npx prisma migrate deploy\n');
+        }
         process.exit(1);
     })
     .finally(async () => {
