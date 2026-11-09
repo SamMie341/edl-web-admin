@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, Query, Put } from '@nestjs/common';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreatePositionDto } from '../application/dtos/create-position.dto.js';
 import { UpdatePositionDto } from '../application/dtos/update-position.dto.js';
 import { CreatePositionUseCase } from '../application/use-cases/create-position.use-case.js';
@@ -9,7 +11,7 @@ import { GetPositionByIdUseCase } from '../application/use-cases/get-position-by
 import { GetPositionsUseCase } from '../application/use-cases/get-position.use-case.js';
 import { UpdatePositionUseCase } from '../application/use-cases/update-position.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('positions')
 export class PositionsController {
     constructor(
@@ -21,7 +23,10 @@ export class PositionsController {
     ) { }
 
     @Post()
-    create(@Body() createDto: CreatePositionDto) { return this.createUseCase.execute(createDto); }
+    @RequirePermission('POSITIONS', 'CREATE')
+    create(@Body() createDto: CreatePositionDto) {
+        return this.createUseCase.execute(createDto);
+    }
 
     @Public()
     @Get()
@@ -37,11 +42,19 @@ export class PositionsController {
 
     @Public()
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.getByIdUseCase.execute(id);
+    }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdatePositionDto) { return this.updateUseCase.execute(id, updateDto); }
+    @RequirePermission('POSITIONS', 'UPDATE')
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdatePositionDto) {
+        return this.updateUseCase.execute(id, updateDto);
+    }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
+    @RequirePermission('POSITIONS', 'DELETE')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.deleteUseCase.execute(id);
+    }
 }

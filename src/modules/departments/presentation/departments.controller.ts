@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateDepartmentDto } from '../application/dtos/create-department.dto.js';
 import { UpdateDepartmentDto } from '../application/dtos/update-department.dto.js';
 import { CreateDepartmentUseCase } from '../application/use-cases/create-department.use-case.js';
@@ -9,7 +11,7 @@ import { GetDepartmentByIdUseCase } from '../application/use-cases/get-departmen
 import { GetDepartmentsUseCase } from '../application/use-cases/get-departments.use-case.js';
 import { UpdateDepartmentUseCase } from '../application/use-cases/update-department.use-case.js';
 
-@UseGuards(JwtAuthGuard) // ຕ້ອງ Login ກ່ອນ
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('departments')
 export class DepartmentsController {
     constructor(
@@ -21,6 +23,7 @@ export class DepartmentsController {
     ) { }
 
     @Post()
+    @RequirePermission('DEPARTMENTS', 'CREATE')
     create(@Body() createDepartmentDto: CreateDepartmentDto) {
         return this.createUseCase.execute(createDepartmentDto);
     }
@@ -38,11 +41,13 @@ export class DepartmentsController {
     }
 
     @Put(':id')
+    @RequirePermission('DEPARTMENTS', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDepartmentDto: UpdateDepartmentDto) {
         return this.updateUseCase.execute(id, updateDepartmentDto);
     }
 
     @Delete(':id')
+    @RequirePermission('DEPARTMENTS', 'DELETE')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }

@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, Put } from '@nestjs/common';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateNewsCategoryDto } from '../application/dtos/create-news-category.dto.js';
 import { UpdateNewsCategoryDto } from '../application/dtos/update-news-category.dto.js';
 import { CreateNewsCategoryUseCase } from '../application/use-cases/create-news-category.use-case.js';
@@ -9,7 +11,7 @@ import { GetNewsCategoryByIdUseCase } from '../application/use-cases/get-news-ca
 import { GetNewsCategoriesUseCase } from '../application/use-cases/get-news-category.use-case.js';
 import { UpdateNewsCategoryUseCase } from '../application/use-cases/update-news-category.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('news-categories')
 export class NewsCategoriesController {
     constructor(
@@ -21,6 +23,7 @@ export class NewsCategoriesController {
     ) { }
 
     @Post()
+    @RequirePermission('NEWS_CATEGORIES', 'CREATE')
     create(@Body() createDto: CreateNewsCategoryDto) {
         return this.createUseCase.execute(createDto);
     }
@@ -38,11 +41,13 @@ export class NewsCategoriesController {
     }
 
     @Put(':id')
+    @RequirePermission('NEWS_CATEGORIES', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateNewsCategoryDto) {
         return this.updateUseCase.execute(id, updateDto);
     }
 
     @Delete(':id')
+    @RequirePermission('NEWS_CATEGORIES', 'DELETE')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }

@@ -4,6 +4,7 @@ import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
 import { LoginUseCase } from "./application/use-cases/login.use-case.js";
 import { ValidateJwtUserUseCase } from "./application/use-cases/validate-jwt-user.use-case.js";
+import { GetProfileUseCase } from "./application/use-cases/get-profile.use-case.js";
 import { AUTH_USER_REPOSITORY } from "./domain/repositories/auth-user.repository.interface.js";
 import { PASSWORD_HASHER } from "./domain/services/password-hasher.interface.js";
 import { TOKEN_SERVICE } from "./domain/services/token.service.interface.js";
@@ -12,6 +13,7 @@ import { BcryptPasswordHasher } from "./infrastructure/security/bcrypt-password-
 import { JwtTokenService } from "./infrastructure/security/jwt-token.service.js";
 import { JwtStrategy } from "./infrastructure/strategies/jwt.strategy.js";
 import { AuthController } from "./presentation/auth.controller.js";
+import { PermissionsGuard } from "./presentation/guards/permissions.guard.js";
 
 @Global()
 @Module({
@@ -34,7 +36,9 @@ import { AuthController } from "./presentation/auth.controller.js";
     providers: [
         LoginUseCase,
         ValidateJwtUserUseCase,
+        GetProfileUseCase,
         JwtStrategy,
+        PermissionsGuard,
         {
             provide: AUTH_USER_REPOSITORY,
             useClass: PrismaAuthUserRepository,
@@ -48,6 +52,6 @@ import { AuthController } from "./presentation/auth.controller.js";
             useClass: JwtTokenService,
         },
     ],
-    exports: [PASSWORD_HASHER, PassportModule, JwtModule],
+    exports: [PASSWORD_HASHER, PassportModule, JwtModule, PermissionsGuard, GetProfileUseCase],
 })
 export class AuthModule { }

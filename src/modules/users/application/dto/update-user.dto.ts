@@ -1,11 +1,14 @@
-import { IsOptional, IsString, IsIn, IsEnum } from 'class-validator';
-import { Role, UserStatus } from '../../../../generated/prisma/enums.js';
+import { IsOptional, IsString, IsIn, IsInt } from 'class-validator';
+import { UserStatus } from '../../../../generated/prisma/enums.js';
 
 export class UpdateUserDto {
     @IsOptional()
+    @IsInt()
+    roleId?: number;
+
+    @IsOptional()
     @IsString()
-    @IsIn([Role.SUPERADMIN, Role.ADMIN, Role.EDITOR, Role.STAFF], { message: 'ສະຖານະບໍ່ຖືກຕ້ອງ' })
-    role?: Role;
+    role?: string;
 
     @IsOptional()
     @IsString()

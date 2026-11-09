@@ -1,6 +1,8 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, Query, Put, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, Query, Put, BadRequestException, UploadedFile, UseInterceptors } from '@nestjs/common';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateJobPostingDto } from '../application/dtos/create-job-posting.dto.js';
 import { UpdateJobPostingDto } from '../application/dtos/update-job-posting.dto.js';
 import { CreateJobPostingUseCase } from '../application/use-cases/create-job-posting.use-case.js';
@@ -15,7 +17,7 @@ import { join } from 'path';
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
 import * as fs from 'fs';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('job-postings')
 export class JobPostingsController {
     constructor(
@@ -28,7 +30,10 @@ export class JobPostingsController {
     ) { }
 
     @Post()
-    create(@Body() createDto: CreateJobPostingDto) { return this.createUseCase.execute(createDto); }
+    @RequirePermission('JOB_POSTINGS', 'CREATE')
+    create(@Body() createDto: CreateJobPostingDto) {
+        return this.createUseCase.execute(createDto);
+    }
 
     @Public()
     @Get()
@@ -44,15 +49,24 @@ export class JobPostingsController {
 
     @Public()
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.getByIdUseCase.execute(id);
+    }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateJobPostingDto) { return this.updateUseCase.execute(id, updateDto); }
+    @RequirePermission('JOB_POSTINGS', 'UPDATE')
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateJobPostingDto) {
+        return this.updateUseCase.execute(id, updateDto);
+    }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
+    @RequirePermission('JOB_POSTINGS', 'DELETE')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.deleteUseCase.execute(id);
+    }
 
     @Post(':id/upload/image')
+    @RequirePermission('JOB_POSTINGS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {

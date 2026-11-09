@@ -2,6 +2,11 @@ import { JwtPayload } from "../interfaces/jwt-payload.interface.js";
 
 export const ACTIVE_USER_STATUS = 'ACTIVE';
 
+export interface UserPermissionItem {
+    module: string;
+    action: string;
+}
+
 export interface AuthUserProps {
     id: number;
     employeeCode: string;
@@ -13,6 +18,7 @@ export interface AuthUserProps {
     unitName: string | null;
     role: string;
     status: string;
+    permissions?: UserPermissionItem[];
 }
 
 /**
@@ -52,9 +58,14 @@ export class AuthUser {
             firstName: this.props.firstName,
             lastName: this.props.lastName,
             department: this.props.departmentName,
+            departmentName: this.props.departmentName,
             division: this.props.divisionName,
+            divisionName: this.props.divisionName,
             unit: this.props.unitName,
+            unitName: this.props.unitName,
             role: this.props.role,
+            status: this.props.status,
+            permissions: this.props.permissions || [],
         };
     }
 
@@ -65,10 +76,15 @@ export class AuthUser {
             employeeCode: this.props.employeeCode,
             firstName: this.props.firstName,
             lastName: this.props.lastName,
+            department: this.props.departmentName,
             departmentName: this.props.departmentName,
+            division: this.props.divisionName,
             divisionName: this.props.divisionName,
+            unit: this.props.unitName,
             unitName: this.props.unitName,
             role: this.props.role,
+            status: this.props.status,
+            permissions: this.props.permissions || [],
         };
     }
 }
@@ -78,8 +94,13 @@ export interface RequestUser {
     employeeCode: string;
     firstName: string;
     lastName: string;
+    department?: string | null;
     departmentName: string | null;
+    division?: string | null;
     divisionName: string | null;
+    unit?: string | null;
     unitName: string | null;
     role: string;
+    status: string;
+    permissions: UserPermissionItem[];
 }

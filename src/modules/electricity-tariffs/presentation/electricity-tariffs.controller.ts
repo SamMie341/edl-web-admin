@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -6,6 +6,8 @@ import * as fs from 'fs';
 import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateElectricityTariffDto } from '../application/dtos/create-electricity-tariff.dto.js';
 import { UpdateElectricityTariffDto } from '../application/dtos/update-electricity-tariff.dto.js';
 import { CreateElectricityTariffUseCase } from '../application/use-cases/create-electricity-tariff.use-case.js';
@@ -15,7 +17,7 @@ import { GetElectricityTariffsUseCase } from '../application/use-cases/get-elect
 import { UpdateElectricityTariffUseCase } from '../application/use-cases/update-electricity-tariff.use-case.js';
 import { UploadElectricityTariffFilesUseCase } from '../application/use-cases/upload-electricity-tariff-files.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('electricity-tariffs')
 export class ElectricityTariffsController {
     constructor(
@@ -28,7 +30,10 @@ export class ElectricityTariffsController {
     ) { }
 
     @Post()
-    create(@Body() createDto: CreateElectricityTariffDto) { return this.createUseCase.execute(createDto); }
+    @RequirePermission('ELECTRICITY_TARIFFS', 'CREATE')
+    create(@Body() createDto: CreateElectricityTariffDto) {
+        return this.createUseCase.execute(createDto);
+    }
 
     @Public()
     @Get()
@@ -44,16 +49,25 @@ export class ElectricityTariffsController {
 
     @Public()
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.getByIdUseCase.execute(id);
+    }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateElectricityTariffDto) { return this.updateUseCase.execute(id, updateDto); }
+    @RequirePermission('ELECTRICITY_TARIFFS', 'UPDATE')
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateElectricityTariffDto) {
+        return this.updateUseCase.execute(id, updateDto);
+    }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
+    @RequirePermission('ELECTRICITY_TARIFFS', 'DELETE')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.deleteUseCase.execute(id);
+    }
 
     // API ສຳລັບອັບໂຫຼດຮູບພາບ
     @Post(':id/upload/image')
+    @RequirePermission('ELECTRICITY_TARIFFS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {
@@ -74,6 +88,7 @@ export class ElectricityTariffsController {
 
     // API ສຳລັບອັບໂຫຼດເອກະສານ PDF
     @Post(':id/upload/document')
+    @RequirePermission('ELECTRICITY_TARIFFS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {

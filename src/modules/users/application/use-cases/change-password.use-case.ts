@@ -1,7 +1,8 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import * as bcrypt from 'bcryptjs';
 import * as userRepositoryInterface from "../../domain/repositories/user.repository.interface.js";
 import { ChangePasswordDto } from "../dto/change-password.dto.js";
+import type { RequestUser } from "../../../auth/domain/entities/auth-user.entity.js";
 
 @Injectable()
 export class ChangePasswordUseCase {
@@ -10,7 +11,7 @@ export class ChangePasswordUseCase {
         private readonly repo: userRepositoryInterface.IUserRepository,
     ) { }
 
-    async execute(id: number, dto: ChangePasswordDto) {
+    async execute(id: number, dto: ChangePasswordDto, currentUser?: RequestUser) {
         let user = await this.repo.findById(id);
         if (!user) {
             user = await this.repo.findByEmployeeCode(id.toString());
@@ -18,6 +19,34 @@ export class ChangePasswordUseCase {
 
         if (!user) {
             throw new NotFoundException(`ບໍ່ພົບຜູ້ໃຊ້ ID: ${id} ໃນລະບົບ`);
+        }
+
+        // ກວດສອບສິດການປ່ຽນລະຫັດຜ່ານ
+        if (currentUser) {
+            const isSelf = currentUser.id === user.id;
+
+            if (isSelf) {
+                // 1. ປ່ຽນລະຫັດຜ່ານຂອງຕົນເອງ: ຕ້ອງໃສ່ລະຫັດຜ່ານເກົ່າສະເໝີ
+                if (!dto.oldPassword) {
+                    throw new BadRequestException('ກະລຸນາປ້ອນລະຫັດຜ່ານເກົ່າ (oldPassword)');
+                }
+            } else {
+                // 2. ປ່ຽນລະຫັດຜ່ານໃຫ້ຜູ້ໃຊ້ອື່ນ (Admin Reset): ຕ້ອງມີສິດ USERS:UPDATE ຫຼື ເປັນ SUPERADMIN
+                const isSuperAdmin = currentUser.role === 'SUPERADMIN';
+                const canUpdate = currentUser.permissions?.some(
+                    (p) => p.module === 'USERS' && p.action === 'UPDATE',
+                );
+
+                if (!isSuperAdmin && !canUpdate) {
+                    throw new ForbiddenException('ທ່ານບໍ່ມີສິດປ່ຽນລະຫັດຜ່ານຂອງຜູ້ໃຊ້ອື່ນ');
+                }
+
+                // ຫ້າມ Admin ທຳມະດາ Reset ລະຫັດຜ່ານຂອງ Superadmin
+                const targetIsSuperAdmin = user.role?.name === 'SUPERADMIN';
+                if (targetIsSuperAdmin && !isSuperAdmin) {
+                    throw new ForbiddenException('ບໍ່ສາມາດປ່ຽນລະຫັດຜ່ານຂອງ Superadmin ໄດ້');
+                }
+            }
         }
 
         const newPassword = dto.newPassword || dto.password;

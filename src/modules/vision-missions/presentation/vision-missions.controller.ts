@@ -1,6 +1,8 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Public } from "../../../core/decorators/public.decorator.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
+import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { CreateVisionMissionUseCase } from "../application/use-cases/create-vision-mission.use-case.js";
 import { UpdateVisionMissionUseCase } from "../application/use-cases/update-vision-mission.use-case.js";
 import { DeleteVisionMissionUseCase } from "../application/use-cases/delete-vision-mission.use-case.js";
@@ -15,7 +17,7 @@ import * as fs from 'fs';
 import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
 import { GetVisionMissionByIdUseCase } from "../application/use-cases/get-vision-mission-by-id.use-case.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('vision-missions')
 export class VisionMissionController {
     constructor(
@@ -28,16 +30,19 @@ export class VisionMissionController {
     ) { }
 
     @Post()
+    @RequirePermission('VISION_MISSIONS', 'CREATE')
     create(@Body() dto: CreateVisionMissionDto) {
         return this.createUseCase.execute(dto);
     }
 
     @Put(':id')
+    @RequirePermission('VISION_MISSIONS', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateVisionMissionDto) {
         return this.updateUseCase.execute(id, dto);
     }
 
     @Delete(':id')
+    @RequirePermission('VISION_MISSIONS', 'DELETE')
     delete(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }
@@ -55,6 +60,7 @@ export class VisionMissionController {
     }
 
     @Post(':id/upload/image')
+    @RequirePermission('VISION_MISSIONS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination(req, file, callback) {

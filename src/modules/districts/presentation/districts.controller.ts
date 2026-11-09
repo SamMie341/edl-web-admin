@@ -1,10 +1,12 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { Public } from "../../../core/decorators/public.decorator.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
+import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { SyncDistrictsUseCase } from "../application/use-cases/sync-districts.use-case.js";
 import { GetDistrictsUseCase } from "../application/use-cases/get-districts.use-case.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('districts')
 export class DistrictsController {
     constructor(
@@ -13,6 +15,7 @@ export class DistrictsController {
     ) { }
 
     @Post('sync')
+    @RequirePermission('DISTRICTS', 'CREATE')
     async syncData() {
         const result = await this.syncUseCase.execute();
         return {

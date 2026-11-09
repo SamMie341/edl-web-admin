@@ -16,6 +16,19 @@ export class UpdateUserUseCase {
         if (!user) {
             throw new NotFoundException('ບໍ່ມີຜູ້ໃຊ້ນີ້ໃນລະບົບ');
         }
-        return this.userRepo.update(id, dto);
+
+        let roleId = dto.roleId;
+        if (!roleId && dto.role) {
+            const role = await this.prismaService.role.findUnique({ where: { name: dto.role } });
+            if (role) {
+                roleId = role.id;
+            }
+        }
+
+        const dataToUpdate: any = {};
+        if (roleId !== undefined) dataToUpdate.roleId = roleId;
+        if (dto.status !== undefined) dataToUpdate.status = dto.status;
+
+        return this.userRepo.update(id, dataToUpdate);
     }
 }

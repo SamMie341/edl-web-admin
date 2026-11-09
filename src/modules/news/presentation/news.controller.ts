@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException, Query, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -6,6 +6,8 @@ import * as fs from 'fs';
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateNewsDto } from '../application/dtos/create-news.dto.js';
 import { UpdateNewsDto } from '../application/dtos/update-news.dto.js';
 import { CreateNewsUseCase } from '../application/use-cases/create-news.use-case.js';
@@ -16,7 +18,7 @@ import { IncrementNewsViewUseCase } from '../application/use-cases/increment-new
 import { UpdateNewsUseCase } from '../application/use-cases/update-news.use-case.js';
 import { UploadNewsImagesUseCase } from '../application/use-cases/upload-news-images.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('news')
 export class NewsController {
     constructor(
@@ -30,7 +32,10 @@ export class NewsController {
     ) { }
 
     @Post()
-    create(@Body() createDto: CreateNewsDto) { return this.createUseCase.execute(createDto); }
+    @RequirePermission('NEWS', 'CREATE')
+    create(@Body() createDto: CreateNewsDto) {
+        return this.createUseCase.execute(createDto);
+    }
 
     @Public()
     @Get()
@@ -46,13 +51,21 @@ export class NewsController {
 
     @Public()
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.getByIdUseCase.execute(id);
+    }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateNewsDto) { return this.updateUseCase.execute(id, updateDto); }
+    @RequirePermission('NEWS', 'UPDATE')
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateNewsDto) {
+        return this.updateUseCase.execute(id, updateDto);
+    }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
+    @RequirePermission('NEWS', 'DELETE')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.deleteUseCase.execute(id);
+    }
 
     @Public()
     @Put(':id/view')
@@ -63,6 +76,7 @@ export class NewsController {
 
     // API ອັບໂຫຼດຮູບປົກ (1 ຮູບ)
     @Post(':id/upload/cover')
+    @RequirePermission('NEWS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {
@@ -83,7 +97,8 @@ export class NewsController {
 
     // API ອັບໂຫຼດຮູບ Gallery (ຫຼາຍຮູບ)
     @Post(':id/upload/gallery')
-    @UseInterceptors(FilesInterceptor('files', 10, { // ອະນຸຍາດສູງສຸດ 10 ຮູບຕໍ່ຄັ້ງ
+    @RequirePermission('NEWS', 'UPDATE')
+    @UseInterceptors(FilesInterceptor('files', 10, {
         storage: diskStorage({
             destination: (req, file, cb) => {
                 const dest = join(process.cwd(), '..', 'uploads', 'news', 'galleries');

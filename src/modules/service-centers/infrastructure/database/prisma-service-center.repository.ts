@@ -52,53 +52,73 @@ export class PrismaServiceCenterRepository implements IServiceCenterRepository {
         return await this.prisma.serviceCenter.delete({ where: { id } });
     }
 
-    async findAll(provinceId?: number): Promise<ServiceCenter[]> {
-        return this.prisma.serviceCenter.findMany({
-            where: provinceId ? { provinceId } : undefined,
-            include: {
-                department: {
-                    select: {
-                        id: true,
-                        name: true,
-                        createdAt: true,
-                        updatedAt: true,
+    async findAll(provinceId?: number, page: number = 1, limit: number = 10): Promise<{ data: ServiceCenter[], meta: any }> {
+        const skip = (page - 1) * limit;
+        const whereCondition = provinceId ? { provinceId } : undefined;
+
+        const [data, total] = await Promise.all([
+            this.prisma.serviceCenter.findMany({
+                where: whereCondition,
+                skip,
+                take: limit,
+                include: {
+                    department: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdAt: true,
+                            updatedAt: true,
+                        },
+                    },
+                    branch: {
+                        select: {
+                            id: true,
+                            branchName: true,
+                            createdAt: true,
+                            updatedAt: true,
+                        },
+                    },
+                    province: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdAt: true,
+                            updatedAt: true,
+                        },
+                    },
+                    district: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdAt: true,
+                            updatedAt: true,
+                        },
+                    },
+                    village: {
+                        select: {
+                            id: true,
+                            name: true,
+                            createdAt: true,
+                            updatedAt: true,
+                        },
                     },
                 },
-                branch: {
-                    select: {
-                        id: true,
-                        branchName: true,
-                        createdAt: true,
-                        updatedAt: true,
-                    },
-                },
-                province: {
-                    select: {
-                        id: true,
-                        name: true,
-                        createdAt: true,
-                        updatedAt: true,
-                    },
-                },
-                district: {
-                    select: {
-                        id: true,
-                        name: true,
-                        createdAt: true,
-                        updatedAt: true,
-                    },
-                },
-                village: {
-                    select: {
-                        id: true,
-                        name: true,
-                        createdAt: true,
-                        updatedAt: true,
-                    },
-                },
+                orderBy: { provinceId: 'asc' },
+            }),
+            this.prisma.serviceCenter.count({ where: whereCondition }),
+        ]);
+
+        const totalPages = Math.ceil(total / limit);
+
+        return {
+            data,
+            meta: {
+                total,
+                page,
+                limit,
+                totalPages,
             },
-            orderBy: { provinceId: 'asc' },
-        });
+        };
     }
 
     async upsert(id: number, data: any): Promise<ServiceCenter> {

@@ -5,7 +5,7 @@ const collection = {
   info: {
     _postman_id: "e4d1a001-ed1a-4d1a-8000-000000000001",
     name: "EDL Admin Management System API",
-    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags, Legislations, Electricity Tariffs, Procurements, Positions, Job Postings (ລວມ 20 Modules, 112 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
+    description: "Postman Collection ສຳລັບທົດສອບລະບົບ EDL Admin Backend API (NestJS Clean Architecture)\n\n### ຄຸນສົມບັດຫຼັກ:\n- ຮອງຮັບທຸກ Module: Auth, Users, Departments, Branches, Service Centers, Provinces, Districts, Villages, Organization Structures, Vision & Missions, Electrical Knowledge, Magazines, News Categories, News, News Tags, Legislations, Electricity Tariffs, Procurements, Positions, Job Postings, Roles (ລວມ 21 Modules, 118 Endpoints)\n- ລະບົບ Auto JWT: ເມື່ອ Login ສຳເລັດ ລະບົບຈະບັນທຶກ `accessToken` ລົງ Collection Variables ອັດຕະໂນມັດ ເພື່ອໃຊ້ກັບ Endpoint ອື່ນໆໄດ້ທັນທີ\n- URL Prefix: `http://localhost:3000/api/v1` (ປັບປ່ຽນໄດ້ຜ່ານຕົວປ່ຽນ `baseUrl`)",
     schema: "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   auth: {
@@ -148,6 +148,37 @@ const collection = {
               variable: [{ key: "id", value: "1", description: "ID ຂອງຜູ້ໃຊ້ງານ" }]
             },
             description: "ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ (ຮອງຮັບທັງການປ່ຽນດ້ວຍຕົນເອງ ຫຼື Admin Reset)"
+          },
+          response: []
+        },
+        {
+          name: "Get All Permissions (ດຶງລາຍການສິດທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: { raw: "{{baseUrl}}/users/permissions/list", host: ["{{baseUrl}}"], path: ["users", "permissions", "list"] },
+            description: "ດຶງລາຍການສິດທັງໝົດໃນລະບົບ (Permissions List ສຳລັບຕິກເລືອກໃຫ້ User)"
+          },
+          response: []
+        },
+        {
+          name: "Assign Permissions (ກຳນົດສິດໃຫ້ຜູ້ໃຊ້ງານ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                permissionIds: [1, 2, 3]
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/users/:id/permissions",
+              host: ["{{baseUrl}}"],
+              path: ["users", ":id", "permissions"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງຜູ້ໃຊ້ງານ" }]
+            },
+            description: "ກຳນົດສິດ (Permissions) ໃຫ້ກັບຜູ້ໃຊ້ງານແຕ່ລະຄົນ"
           },
           response: []
         },
@@ -427,12 +458,16 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/service-centers?provinceId=1",
+              raw: "{{baseUrl}}/service-centers?provinceId=1&page=1&limit=10",
               host: ["{{baseUrl}}"],
               path: ["service-centers"],
-              query: [{ key: "provinceId", value: "1", description: "ກັ່ນຕອງຕາມ ID ແຂວງ (optional)" }]
+              query: [
+                { key: "provinceId", value: "1", description: "ກັ່ນຕອງຕາມ ID ແຂວງ (optional)" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
             },
-            description: "ດຶງລາຍຊື່ສູນບໍລິການລູກຄ້າທັງໝົດ ພ້ອມຂໍ້ມູນ Relation ສາຂາ ແລະ ທີ່ຕັ້ງ (ຮອງຮັບ ?provinceId=...)"
+            description: "ດຶງລາຍຊື່ສູນບໍລິການລູກຄ້າທັງໝົດ ພ້ອມຂໍ້ມູນ Relation ສາຂາ ແລະ ທີ່ຕັ້ງ (ຮອງຮັບ ?provinceId=&page=&limit=)"
           },
           response: []
         },
@@ -442,12 +477,16 @@ const collection = {
             method: "GET",
             header: [],
             url: {
-              raw: "{{baseUrl}}/service-centers/province/:provinceId",
+              raw: "{{baseUrl}}/service-centers/province/:provinceId?page=1&limit=10",
               host: ["{{baseUrl}}"],
               path: ["service-centers", "province", ":provinceId"],
-              variable: [{ key: "provinceId", value: "1", description: "ID ຂອງແຂວງ" }]
+              variable: [{ key: "provinceId", value: "1", description: "ID ຂອງແຂວງ" }],
+              query: [
+                { key: "page", value: "1", description: "ໜ້າທີ່ (optional)" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ (optional)" }
+              ]
             },
-            description: "ດຶງລາຍຊື່ສູນບໍລິການທີ່ຂຶ້ນກັບແຂວງທີ່ລະບຸ"
+            description: "ດຶງລາຍຊື່ສູນບໍລິການທີ່ຂຶ້ນກັບແຂວງທີ່ລະບຸ (ຮອງຮັບ ?page=&limit=)"
           },
           response: []
         },
@@ -2121,6 +2160,118 @@ const collection = {
               variable: [{ key: "id", value: "1", description: "ID ຂອງປະກາດ" }]
             },
             description: "ອັບໂຫຼດຮູບພາບສຳລັບປະກາດຮັບສະໝັກງານ"
+          },
+          response: []
+        }
+      ]
+    },
+
+    // 21. Roles Module
+    {
+      name: "21. Roles",
+      description: "ໂມດູນຈັດການບົດບາດ ແລະ ສິດທິການເຂົ້າເຖິງລະບົບ (Role-Based Access Control)",
+      item: [
+        {
+          name: "Get All Roles (ດຶງລາຍຊື່ບົດບາດທັງໝົດ)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/roles?search=&page=1&limit=10",
+              host: ["{{baseUrl}}"],
+              path: ["roles"],
+              query: [
+                { key: "search", value: "", description: "ຄົ້ນຫາຕາມຊື່ ຫຼື ຄຳອະທິບາຍ" },
+                { key: "page", value: "1", description: "ໜ້າທີ່ຕ້ອງການ" },
+                { key: "limit", value: "10", description: "ຈຳນວນຕໍ່ໜ້າ" }
+              ]
+            },
+            description: "ດຶງລາຍຊື່ບົດບາດທັງໝົດ ພ້ອມ Pagination ແລະ ຄົ້ນຫາ"
+          },
+          response: []
+        },
+        {
+          name: "Get Roles Dropdown (ດຶງບົດບາດແບບ Dropdown)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/roles/dropdown",
+              host: ["{{baseUrl}}"],
+              path: ["roles", "dropdown"]
+            },
+            description: "ດຶງລາຍຊື່ບົດບາດແບບຫຍໍ້ສຳລັບສະແດງໃນ Dropdown (id, name)"
+          },
+          response: []
+        },
+        {
+          name: "Get Role By ID (ດຶງຂໍ້ມູນບົດບາດຕາມ ID)",
+          request: {
+            method: "GET",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/roles/:id",
+              host: ["{{baseUrl}}"],
+              path: ["roles", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງ Role" }]
+            },
+            description: "ດຶງຂໍ້ມູນບົດບາດຕາມ ID ພ້ອມລາຍການສິດທິ (Permissions) ແລະ ຈຳນວນຜູ້ໃຊ້ງານ"
+          },
+          response: []
+        },
+        {
+          name: "Create Role (ສ້າງບົດບາດໃໝ່)",
+          request: {
+            method: "POST",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                name: "HR_MANAGER",
+                description: "ຜູ້ຈັດການຝ່າຍບຸກຄະລາກອນ",
+                permissionIds: [1, 2, 3]
+              }, null, 2)
+            },
+            url: { raw: "{{baseUrl}}/roles", host: ["{{baseUrl}}"], path: ["roles"] },
+            description: "ສ້າງບົດບາດໃໝ່ ພ້ອມກຳນົດສິດທິ (permissionIds)"
+          },
+          response: []
+        },
+        {
+          name: "Update Role (ແກ້ໄຂບົດບາດ)",
+          request: {
+            method: "PUT",
+            header: [{ key: "Content-Type", value: "application/json" }],
+            body: {
+              mode: "raw",
+              raw: JSON.stringify({
+                name: "HR_ADMIN",
+                description: "ແກ້ໄຂລາຍລະອຽດບົດບາດ",
+                permissionIds: [1, 2]
+              }, null, 2)
+            },
+            url: {
+              raw: "{{baseUrl}}/roles/:id",
+              host: ["{{baseUrl}}"],
+              path: ["roles", ":id"],
+              variable: [{ key: "id", value: "1", description: "ID ຂອງ Role" }]
+            },
+            description: "ແກ້ໄຂຂໍ້ມູນບົດບາດ ແລະ ປັບປຸງລາຍການສິດທິ"
+          },
+          response: []
+        },
+        {
+          name: "Delete Role (ລຶບບົດບາດ)",
+          request: {
+            method: "DELETE",
+            header: [],
+            url: {
+              raw: "{{baseUrl}}/roles/:id",
+              host: ["{{baseUrl}}"],
+              path: ["roles", ":id"],
+              variable: [{ key: "id", value: "4", description: "ID ຂອງ Role ທີ່ຕ້ອງການລຶບ" }]
+            },
+            description: "ລຶບບົດບາດ (ລະບົບຈະປ້ອງກັນບໍ່ໃຫ້ລຶບ SUPERADMIN ຫຼື Role ທີ່ມີຜູ້ໃຊ້ງານຜູກຢູ່)"
           },
           response: []
         }

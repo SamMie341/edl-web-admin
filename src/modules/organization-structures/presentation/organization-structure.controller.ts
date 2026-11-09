@@ -1,6 +1,8 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Public } from "../../../core/decorators/public.decorator.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
+import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { CreateOrgStructureUseCase } from "../application/use-cases/create-org-structure.use-case.js";
 import { UpdateOrgStructureUseCase } from "../application/use-cases/update-org-structure.use-case.js";
 import { DeleteOrgStructureUseCase } from "../application/use-cases/delete-org-strcuture.use-case.js";
@@ -15,7 +17,7 @@ import { join } from "path";
 import * as fs from 'fs';
 import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('org-structures')
 export class OrganizationStructureController {
     constructor(
@@ -28,11 +30,13 @@ export class OrganizationStructureController {
     ) { }
 
     @Post()
+    @RequirePermission('ORGANIZATION_STRUCTURES', 'CREATE')
     create(@Body() dto: CreateOrgStructureDto) {
         return this.createUseCase.execute(dto);
     }
 
     @Post('upload-avatar')
+    @RequirePermission('ORGANIZATION_STRUCTURES', 'CREATE')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -61,11 +65,13 @@ export class OrganizationStructureController {
     }
 
     @Put(':id')
+    @RequirePermission('ORGANIZATION_STRUCTURES', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateOrgStructureDto) {
         return this.updateUseCase.execute(id, dto);
     }
 
     @Delete(':id')
+    @RequirePermission('ORGANIZATION_STRUCTURES', 'DELETE')
     delete(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }
@@ -83,6 +89,7 @@ export class OrganizationStructureController {
     }
 
     @Post(':id/upload/image')
+    @RequirePermission('ORGANIZATION_STRUCTURES', 'UPDATE')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({

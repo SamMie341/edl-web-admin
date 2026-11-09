@@ -1,6 +1,8 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { Public } from "../../../core/decorators/public.decorator.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
+import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { SyncServiceCenterUseCase } from "../application/use-cases/sync-service-center.use-case.js";
 import { GetServiceUseCase } from "../application/use-cases/get-service-center.use-case.js";
 import { GetServiceByIdUseCase } from "../application/use-cases/get-service-center-by-id.use-case.js";
@@ -16,7 +18,7 @@ import { join } from "path";
 import * as fs from 'fs';
 import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('service-centers')
 export class ServiceCenterController {
     constructor(
@@ -30,6 +32,7 @@ export class ServiceCenterController {
     ) { }
 
     @Post(':id/upload/image')
+    @RequirePermission('SERVICE_CENTERS', 'UPDATE')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({
@@ -65,41 +68,59 @@ export class ServiceCenterController {
     }
 
     @Post()
+    @RequirePermission('SERVICE_CENTERS', 'CREATE')
     async create(@Body() dto: CreateServiceCenterDto) {
         return this.createUseCase.execute(dto);
     }
 
     @Put(':id')
+    @RequirePermission('SERVICE_CENTERS', 'UPDATE')
     async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateServiceCenterDto) {
         return this.updateUseCase.execute(id, dto);
     }
 
     @Delete(':id')
+    @RequirePermission('SERVICE_CENTERS', 'DELETE')
     async delete(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }
 
     @Post('sync')
+    @RequirePermission('SERVICE_CENTERS', 'CREATE')
     async syncData() {
         const result = await this.syncUseCase.execute();
         return {
             message: 'Sync ຂໍ້ມູນສູນບໍລິການສຳເລັດ',
             total: result.totalSynced,
+            totalFailed: result.totalFailed,
+            failed: result.failed,
             data: result.data,
         };
     }
 
     @Public()
     @Get()
-    async findAll(@Query('provinceId') provinceId?: string) {
+    async findAll(
+        @Query('provinceId') provinceId?: string,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+    ) {
         const parsedProvinceId = provinceId ? parseInt(provinceId, 10) : undefined;
-        return await this.getUseCase.execute(parsedProvinceId);
+        const pageNum = page ? parseInt(page, 10) : 1;
+        const limitNum = limit ? parseInt(limit, 10) : 10;
+        return await this.getUseCase.execute(parsedProvinceId, pageNum, limitNum);
     }
 
     @Public()
     @Get('province/:provinceId')
-    async findByProvince(@Param('provinceId', ParseIntPipe) provinceId: number) {
-        return await this.getUseCase.execute(provinceId);
+    async findByProvince(
+        @Param('provinceId', ParseIntPipe) provinceId: number,
+        @Query('page') page?: string,
+        @Query('limit') limit?: string,
+    ) {
+        const pageNum = page ? parseInt(page, 10) : 1;
+        const limitNum = limit ? parseInt(limit, 10) : 10;
+        return await this.getUseCase.execute(provinceId, pageNum, limitNum);
     }
 
     @Public()

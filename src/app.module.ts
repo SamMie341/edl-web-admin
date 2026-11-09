@@ -3,6 +3,7 @@ import { PrismaModule } from './core/database/prisma.module.js';
 import { ConfigModule } from '@nestjs/config';
 import { AuthModule } from './modules/auth/auth.module.js';
 import { UsersModule } from './modules/users/users.module.js';
+import { RolesModule } from './modules/roles/roles.module.js';
 import { DepartmentsModule } from './modules/departments/departments.module.js';
 import { BranchesModule } from './modules/branches/branches.module.js';
 import { ServeStaticModule } from '@nestjs/serve-static';
@@ -36,6 +37,7 @@ import { JobPostingsModule } from './modules/job-postings/job-postings.module.js
     PrismaModule,
     AuthModule,
     UsersModule,
+    RolesModule,
     DepartmentsModule,
     BranchesModule,
     ProvincesModule,

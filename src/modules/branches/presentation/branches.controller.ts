@@ -17,8 +17,10 @@ import { UpdateBranchDto } from '../application/dtos/update-branch.dto.js';
 import { UploadBranchImageUseCase } from '../application/use-cases/upload-branch-image.use-case.js';
 
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('branches')
 export class BranchesController {
     constructor(
@@ -29,10 +31,10 @@ export class BranchesController {
         private readonly deleteUseCase: DeleteBranchUseCase,
         private readonly getByIdUseCase: GetBranchByIdUseCase,
         private readonly getBranchesDropdownUseCase: GetBranchesDropdownUseCase,
-
         private readonly uploadBranchImageUseCase: UploadBranchImageUseCase,
     ) { }
 
+    @RequirePermission('BRANCHES', 'UPDATE')
     @Post(':id/upload/:imageType')
     @UseInterceptors(
         FileInterceptor('file', {
@@ -74,6 +76,7 @@ export class BranchesController {
     }
 
     // POST /api/v1/branches/sync
+    @RequirePermission('BRANCHES', 'CREATE')
     @Post('sync')
     async syncData() {
         const result = await this.syncBranchesUseCase.execute();
@@ -106,6 +109,7 @@ export class BranchesController {
         return this.getBranchesUseCase.execute(departmentId);
     }
 
+    @RequirePermission('BRANCHES', 'CREATE')
     @Post()
     create(@Body() createBranchDto: CreateBranchDto) {
         return this.createUseCase.execute(createBranchDto);
@@ -117,11 +121,13 @@ export class BranchesController {
         return this.getByIdUseCase.execute(id);
     }
 
+    @RequirePermission('BRANCHES', 'UPDATE')
     @Put(':id')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateBranchDto) {
         return this.updateUseCase.execute(id, dto);
     }
 
+    @RequirePermission('BRANCHES', 'DELETE')
     @Delete(':id')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);

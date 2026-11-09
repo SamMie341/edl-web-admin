@@ -4,7 +4,7 @@ import type { IPasswordHasher } from '../../../auth/domain/services/password-has
 import * as hrmServiceInterface from '../../domain/repositories/hrm.service.interface.js';
 import * as userRepositoryInterface from '../../domain/repositories/user.repository.interface.js';
 import { PrismaService } from '../../../../core/database/prisma.service.js';
-import { Role, UserStatus } from '../../../../generated/prisma/enums.js';
+import { UserStatus } from '../../../../generated/prisma/enums.js';
 
 @Injectable()
 export class SyncUserUseCase {
@@ -46,11 +46,14 @@ export class SyncUserUseCase {
                 const defaultPassword = `EDL${emp.emp_code}`;
                 const passwordHash = await this.passwordHasher.hash(defaultPassword);
 
+                const defaultRole = await this.prismaService.role.findUnique({ where: { name: 'STAFF' } })
+                    || await this.prismaService.role.findUnique({ where: { name: 'ADMIN' } });
+
                 user = await this.userRepository.create({
                     employeeCode: emp.emp_code.toString(),
                     firstName, lastName, email, phoneNumber, departmentName, divisionName, unitName, status,
                     passwordHash: passwordHash,
-                    role: Role.ADMIN,
+                    roleId: defaultRole?.id,
                 });
             }
 

@@ -2,6 +2,8 @@ import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe
 import * as fs from 'fs';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateMagazineUseCase } from '../application/use-cases/create-magazine.use-case.js';
 import { UpdateMagazineUseCase } from '../application/use-cases/update-magazine.use-case.js';
 import { DeleteMagazinUseCase } from '../application/use-cases/delete-magazine.use-case.js';
@@ -16,7 +18,7 @@ import { diskStorage } from 'multer';
 import { join } from 'path';
 import { documentFileFilter, editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('magazines')
 export class MagazinesController {
     constructor(
@@ -30,16 +32,19 @@ export class MagazinesController {
     ) { }
 
     @Post()
+    @RequirePermission('MAGAZINES', 'CREATE')
     create(@Body() dto: CreateMagazineDto) {
         return this.createUseCase.execute(dto);
     }
 
     @Put(':id')
+    @RequirePermission('MAGAZINES', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateMagazineDto) {
         return this.updateUseCase.execute(id, dto);
     }
 
     @Delete(':id')
+    @RequirePermission('MAGAZINES', 'DELETE')
     delete(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }
@@ -66,6 +71,7 @@ export class MagazinesController {
     }
 
     @Post(':id/upload/cover')
+    @RequirePermission('MAGAZINES', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination(req, file, callback) {
@@ -89,6 +95,7 @@ export class MagazinesController {
     }
 
     @Post(':id/upload/document')
+    @RequirePermission('MAGAZINES', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination(req, file, callback) {

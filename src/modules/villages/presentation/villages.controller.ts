@@ -1,10 +1,12 @@
 import { Controller, Get, Param, ParseIntPipe, Post, Query, UseGuards } from "@nestjs/common";
 import { Public } from "../../../core/decorators/public.decorator.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
+import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { SyncVillagesUseCase } from "../application/use-cases/sync-villages.use-case.js";
 import { GetVillagesUseCase } from "../application/use-cases/get-villages.use-case.js";
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('villages')
 export class VillagesController {
     constructor(
@@ -13,6 +15,7 @@ export class VillagesController {
     ) { }
 
     @Post('sync')
+    @RequirePermission('VILLAGES', 'CREATE')
     async syncData() {
         const result = await this.syncVillagesUseCase.execute();
         return {

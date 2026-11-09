@@ -5,7 +5,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 > **ລະບົບບໍລິຫານຈັດການຂໍ້ມູນ ລັດວິສາຫະກິດໄຟຟ້າລາວ (EDL Admin Management System)**  
 > **ພາສາ/ເທັກໂນໂລຢີ:** NestJS (TypeScript), Prisma ORM, PostgreSQL  
 > **ສະຖາປັດຕະຍະກຳ:** Clean Architecture / Domain-Driven Design (DDD)  
-> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 20 ໂມດູນ (112 Endpoints)  
+> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 21 ໂມດູນ (118 Endpoints)  
 > **ອັບເດດຫຼ້າສຸດ:** 2026-09-30
 
 ---
@@ -34,6 +34,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
    - [3.18 Procurements Module (ລະບົບປະກາດຈັດຊື້-ຈັດຈ້າງ)](#318-procurements-module-ລະບົບປະກາດຈັດຊື້-ຈັດຈ້າງ)
    - [3.19 Positions Module (ລະບົບຈັດການຕຳແໜ່ງງານ)](#319-positions-module-ລະບົບຈັດການຕຳແໜ່ງງານ)
    - [3.20 Job Postings Module (ລະບົບປະກາດຮັບສະໝັກພະນັກງານ)](#320-job-postings-module-ລະບົບປະກາດຮັບສະໝັກພະນັກງານ)
+   - [3.21 Roles Module (ລະບົບຈັດການສິດທິບົດບາດ)](#321-roles-module-ລະບົບຈັດການສິດທິບົດບາດ)
 4. [ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ (Roadmap / Future Enhancements)](#4-ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ-roadmap--future-enhancements)
 5. [ຄູ່ມືການອັບເດດເອກະສານ (Documentation Update Guide)](#5-ຄູ່ມືການອັບເດດເອກະສານ-documentation-update-guide)
 
@@ -48,7 +49,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
    │               Presentation Layer (Controllers)         │
    │               - ຮັບ HTTP Request / ສົ່ງ HTTP Response   │
    │               - ກວດສອບຂໍ້ມູນຜ່ານ DTOs                   │
-   │               - ປ້ອງກັນ API ດ້ວຍ JwtAuthGuard           │
+   │               - ປ້ອງກັນ API ດ້ວຍ JwtAuthGuard & PermissionsGuard (PBAC) │
    └───────────────────────────┬────────────────────────────┘
                                │ calls
                                ▼
@@ -99,7 +100,8 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 | **18. Procurements** | \`/api/v1/procurements\` | 7 | File System (/uploads/procurements) | ພ້ອມໃຊ້ງານ |
 | **19. Positions** | \`/api/v1/positions\` | 5 | Master Data ຕຳແໜ່ງງານ | ພ້ອມໃຊ້ງານ |
 | **20. Job Postings** | \`/api/v1/job-postings\` | 6 | File System (/uploads/job-postings) | ພ້ອມໃຊ້ງານ |
-| **ລວມທັງໝົດ (Total)** | **20 Modules** | **112 Endpoints** | | |
+| **21. Roles** | \`/api/v1/roles\` | 6 | ລະບົບ Role-Based Access Control (RBAC) & Fine-Grained Permissions | ພ້ອມໃຊ້ງານ |
+| **ລວມທັງໝົດ (Total)** | **21 Modules** | **118 Endpoints** | | |
 
 ---
 
@@ -149,6 +151,8 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 | \`GET\` | \`/api/v1/users\` | JWT | ດຶງລາຍຊື່ຜູ້ໃຊ້ທັງໝົດ |
 | \`POST\` | \`/api/v1/users/sync/:empCode\` | JWT | ຊິ້ງຂໍ້ມູນພະນັກງານຈາກ HRM ເຂົ້າລະບົບ |
 | \`PUT\` | \`/api/v1/users/change-role/:id\` | JWT | ປ່ຽນສິດທິຜູ້ໃຊ້ (Role) |
+| \`GET\` | \`/api/v1/users/permissions/list\` | JWT | ດຶງລາຍການສິດທັງໝົດໃນລະບົບ |
+| \`PUT\` | \`/api/v1/users/:id/permissions\` | JWT | ກຳນົດສິດການນຳໃຊ້ (Permissions) ໃຫ້ຜູ້ໃຊ້ |
 | \`PUT\` | \`/api/v1/users/change-password/:id\` | JWT | ປ່ຽນລະຫັດຜ່ານຜູ້ໃຊ້ງານ |
 | \`DELETE\` | \`/api/v1/users/:id\` | JWT | ລຶບບັນຊີຜູ້ໃຊ້ |
 
@@ -227,8 +231,8 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 #### ເສັ້ນທາງ API (Endpoints):
 | Method | URL | Auth Guard | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| \`GET\` | \`/api/v1/service-centers\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ (ຮອງຮັບ \`?provinceId=\`) |
-| \`GET\` | \`/api/v1/service-centers/province/:provinceId\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທີ່ຂຶ້ນກັບແຂວງຕາມ ID |
+| \`GET\` | \`/api/v1/service-centers\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທັງໝົດ (ຮອງຮັບ \`?provinceId=&page=&limit=\`) |
+| \`GET\` | \`/api/v1/service-centers/province/:provinceId\` | Public | ດຶງລາຍຊື່ສູນບໍລິການທີ່ຂຶ້ນກັບແຂວງຕາມ ID (ຮອງຮັບ \`?page=&limit=\`) |
 | \`GET\` | \`/api/v1/service-centers/:id\` | Public | ດຶງຂໍ້ມູນສູນບໍລິການຕາມ ID |
 | \`POST\` | \`/api/v1/service-centers\` | JWT | ສ້າງສູນບໍລິການໃໝ່ |
 | \`PUT\` | \`/api/v1/service-centers/:id\` | JWT | ແກ້ໄຂຂໍ້ມູນສູນບໍລິການ |
@@ -534,9 +538,38 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 
 ---
 
+### 3.21 Roles Module (ລະບົບຈັດການສິດທິບົດບາດ)
+* **ທີ່ຕັ້ງໂຟນເດີ:** \`src/modules/roles/\`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຈັດການຂໍ້ມູນບົດບາດ (Role) ແບບ Dynamic ໃນລະບົບ ປ່ຽນແທນ Static Enum ແບບເກົ່າ.
+  - ກຳນົດ ແລະ ຜູກໂຍງສິດທິ (Permissions) ໃຫ້ແຕ່ລະ Role ຜ່ານຕາຕະລາງ \`RolePermission\`.
+  - ສະໜັບສະໜູນການດຶງລາຍຊື່ແບບ Pagination, Dropdown, ແລະ ຄົ້ນຫາຕາມຊື່.
+  - ປ້ອງກັນຄວາມປອດໄພຂອງລະບົບ: ຫ້າມລຶບບົດບາດ \`SUPERADMIN\` ແລະ ຫ້າມລຶບ Role ທີ່ຍັງມີບັນຊີຜູ້ໃຊ້ງານຜູກຢູ່.
+  - ຮອງຮັບລະບົບ Fine-Grained Permission Guard (\`@RequirePermission('ROLES', ...)\`).
+
+#### Use Cases ໃນລະບົບ:
+1. **\`CreateRoleUseCase\`**: ສ້າງບົດບາດໃໝ່ ແລະ ຜູກສິດທິ (Permissions).
+2. **\`GetRolesUseCase\`**: ດຶງລາຍຊື່ບົດບາດທັງໝົດ ພ້ອມ Pagination ແລະ ຄົ້ນຫາ.
+3. **\`GetRolesDropdownUseCase\`**: ດຶງລາຍຊື່ບົດບາດແບບຫຍໍ້ສຳລັບສະແດງໃນ Select/Dropdown.
+4. **\`GetRoleByIdUseCase\`**: ດຶງຂໍ້ມູນບົດບາດຕາມ ID ພ້ອມລາຍການສິດທິທັງໝົດ.
+5. **\`UpdateRoleUseCase\`**: ແກ້ໄຂຂໍ້ມູນບົດບາດ ແລະ ອັບເດດລາຍການສິດທິ (Sync Permissions).
+6. **\`DeleteRoleUseCase\`**: ລຶບບົດບາດ ພ້ອມລະບົບກວດສອບຄວາມປອດໄພ.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| \`GET\` | \`/api/v1/roles\` | JWT (ROLES:READ) | ດຶງລາຍຊື່ບົດບາດທັງໝົດ (Query: \`search\`, \`page\`, \`limit\`) |
+| \`GET\` | \`/api/v1/roles/dropdown\` | JWT (ROLES:READ) | ດຶງລາຍຊື່ບົດບາດສຳລັບ Dropdown (id, name) |
+| \`GET\` | \`/api/v1/roles/:id\` | JWT (ROLES:READ) | ດຶງຂໍ້ມູນບົດບາດຕາມ ID |
+| \`POST\` | \`/api/v1/roles\` | JWT (ROLES:CREATE) | ສ້າງບົດບາດໃໝ່ ພ້ອມກຳນົດສິດທິ |
+| \`PUT\` | \`/api/v1/roles/:id\` | JWT (ROLES:UPDATE) | ແກ້ໄຂຂໍ້ມູນບົດບາດ ແລະ ສິດທິ |
+| \`DELETE\` | \`/api/v1/roles/:id\` | JWT (ROLES:DELETE) | ລຶບບົດບາດ (ມີລະບົບປ້ອງກັນ SUPERADMIN & In-use roles) |
+
+---
+
 ## 4. ແຜນພັດທະນາໂມດູນໃນອະນາຄົດ (Roadmap / Future Enhancements)
 
-ທຸກໂມດູນຫຼັກຕາມ **Prisma Schema (\`schema.prisma\`)** ແລະ **Data Dictionary** ໄດ້ຖືກພັດທະນາຄົບຖ້ວນທັງ **20 ໂມດູນ** ຮຽບຮ້ອຍແລ້ວ. ສຳລັບແຜນພັດທະນາໃນໄລຍະຕໍ່ໄປປະກອບມີ:
+ທຸກໂມດູນຫຼັກຕາມ **Prisma Schema (\`schema.prisma\`)** ແລະ **Data Dictionary** ໄດ້ຖືກພັດທະນາຄົບຖ້ວນທັງ **21 ໂມດູນ** ຮຽບຮ້ອຍແລ້ວ. ສຳລັບແຜນພັດທະນາໃນໄລຍະຕໍ່ໄປປະກອບມີ:
 
 1. **Audit Logs & Activity Tracking**: ບັນທຶກປະຫວັດການແກ້ໄຂ, ເພີ່ມ, ລຶບ ຂອງ Admin ແຕ່ລະຄົນ.
 2. **Notification & Email Alert**: ແຈ້ງເຕືອນຜ່ານ Email / Webhook ເມື່ອມີການສະໝັກງານ ຫຼື ເປີດຊອງປະມູນ.

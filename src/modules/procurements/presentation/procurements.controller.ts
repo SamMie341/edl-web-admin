@@ -6,6 +6,8 @@ import * as fs from 'fs';
 import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateProcurementDto } from '../application/dtos/create-procurement.dto.js';
 import { UpdateProcurementDto } from '../application/dtos/update-procurement.dto.js';
 import { CreateProcurementUseCase } from '../application/use-cases/create-procurement.use-case.js';
@@ -15,7 +17,7 @@ import { GetProcurementsUseCase } from '../application/use-cases/get-procurement
 import { UpdateProcurementUseCase } from '../application/use-cases/update-procurement.use-case.js';
 import { UploadProcurementFilesUseCase } from '../application/use-cases/upload-procurement-files.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('procurements')
 export class ProcurementsController {
     constructor(
@@ -28,7 +30,10 @@ export class ProcurementsController {
     ) { }
 
     @Post()
-    create(@Body() createDto: CreateProcurementDto) { return this.createUseCase.execute(createDto); }
+    @RequirePermission('PROCUREMENTS', 'CREATE')
+    create(@Body() createDto: CreateProcurementDto) {
+        return this.createUseCase.execute(createDto);
+    }
 
     @Public()
     @Get()
@@ -44,16 +49,25 @@ export class ProcurementsController {
 
     @Public()
     @Get(':id')
-    findOne(@Param('id', ParseIntPipe) id: number) { return this.getByIdUseCase.execute(id); }
+    findOne(@Param('id', ParseIntPipe) id: number) {
+        return this.getByIdUseCase.execute(id);
+    }
 
     @Put(':id')
-    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateProcurementDto) { return this.updateUseCase.execute(id, updateDto); }
+    @RequirePermission('PROCUREMENTS', 'UPDATE')
+    update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateProcurementDto) {
+        return this.updateUseCase.execute(id, updateDto);
+    }
 
     @Delete(':id')
-    remove(@Param('id', ParseIntPipe) id: number) { return this.deleteUseCase.execute(id); }
+    @RequirePermission('PROCUREMENTS', 'DELETE')
+    remove(@Param('id', ParseIntPipe) id: number) {
+        return this.deleteUseCase.execute(id);
+    }
 
     // API ສຳລັບອັບໂຫຼດຮູບພາບປະກອບການປະກວດລາຄາ
     @Post(':id/upload/image')
+    @RequirePermission('PROCUREMENTS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {
@@ -74,6 +88,7 @@ export class ProcurementsController {
 
     // API ສຳລັບອັບໂຫຼດເອກະສານ PDF ລາຍລະອຽດການປະມູນ (TOR)
     @Post(':id/upload/document')
+    @RequirePermission('PROCUREMENTS', 'UPDATE')
     @UseInterceptors(FileInterceptor('file', {
         storage: diskStorage({
             destination: (req, file, cb) => {

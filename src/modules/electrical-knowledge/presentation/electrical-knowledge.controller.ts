@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Put } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { join } from 'path';
@@ -6,6 +6,8 @@ import * as fs from 'fs';
 import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
+import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
+import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { CreateElectricalKnowledgeDto } from '../application/dtos/create-electrical-knowledge.dto.js';
 import { UpdateElectricalKnowledgeDto } from '../application/dtos/update-electrical-knowledge.dto.js';
 import { CreateElectricalKnowledgeUseCase } from '../application/use-cases/create-electrical-knowledge.use-case.js';
@@ -16,7 +18,7 @@ import { GetElectricalKnowledgeUseCase } from '../application/use-cases/get-elec
 import { UploadElectricalKnowledgeUseCase } from '../application/use-cases/upload-electrical-knowledge-image.use-case.js';
 import { IncrementElectricalKnowledgeViewUseCase } from '../../organization-structures/application/use-cases/increment-electrical-knowledge-view.use-case.js';
 
-@UseGuards(JwtAuthGuard)
+@UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('electrical-knowledge')
 export class ElectricalKnowledgeController {
     constructor(
@@ -30,6 +32,7 @@ export class ElectricalKnowledgeController {
     ) { }
 
     @Post()
+    @RequirePermission('ELECTRICAL_KNOWLEDGE', 'CREATE')
     create(@Body() createDto: CreateElectricalKnowledgeDto) {
         return this.createUseCase.execute(createDto);
     }
@@ -47,17 +50,20 @@ export class ElectricalKnowledgeController {
     }
 
     @Put(':id')
+    @RequirePermission('ELECTRICAL_KNOWLEDGE', 'UPDATE')
     update(@Param('id', ParseIntPipe) id: number, @Body() updateDto: UpdateElectricalKnowledgeDto) {
         return this.updateUseCase.execute(id, updateDto);
     }
 
     @Delete(':id')
+    @RequirePermission('ELECTRICAL_KNOWLEDGE', 'DELETE')
     remove(@Param('id', ParseIntPipe) id: number) {
         return this.deleteUseCase.execute(id);
     }
 
     // API ອັບໂຫຼດຮູບປົກ
     @Post(':id/upload/cover')
+    @RequirePermission('ELECTRICAL_KNOWLEDGE', 'UPDATE')
     @UseInterceptors(
         FileInterceptor('file', {
             storage: diskStorage({

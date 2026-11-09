@@ -1,4 +1,4 @@
-import { Inject, Injectable } from "@nestjs/common";
+import { BadRequestException, Inject, Injectable } from "@nestjs/common";
 import * as serviceCenterRepositoryInterface from "../../domain/repositories/service-center.repository.interface.js";
 import { SERVICE_CENTER_REPOSITORY } from "../../domain/repositories/service-center.repository.interface.js";
 import * as legacyCenterServiceInterface from "../../domain/repositories/legacy-center.service.interface.js";
@@ -25,8 +25,21 @@ const DEFAULT_PROVINCE_BRANCH_MAP: Record<number, { branchId: number; department
     18: { branchId: 31, departmentId: 5 },
 };
 
-function cleanText(str: string): string {
+function cleanText(str?: string | null): string {
+    if (!str) return '';
     return str.replace(/[\u200B-\u200D\uFEFF]/g, '').trim();
+}
+
+function parseCoordinate(val: any): number | null {
+    if (val === undefined || val === null) return null;
+    if (typeof val === 'number') return isNaN(val) ? null : val;
+    if (typeof val === 'string') {
+        const trimmed = val.trim();
+        if (!trimmed) return null;
+        const num = parseFloat(trimmed);
+        return isNaN(num) ? null : num;
+    }
+    return null;
 }
 
 @Injectable()
@@ -39,12 +52,38 @@ export class SyncServiceCenterUseCase {
     ) { }
 
     async execute() {
-        const provinces = await this.prisma.province.findMany();
-        const branches = await this.prisma.branch.findMany();
-        const districts = await this.prisma.disctrict.findMany();
+        // 1. ກວດສອບຄວາມພ້ອມຂອງຂໍ້ມູນຫຼັກ: ແຂວງ (Provinces), ເມືອງ (Districts), ບ້ານ (Villages)
+        const [provinceCount, districtCount, villageCount] = await Promise.all([
+            this.prisma.province.count(),
+            this.prisma.disctrict.count(),
+            this.prisma.village.count(),
+        ]);
+
+        const missingMasters: string[] = [];
+        if (provinceCount === 0) missingMasters.push('ແຂວງ (Provinces)');
+        if (districtCount === 0) missingMasters.push('ເມືອງ (Districts)');
+        if (villageCount === 0) missingMasters.push('ບ້ານ (Villages)');
+
+        if (missingMasters.length > 0) {
+            throw new BadRequestException(
+                `ບໍ່ສາມາດ Sync ຂໍ້ມູນສູນບໍລິການໄດ້ ເນື່ອງຈາກຍັງບໍ່ມີຂໍ້ມູນ ${missingMasters.join(', ')} ໃນລະບົບ. ກະລຸນາ Sync ຫຼື ນຳເຂົ້າຂໍ້ມູນດັ່ງກ່າວກ່ອນດຳເນີນການ!`
+            );
+        }
+
+        const [provinces, districts, villages, branches] = await Promise.all([
+            this.prisma.province.findMany(),
+            this.prisma.disctrict.findMany(),
+            this.prisma.village.findMany({ select: { id: true } }),
+            this.prisma.branch.findMany(),
+        ]);
+
+        const provinceMap = new Map(provinces.map((p) => [p.id, p]));
         const districtMap = new Map(districts.map((d) => [d.id, d]));
         const districtByCode = new Map(districts.filter((d) => d.code).map((d) => [d.code!, d]));
+        const villageSet = new Set(villages.map((v) => v.id));
+
         const syncedRecords = [];
+        const failedRecords: { centerId: number; centerName: string; reason: string }[] = [];
 
         const getBranchAndDept = (provinceId: number, provinceName: string, districtId?: number) => {
             if (provinceId === 1) {
@@ -69,50 +108,90 @@ export class SyncServiceCenterUseCase {
         };
 
         for (const province of provinces) {
-            const centers = await this.legacyService.fetchCentersByProvince(province.id);
+            let centers: any[] = [];
+            try {
+                centers = await this.legacyService.fetchCentersByProvince(province.id);
+            } catch (fetchError: any) {
+                console.warn(`[Warning] ບໍ່ສາມາດດຶງຂໍ້ມູນສູນບໍລິການແຂວງ ID ${province.id}:`, fetchError.message);
+                continue;
+            }
+
+            if (!centers || !Array.isArray(centers) || centers.length === 0) {
+                continue;
+            }
 
             for (const item of centers) {
-                let imagePath = null;
-                if (item.center_image) {
-                    const cleanName = item.center_image.trim();
-                    const url = encodeURI(`${this.imageBaseUrl}${cleanName}`);
-                    imagePath = await this.legacyService.downloadImage(url, cleanName);
-                }
+                try {
+                    // ກວດສອບຄວາມຖືກຕ້ອງຂອງ ແຂວງ (Province)
+                    if (!provinceMap.has(item.province_id)) {
+                        const reason = `ບໍ່ພົບຂໍ້ມູນແຂວງ ID: ${item.province_id} (${item.province?.province_name || ''}) ໃນລະບົບ`;
+                        console.warn(`[Warning] ຂ້າມສູນ ${item.center_name} (ID: ${item.center_id}): ${reason}`);
+                        failedRecords.push({ centerId: item.center_id, centerName: item.center_name, reason });
+                        continue;
+                    }
 
-                let districtId = item.district_id;
-                if (!districtMap.has(districtId)) {
-                    if (item.village?.district_code && districtByCode.has(item.village.district_code)) {
-                        districtId = districtByCode.get(item.village.district_code)!.id;
-                    } else if (item.village_id) {
-                        const village = await this.prisma.village.findUnique({ where: { id: item.village_id } });
-                        if (village?.districtId) {
-                            districtId = village.districtId;
+                    // ກວດສອບ ແລະ ຈັບຄູ່ລະຫັດເມືອງ (District ID)
+                    let districtId = item.district_id;
+                    // ກໍລະນີພິເສດ: ສູນ 143 (ເມືອງບໍ່ແຕນ ແຂວງໄຊຍະບູລີ ລະຫັດເກົ່າ 648 ຫຼື ລະຫັດ 809 -> ID 64)
+                    if (districtId === 648 || (item.village?.district_code === '809' && districtId !== 64)) {
+                        districtId = 64;
+                    }
+
+                    if (!districtMap.has(districtId)) {
+                        const code = item.district?.district_code || item.village?.district_code;
+                        if (code && districtByCode.has(code)) {
+                            districtId = districtByCode.get(code)!.id;
                         }
                     }
-                }
 
-                const status = item.center_status === 'A' ? 'ACTIVE' : 'INACTIVE';
-                const { branchId, departmentId } = getBranchAndDept(province.id, province.name, districtId);
+                    if (!districtMap.has(districtId)) {
+                        const reason = `ບໍ່ພົບຂໍ້ມູນເມືອງ ID: ${item.district_id} (${item.district?.district_name || ''}) ໃນລະບົບ`;
+                        console.warn(`[Warning] ຂ້າມສູນ ${item.center_name} (ID: ${item.center_id}): ${reason}`);
+                        failedRecords.push({ centerId: item.center_id, centerName: item.center_name, reason });
+                        continue;
+                    }
 
-                const dataToSave = {
-                    departmentId,
-                    branchId,
-                    centerName: item.center_name ? item.center_name.trim() : '',
-                    imageUrl: imagePath,
-                    phoneNumber: item.center_tel ? item.center_tel.trim() : null,
-                    status: status,
-                    latitude: item.latitude ? parseFloat(item.latitude) : null,
-                    longitude: item.longtitude ? parseFloat(item.longtitude) : null,
-                    provinceId: item.province_id,
-                    districtId: districtId,
-                    villageId: item.village_id,
-                };
+                    // ກວດສອບຂໍ້ມູນບ້ານ (Village)
+                    if (!item.village_id || !villageSet.has(item.village_id)) {
+                        const reason = `ບໍ່ພົບຂໍ້ມູນບ້ານ ID: ${item.village_id} (${item.village?.village_name || ''}) ໃນລະບົບ`;
+                        console.warn(`[Warning] ຂ້າມສູນ ${item.center_name} (ID: ${item.center_id}): ${reason}`);
+                        failedRecords.push({ centerId: item.center_id, centerName: item.center_name, reason });
+                        continue;
+                    }
 
-                try {
+                    // ກຳນົດ ສາຂາ (Branch) ແລະ ຝ່າຍ (Department)
+                    const { branchId, departmentId } = getBranchAndDept(province.id, province.name, districtId);
+
+                    // ດາວໂຫຼດຮູບພາບປະກອບ (ຖ້າມີ)
+                    let imagePath = null;
+                    if (item.center_image && typeof item.center_image === 'string' && item.center_image.trim()) {
+                        const cleanName = item.center_image.trim();
+                        const url = encodeURI(`${this.imageBaseUrl}${cleanName}`);
+                        imagePath = await this.legacyService.downloadImage(url, cleanName);
+                    }
+
+                    const status = item.center_status === 'A' ? 'ACTIVE' : 'INACTIVE';
+
+                    const dataToSave = {
+                        departmentId,
+                        branchId,
+                        centerName: item.center_name ? item.center_name.trim() : '',
+                        imageUrl: imagePath,
+                        phoneNumber: item.center_tel ? item.center_tel.trim() : null,
+                        status: status as any,
+                        latitude: parseCoordinate(item.latitude),
+                        longitude: parseCoordinate(item.longtitude),
+                        provinceId: item.province_id,
+                        districtId: districtId,
+                        villageId: item.village_id,
+                    };
+
                     const saved = await this.repository.upsert(item.center_id, dataToSave);
                     syncedRecords.push(saved);
                 } catch (error: any) {
-                    console.warn(`[Warning] ບໍ່ສາມາດ Sync ສູນ ${item.center_name} ໄດ້`, error.message);
+                    const reason = error.message || 'ເກີດຂໍ້ຜິດພາດໃນການບັນທຶກຂໍ້ມູນ';
+                    console.warn(`[Warning] ບໍ່ສາມາດ Sync ສູນ ${item.center_name} (ID: ${item.center_id}) ໄດ້:`, reason);
+                    failedRecords.push({ centerId: item.center_id, centerName: item.center_name, reason });
                 }
             }
         }
@@ -128,7 +207,9 @@ export class SyncServiceCenterUseCase {
 
         return {
             totalSynced: syncedRecords.length,
+            totalFailed: failedRecords.length,
             data: syncedRecords,
+            failed: failedRecords,
         };
     }
 }

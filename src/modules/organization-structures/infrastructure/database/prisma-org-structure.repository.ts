@@ -41,9 +41,13 @@ export class PrismaOrgStructureRepository implements IOrgStructureRepository {
     }
 
     async update(id: number, data: any): Promise<OrganizationStructure> {
+        const updateData = { ...data };
+        if (updateData.imageUrl === null) {
+            updateData.imageUrl = '';
+        }
         return this.prisma.organizationStructure.update({
             where: { id },
-            data,
+            data: updateData,
         });
     }
 
