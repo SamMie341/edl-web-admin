@@ -211,349 +211,435 @@ async function main() {
     // ============================================================================
     console.log('==> [Prisma Seed] Seeding Electricity Calculator Master Data...');
 
-    // 5.1 Appliance Categories
-    const categoriesData = [
-        { code: 'ac', nameLa: 'ເຄື່ອງປັບອາກາດ (ແອ)', nameEn: 'Air Conditioner', iconName: 'Snowflake', orderIndex: 1 },
-        { code: 'fridge', nameLa: 'ຕູ້ເຢັນ / ຕູ້ແຊ່', nameEn: 'Refrigerator & Freezer', iconName: 'Refrigerator', orderIndex: 2 },
-        { code: 'fan', nameLa: 'ພັດລົມ', nameEn: 'Electric Fan', iconName: 'Fan', orderIndex: 3 },
-        { code: 'led', nameLa: 'ດອກໄຟ LED', nameEn: 'LED Light Bulb', iconName: 'Lightbulb', orderIndex: 4 },
-        { code: 'oldlight', nameLa: 'ດອກໄຟນີອອນ / ດອກໄຟຮຸ່ນເກົ່າ', nameEn: 'Fluorescent / Incandescent Bulb', iconName: 'Lamp', orderIndex: 5 },
-        { code: 'heater', nameLa: 'ເຄື່ອງທຳນ້ຳອຸ່ນ / ກາต้มນ້ຳຮ້ອນ', nameEn: 'Water Heater & Kettle', iconName: 'Flame', orderIndex: 6 },
-        { code: 'kitchen', nameLa: 'ເຄື່ອງໃຊ້ໄຟຟ້າໃນຄົວເຮືອນ', nameEn: 'Kitchen Appliances', iconName: 'Utensils', orderIndex: 7 },
-        { code: 'laundry', nameLa: 'ຈັກຊັກຜ້າ / ເຕົາລີດ', nameEn: 'Laundry & Ironing', iconName: 'Shirt', orderIndex: 8 },
-        { code: 'entertainment', nameLa: 'ໂທລະທັດ / ຄອມພິວເຕີ', nameEn: 'TV & Electronics', iconName: 'Tv', orderIndex: 9 },
-        { code: 'standby', nameLa: 'ສຽບປັກໄຟຖິ້ມໄວ້ (Standby)', nameEn: 'Standby Power', iconName: 'Plug', orderIndex: 10 },
-    ];
+    // 5.1 Clean up deprecated / unneeded seed data (saving templates, presets, appliance categories, 8-tier residential notice)
+    await prisma.savingActionTemplate.deleteMany({});
+    await prisma.appliancePreset.deleteMany({});
+    await prisma.applianceCategory.deleteMany({});
 
-    const categoryMap: Record<string, number> = {};
-    for (const c of categoriesData) {
-        const cat = await prisma.applianceCategory.upsert({
-            where: { code: c.code },
-            update: {
-                nameLa: c.nameLa,
-                nameEn: c.nameEn,
-                iconName: c.iconName,
-                orderIndex: c.orderIndex,
-                status: 'ACTIVE',
-            },
-            create: {
-                code: c.code,
-                nameLa: c.nameLa,
-                nameEn: c.nameEn,
-                iconName: c.iconName,
-                orderIndex: c.orderIndex,
-                status: 'ACTIVE',
-            },
-        });
-        categoryMap[c.code] = cat.id;
-    }
-
-    // 5.2 Appliance Presets
-    const presetsData = [
-        { categoryCode: 'ac', code: 'ac9', nameLa: 'ແອ 9,000 BTU', nameEn: 'Air Conditioner 9,000 BTU', defaultWatt: 800, defaultQuantity: 1, defaultHoursPerDay: 8.0, defaultDaysPerMonth: 30, isSampleDefault: false, orderIndex: 1 },
-        { categoryCode: 'ac', code: 'ac12', nameLa: 'ແອ 12,000 BTU', nameEn: 'Air Conditioner 12,000 BTU', defaultWatt: 1100, defaultQuantity: 1, defaultHoursPerDay: 8.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 2 },
-        { categoryCode: 'ac', code: 'ac18', nameLa: 'ແອ 18,000 BTU', nameEn: 'Air Conditioner 18,000 BTU', defaultWatt: 1600, defaultQuantity: 1, defaultHoursPerDay: 8.0, defaultDaysPerMonth: 30, isSampleDefault: false, orderIndex: 3 },
-        { categoryCode: 'fridge', code: 'fridge', nameLa: 'ຕູ້ເຢັນ 1–2 ປະຕູ (ເຮັດວຽກຕະຫຼອດ)', nameEn: 'Refrigerator (Effective Load)', defaultWatt: 120, defaultQuantity: 1, defaultHoursPerDay: 12.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 4 },
-        { categoryCode: 'fan', code: 'fan16', nameLa: 'ພັດລົມຕັ້ງພື້ນ / ຕັ້ງໂຕະ 16 ນິ້ວ', nameEn: '16-inch Electric Fan', defaultWatt: 50, defaultQuantity: 2, defaultHoursPerDay: 8.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 5 },
-        { categoryCode: 'led', code: 'led9', nameLa: 'ດອກໄຟ LED 9W', nameEn: 'LED Bulb 9W', defaultWatt: 9, defaultQuantity: 5, defaultHoursPerDay: 6.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 6 },
-        { categoryCode: 'oldlight', code: 'oldlight36', nameLa: 'ດອກໄຟນີອອນຍາວ 36W (ຮຸ່ນເກົ່າ)', nameEn: 'Fluorescent Tube 36W', defaultWatt: 36, defaultQuantity: 4, defaultHoursPerDay: 6.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 7 },
-        { categoryCode: 'heater', code: 'heater3500', nameLa: 'ເຄື່ອງທຳນ້ຳອຸ່ນ 3,500W', nameEn: 'Water Heater 3,500W', defaultWatt: 3500, defaultQuantity: 1, defaultHoursPerDay: 0.5, defaultDaysPerMonth: 30, isSampleDefault: false, orderIndex: 8 },
-        { categoryCode: 'kitchen', code: 'ricecooker', nameLa: 'ໝໍ້ຫຸງເຂົ້າໄຟຟ້າ', nameEn: 'Electric Rice Cooker', defaultWatt: 700, defaultQuantity: 1, defaultHoursPerDay: 1.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 9 },
-        { categoryCode: 'laundry', code: 'iron', nameLa: 'ເຕົາລີດໄຟຟ້າ', nameEn: 'Electric Iron', defaultWatt: 1200, defaultQuantity: 1, defaultHoursPerDay: 0.5, defaultDaysPerMonth: 15, isSampleDefault: false, orderIndex: 10 },
-        { categoryCode: 'entertainment', code: 'tv_led', nameLa: 'ໂທລະທັດ LED TV 43–55 ນິ້ວ', nameEn: 'LED TV 43-55 inch', defaultWatt: 100, defaultQuantity: 1, defaultHoursPerDay: 5.0, defaultDaysPerMonth: 30, isSampleDefault: true, orderIndex: 11 },
-        { categoryCode: 'standby', code: 'standby_plug', nameLa: 'ສຽບປັກໄຟຄ້າງໄວ້ (Standby ລວມ)', nameEn: 'Standby Power (Chargers/TV/Appliances)', defaultWatt: 15, defaultQuantity: 1, defaultHoursPerDay: 24.0, defaultDaysPerMonth: 30, isSampleDefault: false, orderIndex: 12 },
-    ];
-
-    for (const p of presetsData) {
-        const categoryId = categoryMap[p.categoryCode];
-        if (!categoryId) continue;
-
-        await prisma.appliancePreset.upsert({
-            where: { code: p.code },
-            update: {
-                categoryId,
-                nameLa: p.nameLa,
-                nameEn: p.nameEn,
-                defaultWatt: p.defaultWatt,
-                defaultQuantity: p.defaultQuantity,
-                defaultHoursPerDay: p.defaultHoursPerDay,
-                defaultDaysPerMonth: p.defaultDaysPerMonth,
-                isSampleDefault: p.isSampleDefault,
-                orderIndex: p.orderIndex,
-                status: 'ACTIVE',
-            },
-            create: {
-                categoryId,
-                code: p.code,
-                nameLa: p.nameLa,
-                nameEn: p.nameEn,
-                defaultWatt: p.defaultWatt,
-                defaultQuantity: p.defaultQuantity,
-                defaultHoursPerDay: p.defaultHoursPerDay,
-                defaultDaysPerMonth: p.defaultDaysPerMonth,
-                isSampleDefault: p.isSampleDefault,
-                orderIndex: p.orderIndex,
-                status: 'ACTIVE',
-            },
-        });
-    }
-
-    // 5.3 Saving Action Templates
-    const savingTemplatesData = [
-        {
-            categoryCode: 'ac',
-            code: 'ac26',
-            titleLa: 'ປັບອຸນຫະພູມແອເປັນ 26–27°C ພ້ອມເປີດພັດລົມຊ່ວຍ',
-            titleEn: 'Set AC to 26–27°C and use a fan',
-            descriptionLa: 'ການປັບອຸນຫະພູມແອຂຶ້ນທຸກໆ 1 ອົງສາ ຊ່ວຍປະຢັດໄຟໄດ້ປະມານ 10–15%',
-            descriptionEn: 'Increasing AC temperature by 1-2°C reduces compressor workload by ~15%',
-            effortLevel: 'EASY' as const,
-            ruleType: 'FIXED_FRACTION' as const,
-            fixedFraction: 0.15,
-            reduceHoursBy: null,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: true,
-            orderIndex: 1,
-        },
-        {
-            categoryCode: 'ac',
-            code: 'actimer',
-            titleLa: 'ຕັ້ງເວລາປິດແອໄວຂຶ້ນ 1 ຊົ່ວໂມງກ່ອນຕື່ນນອນ',
-            titleEn: 'Turn off AC 1 hour earlier using timer',
-            descriptionLa: 'ຄວາມເຢັນຍັງຄົງຢູ່ໃນຫ້ອງອີກ 30–60 ນາທີຫຼັງປິດແອ ຊ່ວຍຫຼຸດຊົ່ວໂມງເຮັດວຽກລົງ 1 ຊມ./ມື້',
-            descriptionEn: 'Room stays cool for 30-60 mins after turning off AC',
-            effortLevel: 'EASY' as const,
-            ruleType: 'REDUCE_HOURS' as const,
-            fixedFraction: null,
-            reduceHoursBy: 1.0,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: true,
-            orderIndex: 2,
-        },
-        {
-            categoryCode: 'ac',
-            code: 'acclean',
-            titleLa: 'ລ້າງແຜ່ນກອງອາກາດ ແລະ ລ້າງແອທຸກໆ 6 ເດືອນ',
-            titleEn: 'Clean AC filters and coils every 6 months',
-            descriptionLa: 'ຊ່ວຍໃຫ້ແອລະບາຍຄວາມເຢັນได้ดีຂຶ້ນ ປະຢັດໄຟລົງປະມານ 10%',
-            descriptionEn: 'Improves airflow and cooling efficiency by ~10%',
-            effortLevel: 'LOW_COST' as const,
-            ruleType: 'FIXED_FRACTION' as const,
-            fixedFraction: 0.10,
-            reduceHoursBy: null,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: false,
-            orderIndex: 3,
-        },
-        {
-            categoryCode: 'oldlight',
-            code: 'toled',
-            titleLa: 'ປ່ຽນດອກໄຟຮຸ່ນເກົ່າເປັນດອກໄຟ LED ປະຢັດໄຟ (9W–16W)',
-            titleEn: 'Replace old bulbs with LED (9W–16W)',
-            descriptionLa: 'ດອກໄຟ LED ໃຫ້ຄວາມສະຫວ່າງເທົ່າກັນ ແຕ່ກິນໄຟໜ້ອຍກວ່າ 50–75%',
-            descriptionEn: 'LED bulbs consume 50-75% less wattage for the same brightness',
-            effortLevel: 'LOW_COST' as const,
-            ruleType: 'REPLACE_WATTAGE' as const,
-            fixedFraction: null,
-            reduceHoursBy: null,
-            targetWattLow: 9,
-            targetWattHigh: 16,
-            defaultSelected: true,
-            orderIndex: 4,
-        },
-        {
-            categoryCode: 'fridge',
-            code: 'fridgeseal',
-            titleLa: 'ຈັດລະບຽບຕູ້ເຢັນ ບໍ່ໃສ່ເຄື່ອງແໜ້ນເກີນໄປ ແລະ ກວດຂອບຢາງປະຕູ',
-            titleEn: 'Avoid overpacking fridge and check door seals',
-            descriptionLa: 'ຊ່ວຍໃຫ້ຄວາມເຢັນໝູນວຽນສະດວກ ຫຼຸດການເຮັດວຽກຂອງຄອມເພຣສເຊີລົງ 10%',
-            descriptionEn: 'Better cold air circulation saves ~10% energy',
-            effortLevel: 'EASY' as const,
-            ruleType: 'FIXED_FRACTION' as const,
-            fixedFraction: 0.10,
-            reduceHoursBy: null,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: true,
-            orderIndex: 5,
-        },
-        {
-            categoryCode: 'heater',
-            code: 'heatershower',
-            titleLa: 'ປັບລະດັບຄວາມຮ້ອນພໍດີ ແລະ ປິດເຄື່ອງທຳນ້ຳອຸ່ນຂະນະຟອກສະບູ',
-            titleEn: 'Lower heater setting and turn off while lathering',
-            descriptionLa: 'ຫຼຸດພາລະກຳລັງໄຟສູງຂອງເຄື່ອງທຳນ້ຳອຸ່ນລົງໄດ້ປະມານ 20%',
-            descriptionEn: 'Reduces high-wattage heating time by ~20%',
-            effortLevel: 'EASY' as const,
-            ruleType: 'FIXED_FRACTION' as const,
-            fixedFraction: 0.20,
-            reduceHoursBy: null,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: true,
-            orderIndex: 6,
-        },
-        {
-            categoryCode: 'standby',
-            code: 'unplugstandby',
-            titleLa: 'ຖອດປັກໄຟ ຫຼື ປິດສະວິດຮາງปลั๊กທຸກຄັ້ງຫຼັງໃຊ້ງານ',
-            titleEn: 'Unplug appliances or switch off power strips when not in use',
-            descriptionLa: 'ຕັດກະແສໄຟທີ່ສູນເສຍໄປລ້າໆ ຂະນະ Standby ໄດ້ເຖິງ 80%',
-            descriptionEn: 'Eliminates up to 80% of phantom standby load',
-            effortLevel: 'EASY' as const,
-            ruleType: 'FIXED_FRACTION' as const,
-            fixedFraction: 0.80,
-            reduceHoursBy: null,
-            targetWattLow: null,
-            targetWattHigh: null,
-            defaultSelected: true,
-            orderIndex: 7,
-        },
-    ];
-
-    for (const st of savingTemplatesData) {
-        const categoryId = categoryMap[st.categoryCode];
-        if (!categoryId) continue;
-
-        await prisma.savingActionTemplate.upsert({
-            where: { code: st.code },
-            update: {
-                categoryId,
-                titleLa: st.titleLa,
-                titleEn: st.titleEn,
-                descriptionLa: st.descriptionLa,
-                descriptionEn: st.descriptionEn,
-                effortLevel: st.effortLevel,
-                ruleType: st.ruleType,
-                fixedFraction: st.fixedFraction,
-                reduceHoursBy: st.reduceHoursBy,
-                targetWattLow: st.targetWattLow,
-                targetWattHigh: st.targetWattHigh,
-                defaultSelected: st.defaultSelected,
-                orderIndex: st.orderIndex,
-                status: 'ACTIVE',
-            },
-            create: {
-                categoryId,
-                code: st.code,
-                titleLa: st.titleLa,
-                titleEn: st.titleEn,
-                descriptionLa: st.descriptionLa,
-                descriptionEn: st.descriptionEn,
-                effortLevel: st.effortLevel,
-                ruleType: st.ruleType,
-                fixedFraction: st.fixedFraction,
-                reduceHoursBy: st.reduceHoursBy,
-                targetWattLow: st.targetWattLow,
-                targetWattHigh: st.targetWattHigh,
-                defaultSelected: st.defaultSelected,
-                orderIndex: st.orderIndex,
-                status: 'ACTIVE',
-            },
-        });
-    }
-
-    // 5.4 Tariff Notice & Monthly Schedules (May 2026 - Dec 2029)
-    const notice = await prisma.tariffNotice.upsert({
+    // Clean up old 8-tier residential notice and its schedules / tiers if they exist
+    const oldResidentialNotice = await prisma.tariffNotice.findUnique({
         where: { noticeNumber: '1916/ຟຟລ.ຝທຜ' },
+    });
+    if (oldResidentialNotice) {
+        await prisma.tariffSchedule.deleteMany({
+            where: { noticeId: oldResidentialNotice.id },
+        });
+        await prisma.tariffNotice.delete({
+            where: { id: oldResidentialNotice.id },
+        });
+    }
+
+    // Clean up any old schedules / categories outside the 27 official notice categories
+    await prisma.tariffSchedule.deleteMany({
+        where: { categoryId: { gt: 27 } },
+    });
+    await prisma.tariffCategory.deleteMany({
+        where: { id: { gt: 27 } },
+    });
+
+    // 5.2 Tariff Notice (Notice 2870/ຟຟລ.ຝທຜ - Q3 2026 Non-Residential)
+    const nonResidentialNotice = await prisma.tariffNotice.upsert({
+        where: { noticeNumber: '2870/ຟຟລ.ຝທຜ' },
         update: {
-            title: 'ແຈ້ງການ ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າປະເພດທີ່ຢູ່ອາໄສ (2026–2029)',
-            issuedDate: new Date('2026-04-15'),
-            effectiveFrom: new Date('2026-05-01'),
-            effectiveTo: new Date('2029-12-31'),
+            title: 'ແຈ້ງການ ປັບປຸງລາຄາໄຟຟ້າພາກບໍ່ແມ່ນທີ່ຢູ່ອາໄສ ປະຈຳໄຕມາດ 03 ປີ 2026',
+            issuedDate: new Date('2026-07-09'),
+            effectiveFrom: new Date('2026-07-01'),
+            effectiveTo: new Date('2026-09-30'),
             vatRate: 0.10,
-            hotSeasonDiscountCapKwh: 300,
+            hotSeasonDiscountCapKwh: 0,
+            maintenanceFeeKip: 10000,
             status: 'ACTIVE',
         },
         create: {
-            noticeNumber: '1916/ຟຟລ.ຝທຜ',
-            title: 'ແຈ້ງການ ໂຄງສ້າງອັດຕາຄ່າໄຟຟ້າປະເພດທີ່ຢູ່ອາໄສ (2026–2029)',
-            issuedDate: new Date('2026-04-15'),
-            effectiveFrom: new Date('2026-05-01'),
-            effectiveTo: new Date('2029-12-31'),
+            noticeNumber: '2870/ຟຟລ.ຝທຜ',
+            title: 'ແຈ້ງການ ປັບປຸງລາຄາໄຟຟ້າພາກບໍ່ແມ່ນທີ່ຢູ່ອາໄສ ປະຈຳໄຕມາດ 03 ປີ 2026',
+            issuedDate: new Date('2026-07-09'),
+            effectiveFrom: new Date('2026-07-01'),
+            effectiveTo: new Date('2026-09-30'),
             vatRate: 0.10,
-            hotSeasonDiscountCapKwh: 300,
+            hotSeasonDiscountCapKwh: 0,
+            maintenanceFeeKip: 10000,
             status: 'ACTIVE',
         },
     });
 
-    // 8 ຂັ້ນບັນໄດມາດຕະຖານ ແລະ ອັດຕາຄ່າໄຟລາຍປີ (2026 - 2029)
-    const yearlyRates: Record<number, number[]> = {
-        2026: [355, 422, 999, 1200, 1450, 1750, 2050, 2350],
-        2027: [450, 550, 1150, 1350, 1600, 1900, 2200, 2500],
-        2028: [600, 720, 1300, 1500, 1750, 2050, 2350, 2650],
-        2029: [750, 900, 1450, 1650, 1900, 2200, 2500, 2800],
-    };
+    // 5.3 Tariff Categories (27 Official EDL Categories from Notice 2870 across 3 Voltage Levels)
+    const tariffCategoriesData: Array<{
+        id: number;
+        nameLa: string;
+        nameEn: string;
+        categoryGroup: string;
+        voltageLevel: string;
+        description: string;
+        orderIndex: number;
+        flatRate: number;
+    }> = [
+        // ==========================================
+        // 1. ແຮງດັນຕ່ຳ 0.4 kV (Low Voltage - 9 Categories)
+        // ==========================================
+        {
+            id: 1,
+            nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
+            nameEn: 'International Organizations',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນຕ່ຳ 0.4 kV (2,632 ກີບ/kWh)',
+            orderIndex: 1,
+            flatRate: 2632,
+        },
+        {
+            id: 2,
+            nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+            nameEn: 'General Business, Backup & Temporary Power',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນຕ່ຳ 0.4 kV (2,101 ກີບ/kWh)',
+            orderIndex: 2,
+            flatRate: 2101,
+        },
+        {
+            id: 3,
+            nameLa: 'ທຸລະກິດສຶກສາ',
+            nameEn: 'Educational Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ທຸລະກິດສຶກສາ ແຮງດັນຕ່ຳ 0.4 kV (1,673 ກີບ/kWh)',
+            orderIndex: 3,
+            flatRate: 1673,
+        },
+        {
+            id: 4,
+            nameLa: 'ທຸລະກິດກິລາ',
+            nameEn: 'Sports Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ທຸລະກິດກິລາ ແຮງດັນຕ່ຳ 0.4 kV (2,029 ກີບ/kWh)',
+            orderIndex: 4,
+            flatRate: 2029,
+        },
+        {
+            id: 5,
+            nameLa: 'ທຸລະກິດບັນເທີງ',
+            nameEn: 'Entertainment Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ທຸລະກິດບັນເທີງ ແຮງດັນຕ່ຳ 0.4 kV (2,715 ກີບ/kWh)',
+            orderIndex: 5,
+            flatRate: 2715,
+        },
+        {
+            id: 6,
+            nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
+            nameEn: 'State Administrative Offices',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນຕ່ຳ 0.4 kV (1,711 ກີບ/kWh)',
+            orderIndex: 6,
+            flatRate: 1711,
+        },
+        {
+            id: 7,
+            nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
+            nameEn: 'Irrigation & Household Agriculture',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນຕ່ຳ 0.4 kV (1,465 ກີບ/kWh)',
+            orderIndex: 7,
+            flatRate: 1465,
+        },
+        {
+            id: 8,
+            nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
+            nameEn: 'Commercial Agriculture',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນຕ່ຳ 0.4 kV (1,826 ກີບ/kWh)',
+            orderIndex: 8,
+            flatRate: 1826,
+        },
+        {
+            id: 9,
+            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+            nameEn: 'General Processing Industry',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '0.4 kV',
+            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນຕ່ຳ 0.4 kV (1,921 ກີບ/kWh)',
+            orderIndex: 9,
+            flatRate: 1921,
+        },
 
-    const tierBrackets = [
-        { tierOrder: 1, label: '0–25', minKwh: 0, maxKwh: 25 },
-        { tierOrder: 2, label: '26–150', minKwh: 26, maxKwh: 150 },
-        { tierOrder: 3, label: '151–300', minKwh: 151, maxKwh: 300 },
-        { tierOrder: 4, label: '301–400', minKwh: 301, maxKwh: 400 },
-        { tierOrder: 5, label: '401–500', minKwh: 401, maxKwh: 500 },
-        { tierOrder: 6, label: '501–1,000', minKwh: 501, maxKwh: 1000 },
-        { tierOrder: 7, label: '1,001–1,500', minKwh: 1001, maxKwh: 1500 },
-        { tierOrder: 8, label: '> 1,500', minKwh: 1501, maxKwh: null },
+        // ==========================================
+        // 2. ແຮງດັນກາງ 22 kV (Medium Voltage - 12 Categories)
+        // ==========================================
+        {
+            id: 10,
+            nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
+            nameEn: 'International Organizations',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນກາງ 22 kV (2,347 ກີບ/kWh)',
+            orderIndex: 10,
+            flatRate: 2347,
+        },
+        {
+            id: 11,
+            nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+            nameEn: 'General Business, Backup & Temporary Power',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນກາງ 22 kV (1,882 ກີບ/kWh)',
+            orderIndex: 11,
+            flatRate: 1882,
+        },
+        {
+            id: 12,
+            nameLa: 'ທຸລະກິດສຶກສາ',
+            nameEn: 'Educational Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ທຸລະກິດສຶກສາ ແຮງດັນກາງ 22 kV (1,505 ກີບ/kWh)',
+            orderIndex: 12,
+            flatRate: 1505,
+        },
+        {
+            id: 13,
+            nameLa: 'ທຸລະກິດກິລາ',
+            nameEn: 'Sports Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ທຸລະກິດກິລາ ແຮງດັນກາງ 22 kV (1,817 ກີບ/kWh)',
+            orderIndex: 13,
+            flatRate: 1817,
+        },
+        {
+            id: 14,
+            nameLa: 'ທຸລະກິດບັນເທີງ',
+            nameEn: 'Entertainment Business',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ທຸລະກິດບັນເທີງ ແຮງດັນກາງ 22 kV (2,422 ກີບ/kWh)',
+            orderIndex: 14,
+            flatRate: 2422,
+        },
+        {
+            id: 15,
+            nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
+            nameEn: 'State Administrative Offices',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນກາງ 22 kV (1,539 ກີບ/kWh)',
+            orderIndex: 15,
+            flatRate: 1539,
+        },
+        {
+            id: 16,
+            nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
+            nameEn: 'Irrigation & Household Agriculture',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນກາງ 22 kV (1,375 ກີບ/kWh)',
+            orderIndex: 16,
+            flatRate: 1375,
+        },
+        {
+            id: 17,
+            nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
+            nameEn: 'Commercial Agriculture',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນກາງ 22 kV (1,785 ກີບ/kWh)',
+            orderIndex: 17,
+            flatRate: 1785,
+        },
+        {
+            id: 18,
+            nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
+            nameEn: 'Mining & Mineral Processing Industry',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນກາງ 22 kV (2,228 ກີບ/kWh)',
+            orderIndex: 18,
+            flatRate: 2228,
+        },
+        {
+            id: 19,
+            nameLa: 'ເຂດເສດຖະກິດພິເສດ',
+            nameEn: 'Special Economic Zones (SEZ)',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນກາງ 22 kV (2,133 ກີບ/kWh)',
+            orderIndex: 19,
+            flatRate: 2133,
+        },
+        {
+            id: 20,
+            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+            nameEn: 'General Processing Industry',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນກາງ 22 kV (1,840 ກີບ/kWh)',
+            orderIndex: 20,
+            flatRate: 1840,
+        },
+        {
+            id: 21,
+            nameLa: 'ນິຄົມອຸດສາຫະກຳ',
+            nameEn: 'Industrial Estate / Industrial Zone',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '22 kV',
+            description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນກາງ 22 kV (1,722 ກີບ/kWh)',
+            orderIndex: 21,
+            flatRate: 1722,
+        },
+
+        // ==========================================
+        // 3. ແຮງດັນສູງ 115 kV (High Voltage - 6 Categories)
+        // ==========================================
+        {
+            id: 22,
+            nameLa: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+            nameEn: 'General Business & Temporary Power',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນສູງ 115 kV (1,801 ກີບ/kWh)',
+            orderIndex: 22,
+            flatRate: 1801,
+        },
+        {
+            id: 23,
+            nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
+            nameEn: 'Mining & Mineral Processing Industry',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນສູງ 115 kV (2,133 ກີບ/kWh)',
+            orderIndex: 23,
+            flatRate: 2133,
+        },
+        {
+            id: 24,
+            nameLa: 'ເຂດເສດຖະກິດພິເສດ',
+            nameEn: 'Special Economic Zones (SEZ)',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນສູງ 115 kV (2,045 ກີບ/kWh)',
+            orderIndex: 24,
+            flatRate: 2045,
+        },
+        {
+            id: 25,
+            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+            nameEn: 'General Processing Industry',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນສູງ 115 kV (1,792 ກີບ/kWh)',
+            orderIndex: 25,
+            flatRate: 1792,
+        },
+        {
+            id: 26,
+            nameLa: 'ນິຄົມອຸດສາຫະກຳ',
+            nameEn: 'Industrial Estate / Industrial Zone',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນສູງ 115 kV (1,680 ກີບ/kWh)',
+            orderIndex: 26,
+            flatRate: 1680,
+        },
+        {
+            id: 27,
+            nameLa: 'ທາງລົດໄຟຄວາມໄວສູງ',
+            nameEn: 'High-Speed Railway',
+            categoryGroup: 'NON_RESIDENTIAL',
+            voltageLevel: '115 kV',
+            description: 'ທາງລົດໄຟຄວາມໄວສູງ ແຮງດັນສູງ 115 kV (1,961 ກີບ/kWh)',
+            orderIndex: 27,
+            flatRate: 1961,
+        },
     ];
 
+    for (const tc of tariffCategoriesData) {
+        await prisma.tariffCategory.upsert({
+            where: { id: tc.id },
+            update: {
+                nameLa: tc.nameLa,
+                nameEn: tc.nameEn,
+                categoryGroup: tc.categoryGroup,
+                voltageLevel: tc.voltageLevel,
+                description: tc.description,
+                orderIndex: tc.orderIndex,
+                status: 'ACTIVE',
+            },
+            create: {
+                id: tc.id,
+                nameLa: tc.nameLa,
+                nameEn: tc.nameEn,
+                categoryGroup: tc.categoryGroup,
+                voltageLevel: tc.voltageLevel,
+                description: tc.description,
+                orderIndex: tc.orderIndex,
+                status: 'ACTIVE',
+            },
+        });
+    }
+
+    // 5.4 Seed Tariff Schedules for all 27 Non-Residential Categories (Notice 2870/ຟຟລ.ຝທຜ, Q3 & 2026)
+    console.log('==> [Prisma Seed] Seeding non-residential flat-rate tariff schedules (27 categories)...');
     let scheduleCount = 0;
-    for (let year = 2026; year <= 2029; year++) {
-        const startMonth = year === 2026 ? 5 : 1;
-        const rates = yearlyRates[year];
-
-        for (let month = startMonth; month <= 12; month++) {
-            const isHotSeason = month >= 3 && month <= 5; // ມີນາ - ພຶດສະພາ (ລະດູຮ້ອນ)
-
+    for (const cat of tariffCategoriesData) {
+        // Seed months 5-12 in 2026 (including Q3 months 7, 8, 9 from Notice 2870)
+        for (let month = 5; month <= 12; month++) {
+            const isHotSeason = month >= 3 && month <= 5;
             const schedule = await prisma.tariffSchedule.upsert({
                 where: {
-                    year_month: { year, month },
+                    categoryId_year_month: { categoryId: cat.id, year: 2026, month },
                 },
                 update: {
-                    noticeId: notice.id,
+                    noticeId: nonResidentialNotice.id,
                     isHotSeason,
+                    maintenanceFeeKip: 10000,
                 },
                 create: {
-                    noticeId: notice.id,
-                    year,
+                    noticeId: nonResidentialNotice.id,
+                    categoryId: cat.id,
+                    year: 2026,
                     month,
                     isHotSeason,
+                    maintenanceFeeKip: 10000,
                 },
             });
 
-            for (let i = 0; i < tierBrackets.length; i++) {
-                const b = tierBrackets[i];
-                const rateKipPerKwh = rates[i];
-
-                await prisma.tariffTier.upsert({
-                    where: {
-                        scheduleId_tierOrder: {
-                            scheduleId: schedule.id,
-                            tierOrder: b.tierOrder,
-                        },
-                    },
-                    update: {
-                        label: b.label,
-                        minKwh: b.minKwh,
-                        maxKwh: b.maxKwh,
-                        rateKipPerKwh,
-                    },
-                    create: {
+            await prisma.tariffTier.upsert({
+                where: {
+                    scheduleId_tierOrder: {
                         scheduleId: schedule.id,
-                        tierOrder: b.tierOrder,
-                        label: b.label,
-                        minKwh: b.minKwh,
-                        maxKwh: b.maxKwh,
-                        rateKipPerKwh,
+                        tierOrder: 1,
                     },
-                });
-            }
+                },
+                update: {
+                    label: 'ອັດຕາດຽວ (Flat Rate)',
+                    minKwh: 0,
+                    maxKwh: null,
+                    rateKipPerKwh: cat.flatRate,
+                },
+                create: {
+                    scheduleId: schedule.id,
+                    tierOrder: 1,
+                    label: 'ອັດຕາດຽວ (Flat Rate)',
+                    minKwh: 0,
+                    maxKwh: null,
+                    rateKipPerKwh: cat.flatRate,
+                },
+            });
             scheduleCount++;
         }
     }
-    console.log(`==> [Prisma Seed] Seeded ${categoriesData.length} appliance categories, ${presetsData.length} presets, ${savingTemplatesData.length} saving templates, and ${scheduleCount} monthly tariff schedules (2026-2029).`);
+
+    // Reset sequence for tariff_categories so future inserts don't collide
+    await prisma.$executeRawUnsafe(
+        `SELECT setval(pg_get_serial_sequence('tariff_categories', 'id'), coalesce(max(id), 1)) FROM tariff_categories;`
+    );
+
+    console.log(`==> [Prisma Seed] Seeded ${tariffCategoriesData.length} tariff categories and ${scheduleCount} monthly tariff schedules.`);
 
     console.log('==> [Prisma Seed] Seeding finished successfully.');
 }

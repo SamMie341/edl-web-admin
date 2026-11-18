@@ -16,7 +16,7 @@ export class DeleteDepartmentUseCase {
         try {
             await this.repository.delete(id);
             return { message: 'ລຶບຂໍ້ມູນຝ່າຍສຳເລັດ' };
-        } catch (error) {
+        } catch {
             // ດັກຈັບ Error ກໍລະນີມີສາຂາ ຫຼື ຜູ້ໃຊ້ຜູກມັດຢູ່ (Foreign Key Constraint)
             throw new BadRequestException('ບໍ່ສາມາດລຶບໄດ້ ເພາະມີສາຂາ ຫຼື ຜູ້ໃຊ້ງານສັງກັດຝ່າຍນີ້ຢູ່');
         }

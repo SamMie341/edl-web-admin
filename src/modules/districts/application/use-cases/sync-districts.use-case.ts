@@ -31,7 +31,7 @@ export class SyncDistrictsUseCase {
             try {
                 const saved = await this.districtRepo.upsert(item.district_id, dataToSave);
                 syncedRecords.push(saved);
-            } catch (error) {
+            } catch {
                 console.warn(`[Warning] ບໍ່ສາມາດ Sync ເມືອງ ${item.district_name} ໄດ້ ເນື່ອງຈາກບໍ່ພົບລະຫັດແຂວງ ${provinceId} ໃນລະບົບ`);
             }
         }

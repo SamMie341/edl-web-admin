@@ -32,7 +32,7 @@ export class SyncVillagesUseCase {
             try {
                 const saved = await this.villageRepository.upsert(item.village_id, dataToSave);
                 syncedRecords.push(saved);
-            } catch (error) {
+            } catch {
                 console.warn(`[Warning] ບໍ່ສາມາດ Sync ບ້ານ ${item.village_name} ໄດ້ ເນື່ອງຈາກບໍ່ພົບເມືອງ ${item.district?.district_name}`);
             }
         }

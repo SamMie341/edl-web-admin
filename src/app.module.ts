@@ -21,6 +21,12 @@ import { NewsModule } from './modules/news/news.module.js';
 import { NewsTagModule } from './modules/news-tags/news-tag.module.js';
 import { LegislationsModule } from './modules/legislations/legislations.module.js';
 import { ElectricityTariffsModule } from './modules/electricity-tariffs/electricity-tariffs.module.js';
+import { TariffCategoriesModule } from './modules/tariff-categories/tariff-categories.module.js';
+import { TariffSchedulesModule } from './modules/tariff-schedules/tariff-schedules.module.js';
+import { ApplianceCategoriesModule } from './modules/appliance-categories/appliance-categories.module.js';
+import { AppliancePresetsModule } from './modules/appliance-presets/appliance-presets.module.js';
+import { SavingTemplatesModule } from './modules/saving-templates/saving-templates.module.js';
+import { ElectricityCalculatorModule } from './modules/electricity-calculator/electricity-calculator.module.js';
 import { ProcurementsModule } from './modules/procurements/procurements.module.js';
 import { PositionsModule } from './modules/positions/positions.module.js';
 import { JobPostingsModule } from './modules/job-postings/job-postings.module.js';
@@ -53,6 +59,12 @@ import { JobPostingsModule } from './modules/job-postings/job-postings.module.js
     NewsTagModule,
     LegislationsModule,
     ElectricityTariffsModule,
+    TariffCategoriesModule,
+    TariffSchedulesModule,
+    ApplianceCategoriesModule,
+    AppliancePresetsModule,
+    SavingTemplatesModule,
+    ElectricityCalculatorModule,
     ProcurementsModule,
     PositionsModule,
     JobPostingsModule,

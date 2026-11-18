@@ -123,11 +123,13 @@ export class PrismaRoleRepository implements IRoleRepository {
             });
 
             if (permissionIds && permissionIds.length > 0) {
+                const uniquePermissionIds = [...new Set(permissionIds)];
                 await tx.rolePermission.createMany({
-                    data: permissionIds.map(pId => ({
+                    data: uniquePermissionIds.map(pId => ({
                         roleId: role.id,
                         permissionId: pId,
                     })),
+                    skipDuplicates: true,
                 });
             }
 
@@ -176,12 +178,14 @@ export class PrismaRoleRepository implements IRoleRepository {
                     where: { roleId: id },
                 });
 
-                if (permissionIds.length > 0) {
+                const uniquePermissionIds = [...new Set(permissionIds)];
+                if (uniquePermissionIds.length > 0) {
                     await tx.rolePermission.createMany({
-                        data: permissionIds.map(pId => ({
+                        data: uniquePermissionIds.map(pId => ({
                             roleId: id,
                             permissionId: pId,
                         })),
+                        skipDuplicates: true,
                     });
                 }
             }
@@ -222,5 +226,17 @@ export class PrismaRoleRepository implements IRoleRepository {
 
     async countUsersByRoleId(roleId: number): Promise<number> {
         return this.prisma.user.count({ where: { roleId } });
+    }
+
+    async findPermissionsByIds(ids: number[]): Promise<{ id: number; module: string; action: string }[]> {
+        if (ids.length === 0) return [];
+        return this.prisma.permission.findMany({
+            where: { id: { in: ids } },
+            select: {
+                id: true,
+                module: true,
+                action: true,
+            },
+        });
     }
 }

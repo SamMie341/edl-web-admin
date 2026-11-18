@@ -11,4 +11,5 @@ export interface IRoleRepository {
     update(id: number, data: { name?: string; description?: string }, permissionIds?: number[]): Promise<any>;
     delete(id: number): Promise<Role>;
     countUsersByRoleId(roleId: number): Promise<number>;
+    findPermissionsByIds(ids: number[]): Promise<{ id: number; module: string; action: string }[]>;
 }

@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException, HttpException, HttpStatus } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException } from '@nestjs/common';
 import { PASSWORD_HASHER } from '../../../auth/domain/services/password-hasher.interface.js';
 import type { IPasswordHasher } from '../../../auth/domain/services/password-hasher.interface.js';
 import * as hrmServiceInterface from '../../domain/repositories/hrm.service.interface.js';

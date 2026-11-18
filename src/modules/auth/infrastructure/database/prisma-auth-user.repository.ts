@@ -1,7 +1,36 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaService } from "../../../../core/database/prisma.service.js";
+import { resolveEffectivePermissions } from "../../../../core/utils/permission-resolver.util.js";
 import { AuthUser } from "../../domain/entities/auth-user.entity.js";
 import { IAuthUserRepository } from "../../domain/repositories/auth-user.repository.interface.js";
+
+const AUTH_USER_INCLUDE = {
+    role: {
+        include: {
+            rolePermissions: {
+                select: {
+                    permission: {
+                        select: {
+                            module: true,
+                            action: true,
+                        },
+                    },
+                },
+            },
+        },
+    },
+    userPermissions: {
+        select: {
+            effect: true,
+            permission: {
+                select: {
+                    module: true,
+                    action: true,
+                },
+            },
+        },
+    },
+} as const;
 
 @Injectable()
 export class PrismaAuthUserRepository implements IAuthUserRepository {
@@ -10,32 +39,7 @@ export class PrismaAuthUserRepository implements IAuthUserRepository {
     async findByEmployeeCode(employeeCode: string): Promise<AuthUser | null> {
         const user = await this.prisma.user.findUnique({
             where: { employeeCode },
-            include: {
-                role: {
-                    include: {
-                        rolePermissions: {
-                            select: {
-                                permission: {
-                                    select: {
-                                        module: true,
-                                        action: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                userPermissions: {
-                    select: {
-                        permission: {
-                            select: {
-                                module: true,
-                                action: true,
-                            },
-                        },
-                    },
-                },
-            },
+            include: AUTH_USER_INCLUDE,
         });
         return user ? this.toDomain(user) : null;
     }
@@ -43,32 +47,7 @@ export class PrismaAuthUserRepository implements IAuthUserRepository {
     async findById(id: number): Promise<AuthUser | null> {
         const user = await this.prisma.user.findUnique({
             where: { id },
-            include: {
-                role: {
-                    include: {
-                        rolePermissions: {
-                            select: {
-                                permission: {
-                                    select: {
-                                        module: true,
-                                        action: true,
-                                    },
-                                },
-                            },
-                        },
-                    },
-                },
-                userPermissions: {
-                    select: {
-                        permission: {
-                            select: {
-                                module: true,
-                                action: true,
-                            },
-                        },
-                    },
-                },
-            },
+            include: AUTH_USER_INCLUDE,
         });
         return user ? this.toDomain(user) : null;
     }
@@ -87,14 +66,17 @@ export class PrismaAuthUserRepository implements IAuthUserRepository {
         })) || [];
 
         const userPermissions = user.userPermissions?.map((up: any) => ({
-            module: up.permission.module,
-            action: up.permission.action,
+            effect: up.effect,
+            permission: {
+                module: up.permission.module,
+                action: up.permission.action,
+            },
         })) || [];
 
-        const permMap = new Map<string, { module: string; action: string }>();
-        for (const p of [...rolePermissions, ...userPermissions]) {
-            permMap.set(`${p.module}:${p.action}`, p);
-        }
+        const { effectivePermissions, deniedPermissions } = resolveEffectivePermissions(
+            rolePermissions,
+            userPermissions,
+        );
 
         return new AuthUser({
             id: user.id,
@@ -107,7 +89,8 @@ export class PrismaAuthUserRepository implements IAuthUserRepository {
             unitName: user.unitName,
             role: user.role?.name || 'STAFF',
             status: user.status,
-            permissions: Array.from(permMap.values()),
+            permissions: effectivePermissions,
+            deniedPermissions,
         });
     }
 }

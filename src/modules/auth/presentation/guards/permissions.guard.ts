@@ -3,6 +3,7 @@ import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
 import { PERMISSION_KEY, RequiredPermission } from "../../../../core/decorators/permissions.decorator.js";
 import { IS_PUBLIC_KEY } from "../../../../core/decorators/public.decorator.js";
+import { hasUserEffectivePermission } from "../../../../core/utils/permission-resolver.util.js";
 
 @Injectable()
 export class PermissionsGuard implements CanActivate {
@@ -19,12 +20,17 @@ export class PermissionsGuard implements CanActivate {
             return true;
         }
 
-        const required = this.reflector.getAllAndOverride<RequiredPermission>(PERMISSION_KEY, [
+        const required = this.reflector.getAllAndOverride<RequiredPermission | RequiredPermission[]>(PERMISSION_KEY, [
             context.getHandler(),
             context.getClass(),
         ]);
 
         if (!required) {
+            return true;
+        }
+
+        const requiredList = Array.isArray(required) ? required : [required];
+        if (requiredList.length === 0) {
             return true;
         }
 
@@ -35,13 +41,7 @@ export class PermissionsGuard implements CanActivate {
             throw new ForbiddenException('ບໍ່ພົບຂໍ້ມູນຜູ້ໃຊ້ງານ');
         }
 
-        if (user.role === 'SUPERADMIN') {
-            return true;
-        }
-
-        const userPermissions: { module: string; action: string }[] = user.permissions || [];
-
-        const hasPermission = userPermissions.some((p) => p.module === required.module && p.action === required.action);
+        const hasPermission = requiredList.some((perm) => hasUserEffectivePermission(user, perm));
 
         if (!hasPermission) {
             throw new ForbiddenException('ທ່ານບໍ່ມີສິດເຂົ້າເຖິງ ຫຼື ດຳເນີນການໃນສ່ວນນີ້');

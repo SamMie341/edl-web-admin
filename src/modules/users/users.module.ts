@@ -12,6 +12,7 @@ import { DeleteUserUseCase } from "./application/use-cases/delete-user.use-case.
 import { ChangePasswordUseCase } from "./application/use-cases/change-password.use-case.js";
 import { AssignPermissionsUseCase } from "./application/use-cases/assign-permissions.use-case.js";
 import { GetPermissionsUseCase } from "./application/use-cases/get-permissions.use-case.js";
+import { GetUserPermissionsUseCase } from "./application/use-cases/get-user-permissions.use-case.js";
 
 @Module({
     imports: [HttpModule],
@@ -28,6 +29,7 @@ import { GetPermissionsUseCase } from "./application/use-cases/get-permissions.u
         ChangePasswordUseCase,
         AssignPermissionsUseCase,
         GetPermissionsUseCase,
+        GetUserPermissionsUseCase,
         {
             provide: USER_REPOSITORY,
             useClass: PrismaUserRepository,

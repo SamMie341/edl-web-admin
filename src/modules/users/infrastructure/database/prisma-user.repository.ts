@@ -3,6 +3,28 @@ import { IUserRepository } from "../../domain/repositories/user.repository.inter
 import { User } from "../../../../generated/prisma/client.js";
 import { PrismaService } from "../../../../core/database/prisma.service.js";
 
+const USER_DETAIL_INCLUDE = {
+    role: {
+        select: {
+            id: true,
+            name: true,
+            description: true,
+        },
+    },
+    userPermissions: {
+        select: {
+            effect: true,
+            permission: {
+                select: {
+                    id: true,
+                    module: true,
+                    action: true,
+                },
+            },
+        },
+    },
+} as const;
+
 @Injectable()
 export class PrismaUserRepository implements IUserRepository {
     constructor(private readonly prisma: PrismaService) { }
@@ -14,52 +36,14 @@ export class PrismaUserRepository implements IUserRepository {
     async findAll(): Promise<any[]> {
         return this.prisma.user.findMany({
             orderBy: { createdAt: 'desc' },
-            include: {
-                role: {
-                    select: {
-                        id: true,
-                        name: true,
-                        description: true,
-                    },
-                },
-                userPermissions: {
-                    select: {
-                        permission: {
-                            select: {
-                                id: true,
-                                module: true,
-                                action: true,
-                            },
-                        },
-                    },
-                },
-            },
+            include: USER_DETAIL_INCLUDE,
         });
     }
 
     async findById(id: number): Promise<any | null> {
         return this.prisma.user.findUnique({
             where: { id },
-            include: {
-                role: {
-                    select: {
-                        id: true,
-                        name: true,
-                        description: true,
-                    },
-                },
-                userPermissions: {
-                    select: {
-                        permission: {
-                            select: {
-                                id: true,
-                                module: true,
-                                action: true,
-                            },
-                        },
-                    },
-                },
-            },
+            include: USER_DETAIL_INCLUDE,
         });
     }
 

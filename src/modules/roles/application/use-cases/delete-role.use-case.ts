@@ -1,4 +1,6 @@
-import { BadRequestException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
+import { findMissingActorPermissions } from "../../../../core/utils/permission-resolver.util.js";
+import type { RequestUser } from "../../../auth/domain/entities/auth-user.entity.js";
 import * as roleRepoInterface from "../../domain/repositories/role.repository.interface.js";
 import type { IRoleRepository } from "../../domain/repositories/role.repository.interface.js";
 
@@ -8,7 +10,7 @@ export class DeleteRoleUseCase {
         @Inject(roleRepoInterface.ROLE_REPOSITORY) private readonly repo: IRoleRepository,
     ) { }
 
-    async execute(id: number) {
+    async execute(id: number, currentUser?: RequestUser) {
         const existing = await this.repo.findById(id);
         if (!existing) {
             throw new NotFoundException(`ບໍ່ພົບຂໍ້ມູນສິດທິ (Role) ລະຫັດ ID ${id}`);
@@ -16,6 +18,13 @@ export class DeleteRoleUseCase {
 
         if (existing.name === 'SUPERADMIN') {
             throw new BadRequestException('ບໍ່ສາມາດລຶບສິດທິ SUPERADMIN ຂອງລະບົບໄດ້');
+        }
+
+        if (currentUser && currentUser.role !== 'SUPERADMIN') {
+            const missingPerms = findMissingActorPermissions(currentUser, existing.permissions ?? []);
+            if (missingPerms.length > 0) {
+                throw new ForbiddenException('ທ່ານບໍ່ມີສິດລຶບບົດບາດທີ່ມີສິດທິສູງກວ່າສິດທິຂອງຕົນເອງໄດ້');
+            }
         }
 
         const userCount = await this.repo.countUsersByRoleId(id);

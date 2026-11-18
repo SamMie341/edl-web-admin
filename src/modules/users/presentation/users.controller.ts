@@ -1,7 +1,7 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
-import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
+import { RequireAnyPermission, RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { CurrentUser } from "../../../core/decorators/current-user.decorator.js";
 import type { RequestUser } from "../../auth/domain/entities/auth-user.entity.js";
 import { GetUsersUseCase } from "../application/use-cases/get-users.use-case.js";
@@ -13,6 +13,7 @@ import { ChangePasswordUseCase } from "../application/use-cases/change-password.
 import { ChangePasswordDto } from "../application/dto/change-password.dto.js";
 import { AssignPermissionsUseCase } from "../application/use-cases/assign-permissions.use-case.js";
 import { GetPermissionsUseCase } from "../application/use-cases/get-permissions.use-case.js";
+import { GetUserPermissionsUseCase } from "../application/use-cases/get-user-permissions.use-case.js";
 import { AssignPermissionsDto } from "../application/dto/assign-permissions.dto.js";
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -26,11 +27,22 @@ export class UsersController {
         private readonly changePasswordUseCase: ChangePasswordUseCase,
         private readonly assignPermissionsUseCase: AssignPermissionsUseCase,
         private readonly getPermissionsUseCase: GetPermissionsUseCase,
+        private readonly getUserPermissionsUseCase: GetUserPermissionsUseCase,
     ) { }
 
     @Get('permissions/list')
+    @RequireAnyPermission(
+        { module: 'USERS', action: 'READ' },
+        { module: 'ROLES', action: 'READ' },
+    )
     async getPermissions() {
         return await this.getPermissionsUseCase.execute();
+    }
+
+    @Get(':id/permissions')
+    @RequirePermission('USERS', 'READ')
+    async getUserPermissions(@Param('id', ParseIntPipe) id: number) {
+        return await this.getUserPermissionsUseCase.execute(id);
     }
 
     @Post('sync/:empCode')
@@ -51,17 +63,12 @@ export class UsersController {
 
     @Put('change-role/:id')
     @RequirePermission('USERS', 'UPDATE')
-    async update(@Param('id', ParseIntPipe) id: number, @Body() dto: UpdateUserDto) {
-        return await this.updateUseCase.execute(id, dto);
-    }
-
-    @Put(':id/permissions')
-    @RequirePermission('USERS', 'UPDATE')
-    async assignPermissions(
+    async update(
         @Param('id', ParseIntPipe) id: number,
-        @Body() dto: AssignPermissionsDto,
+        @Body() dto: UpdateUserDto,
+        @CurrentUser() currentUser: RequestUser,
     ) {
-        return await this.assignPermissionsUseCase.execute(id, dto);
+        return await this.updateUseCase.execute(id, dto, currentUser);
     }
 
     @Put('change-password/:id')
@@ -73,9 +80,22 @@ export class UsersController {
         return await this.changePasswordUseCase.execute(id, dto, currentUser);
     }
 
+    @Put(':id/permissions')
+    @RequirePermission('USERS', 'UPDATE')
+    async assignPermissions(
+        @Param('id', ParseIntPipe) id: number,
+        @Body() dto: AssignPermissionsDto,
+        @CurrentUser() currentUser: RequestUser,
+    ) {
+        return await this.assignPermissionsUseCase.execute(id, dto, currentUser);
+    }
+
     @Delete(':id')
     @RequirePermission('USERS', 'DELETE')
-    async remove(@Param('id', ParseIntPipe) id: number) {
-        return await this.deleteUseCase.execute(id);
+    async remove(
+        @Param('id', ParseIntPipe) id: number,
+        @CurrentUser() currentUser: RequestUser,
+    ) {
+        return await this.deleteUseCase.execute(id, currentUser);
     }
 }

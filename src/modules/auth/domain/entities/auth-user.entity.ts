@@ -19,6 +19,7 @@ export interface AuthUserProps {
     role: string;
     status: string;
     permissions?: UserPermissionItem[];
+    deniedPermissions?: UserPermissionItem[];
 }
 
 /**
@@ -85,6 +86,7 @@ export class AuthUser {
             role: this.props.role,
             status: this.props.status,
             permissions: this.props.permissions || [],
+            deniedPermissions: this.props.deniedPermissions || [],
         };
     }
 }
@@ -103,4 +105,5 @@ export interface RequestUser {
     role: string;
     status: string;
     permissions: UserPermissionItem[];
+    deniedPermissions?: UserPermissionItem[];
 }

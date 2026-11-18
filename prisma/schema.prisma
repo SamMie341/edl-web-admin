@@ -39,19 +39,25 @@ model Permission {
 }
 
 model RolePermission {
-  roleId       Int        @map("role_id")
-  permissionId Int        @map("permission_id")
+  roleId       Int @map("role_id")
+  permissionId Int @map("permission_id")
 
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
   @@map("role_permissions")
 }
 
+enum PermissionEffect {
+  ALLOW
+  DENY
+}
+
 model UserPermission {
-  userId       Int @map("user_id")
-  permissionId Int @map("permission_id")
+  userId       Int              @map("user_id")
+  permissionId Int              @map("permission_id")
+  effect       PermissionEffect @default(ALLOW)
 
   user       User       @relation(fields: [userId], references: [id], onDelete: Cascade)
   permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
@@ -407,6 +413,166 @@ model User {
   userPermissions UserPermission[]
 
   @@map("users")
+}
+
+// ==========================================
+// MOD-05: Electricity Calculator & Saving Plan
+// ==========================================
+
+enum EffortLevel {
+  EASY // ງ່າຍ (ປັບພຶດຕິກຳໄດ້ທັນທີ)
+  LOW_COST // ລົງທຶນໜ້ອຍ (ເຊັ່ນ ປ່ຽນດອກໄຟເປັນ LED)
+  INVESTMENT // ລົງທຶນ (ເຊັ່ນ ປ່ຽນແອເປັນ Inverter)
+}
+
+enum SavingRuleType {
+  FIXED_FRACTION // ຫຼຸດຕາມ % ຄົງທີ່ ເຊັ່ນ ຕັ້ງແອ 26°C ຫຼຸດ 15% (0.15)
+  REDUCE_HOURS // ຫຼຸດຈຳນວນຊົ່ວໂມງຕໍ່ມື້ ເຊັ່ນ ຕັ້ງເວລາປິດແອໄວຂຶ້ນ 1 ຊມ.
+  REPLACE_WATTAGE // ປ່ຽນກຳລັງວັດ ເຊັ່ນ ປ່ຽນດອກໄຟເກົ່າເປັນ LED 9W ຫຼື 16W
+}
+
+/// ໝວດໝູ່ເຄື່ອງໃຊ້ໄຟຟ້າ (ເຊັ່ນ ແອ, ຕູ້ເຢັນ, ດອກໄຟ LED, ພັດລົມ, ເຄື່ອງທຳນ້ຳອຸ່ນ)
+model ApplianceCategory {
+  id         Int          @id @default(autoincrement())
+  nameLa     String       @map("name_la")
+  nameEn     String?      @map("name_en")
+  orderIndex Int          @default(0) @map("order_index")
+  status     CommonStatus @default(ACTIVE)
+  createdAt  DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt  DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  presets         AppliancePreset[]
+  actionTemplates SavingActionTemplate[]
+
+  @@map("appliance_categories")
+}
+
+/// ຂໍ້ມູນຕົ້ນແບບເຄື່ອງໃຊ້ໄຟຟ້າ (Preset Dropdown ເຊັ່ນ ແອ 9,000 BTU, ຕູ້ເຢັນ 1–2 ປະຕູ, ພັດລົມ 16 ນິ້ວ)
+model AppliancePreset {
+  id                  Int          @id @default(autoincrement())
+  categoryId          Int          @map("category_id")
+  nameLa              String       @map("name_la")
+  nameEn              String?      @map("name_en")
+  defaultWatt         Int          @map("default_watt")
+  defaultQuantity     Int          @default(1) @map("default_quantity")
+  defaultHoursPerDay  Decimal      @default(4.0) @map("default_hours_per_day") @db.Decimal(4, 1)
+  defaultDaysPerMonth Int          @default(30) @map("default_days_per_month")
+  isSampleDefault     Boolean      @default(false) @map("is_sample_default")
+  orderIndex          Int          @default(0) @map("order_index")
+  status              CommonStatus @default(ACTIVE)
+  createdAt           DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt           DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  category ApplianceCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  @@index([categoryId])
+  @@map("appliance_presets")
+}
+
+/// ແມ່ແບບວິທີປະຢັດໄຟແຍກຕາມໝວດໝູ່ເຄື່ອງໃຊ້ໄຟຟ້າ
+model SavingActionTemplate {
+  id            Int            @id @default(autoincrement())
+  categoryId    Int            @map("category_id")
+  titleLa       String         @map("title_la")
+  titleEn       String?        @map("title_en")
+  descriptionLa String         @map("description_la")
+  descriptionEn String?        @map("description_en")
+  effortLevel   EffortLevel    @default(EASY) @map("effort_level")
+  ruleType      SavingRuleType @map("rule_type")
+
+  // ພາລາມິເຕີສຳລັບຄຳນວນສັດສ່ວນການປະຢັດ (frac)
+  fixedFraction  Decimal? @map("fixed_fraction") @db.Decimal(5, 4)
+  reduceHoursBy  Decimal? @map("reduce_hours_by") @db.Decimal(4, 1)
+  targetWattLow  Int?     @map("target_watt_low")
+  targetWattHigh Int?     @map("target_watt_high")
+
+  defaultSelected Boolean      @default(true) @map("default_selected")
+  orderIndex      Int          @default(0) @map("order_index")
+  status          CommonStatus @default(ACTIVE)
+  createdAt       DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt       DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  category ApplianceCategory @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+
+  @@index([categoryId])
+  @@map("saving_action_templates")
+}
+
+/// ປະກາດອັດຕາຄ່າໄຟຟ້າ (ເຊັ່ນ ແຈ້ງການ ຟຟລ ເລກທີ 1916/ຟຟລ.ຝທຜ)
+model TariffNotice {
+  id                      Int          @id @default(autoincrement())
+  noticeNumber            String       @unique @map("notice_number")
+  title                   String
+  issuedDate              DateTime     @map("issued_date") @db.Date
+  effectiveFrom           DateTime     @map("effective_from") @db.Date
+  effectiveTo             DateTime     @map("effective_to") @db.Date
+  vatRate                 Decimal      @default(0.10) @map("vat_rate") @db.Decimal(5, 4)
+  hotSeasonDiscountCapKwh Int          @default(300) @map("hot_season_discount_cap_kwh")
+  maintenanceFeeKip       Decimal      @default(0) @map("maintenance_fee_kip") @db.Decimal(14, 2)
+  status                  CommonStatus @default(ACTIVE)
+  createdAt               DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt               DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  schedules TariffSchedule[]
+
+  @@map("tariff_notices")
+}
+
+/// ໝວດໝູ່/ປະເພດລາຄາໄຟຟ້າ (Tariff Categories: ທີ່ຢູ່ອາໄສ, ທຸລະກິດ, ອຸດສາຫະກຳ, ກະສິກຳ, ຯລຯ)
+model TariffCategory {
+  id            Int          @id @default(autoincrement())
+  nameLa        String       @map("name_la") // ເຊັ່ນ "ປະເພດທີ່ຢູ່ອາໄສ"
+  nameEn        String?      @map("name_en") // ເຊັ່ນ "Residential / Household"
+  categoryGroup String?      @map("category_group") // "RESIDENTIAL" | "NON_RESIDENTIAL"
+  voltageLevel  String?      @map("voltage_level") // "0.4 kV" | "22 kV" | "115 kV"
+  description   String?
+  orderIndex    Int          @default(0) @map("order_index")
+  status        CommonStatus @default(ACTIVE)
+  createdAt     DateTime     @default(now()) @map("created_at") @db.Timestamptz
+  updatedAt     DateTime     @updatedAt @map("updated_at") @db.Timestamptz
+
+  schedules TariffSchedule[]
+
+  @@map("tariff_categories")
+}
+
+/// ຕາຕະລາງອັດຕາຄ່າໄຟລາຍເດືອນ (ພ.ຄ. 2026 - ທ.ຄ. 2029)
+model TariffSchedule {
+  id                Int      @id @default(autoincrement())
+  noticeId          Int      @map("notice_id")
+  categoryId        Int      @map("category_id")
+  year              Int
+  month             Int
+  isHotSeason       Boolean  @default(false) @map("is_hot_season")
+  maintenanceFeeKip Decimal? @map("maintenance_fee_kip") @db.Decimal(14, 2)
+  createdAt         DateTime @default(now()) @map("created_at") @db.Timestamptz
+
+  notice   TariffNotice   @relation(fields: [noticeId], references: [id], onDelete: Cascade)
+  category TariffCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+  tiers    TariffTier[]
+
+  @@unique([categoryId, year, month])
+  @@index([noticeId])
+  @@index([categoryId])
+  @@index([year, isHotSeason])
+  @@map("tariff_schedules")
+}
+
+/// ຂັ້ນບັນໄດອັດຕາຄ່າໄຟຟ້າ (8 ຂັ້ນຕໍ່ເດືອນ)
+model TariffTier {
+  id            Int     @id @default(autoincrement())
+  scheduleId    Int     @map("schedule_id")
+  tierOrder     Int     @map("tier_order") // 1 - 8
+  label         String // "0–25", "26–150", ..., "> 1,500"
+  minKwh        Int     @map("min_kwh")
+  maxKwh        Int?    @map("max_kwh") // null = ບໍ່ຈຳກັດເພດານ (ຂັ້ນທີ 8)
+  rateKipPerKwh Decimal @map("rate_kip_per_kwh") @db.Decimal(10, 2)
+
+  schedule TariffSchedule @relation(fields: [scheduleId], references: [id], onDelete: Cascade)
+
+  @@unique([scheduleId, tierOrder])
+  @@index([scheduleId])
+  @@map("tariff_tiers")
 }
 
 // ==========================================

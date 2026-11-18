@@ -50,7 +50,7 @@ export class LegacyCenterService implements ILegacyCenterService {
             await finished(writer);
 
             return `/uploads/centers/${fileName}`;
-        } catch (error) {
+        } catch {
             console.warn(`[Warning] ໂຫຼດຮູບສູນ ${fileName} ບໍ່ສຳເລັດ`);
             return null;
         }

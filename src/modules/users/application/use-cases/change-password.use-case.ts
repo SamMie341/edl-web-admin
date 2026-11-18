@@ -1,5 +1,6 @@
 import { BadRequestException, ForbiddenException, Inject, Injectable, NotFoundException } from "@nestjs/common";
 import * as bcrypt from 'bcryptjs';
+import { hasUserEffectivePermission } from "../../../../core/utils/permission-resolver.util.js";
 import * as userRepositoryInterface from "../../domain/repositories/user.repository.interface.js";
 import { ChangePasswordDto } from "../dto/change-password.dto.js";
 import type { RequestUser } from "../../../auth/domain/entities/auth-user.entity.js";
@@ -31,13 +32,14 @@ export class ChangePasswordUseCase {
                     throw new BadRequestException('ກະລຸນາປ້ອນລະຫັດຜ່ານເກົ່າ (oldPassword)');
                 }
             } else {
-                // 2. ປ່ຽນລະຫັດຜ່ານໃຫ້ຜູ້ໃຊ້ອື່ນ (Admin Reset): ຕ້ອງມີສິດ USERS:UPDATE ຫຼື ເປັນ SUPERADMIN
+                // 2. ປ່ຽນລະຫັດຜ່ານໃຫ້ຜູ້ໃຊ້ອື່ນ (Admin Reset): ຕ້ອງມີສິດ USERS:UPDATE (ຫຼື SUPERADMIN ທີ່ບໍ່ຖືກ DENY)
                 const isSuperAdmin = currentUser.role === 'SUPERADMIN';
-                const canUpdate = currentUser.permissions?.some(
-                    (p) => p.module === 'USERS' && p.action === 'UPDATE',
-                );
+                const canUpdate = hasUserEffectivePermission(currentUser, {
+                    module: 'USERS',
+                    action: 'UPDATE',
+                });
 
-                if (!isSuperAdmin && !canUpdate) {
+                if (!canUpdate) {
                     throw new ForbiddenException('ທ່ານບໍ່ມີສິດປ່ຽນລະຫັດຜ່ານຂອງຜູ້ໃຊ້ອື່ນ');
                 }
 

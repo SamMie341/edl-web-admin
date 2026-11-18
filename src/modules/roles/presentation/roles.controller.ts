@@ -1,4 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UseGuards } from "@nestjs/common";
+import { CurrentUser } from "../../../core/decorators/current-user.decorator.js";
+import type { RequestUser } from "../../auth/domain/entities/auth-user.entity.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
 import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
@@ -25,8 +27,8 @@ export class RolesController {
 
     @Post()
     @RequirePermission('ROLES', 'CREATE')
-    create(@Body() dto: CreateRoleDto) {
-        return this.createUseCase.execute(dto);
+    create(@Body() dto: CreateRoleDto, @CurrentUser() currentUser: RequestUser) {
+        return this.createUseCase.execute(dto, currentUser);
     }
 
     @Get()
@@ -58,13 +60,14 @@ export class RolesController {
     update(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: UpdateRoleDto,
+        @CurrentUser() currentUser: RequestUser,
     ) {
-        return this.updateUseCase.execute(id, dto);
+        return this.updateUseCase.execute(id, dto, currentUser);
     }
 
     @Delete(':id')
     @RequirePermission('ROLES', 'DELETE')
-    remove(@Param('id', ParseIntPipe) id: number) {
-        return this.deleteUseCase.execute(id);
+    remove(@Param('id', ParseIntPipe) id: number, @CurrentUser() currentUser: RequestUser) {
+        return this.deleteUseCase.execute(id, currentUser);
     }
 }
