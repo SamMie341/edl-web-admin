@@ -6,7 +6,6 @@ import {
 } from "../../../../core/utils/permission-resolver.util.js";
 import { PermissionEffect } from "../../../../generated/prisma/enums.js";
 import type { RequestUser } from "../../../auth/domain/entities/auth-user.entity.js";
-import { USER_SAFE_SELECT } from "../../infrastructure/database/prisma-user.repository.js";
 import { AssignPermissionsDto } from "../dto/assign-permissions.dto.js";
 
 @Injectable()
@@ -27,11 +26,9 @@ export class AssignPermissionsUseCase {
 
         const user = await this.prisma.user.findUnique({
             where: { id: userId },
-            select: {
-                id: true,
+            include: {
                 role: {
-                    select: {
-                        name: true,
+                    include: {
                         rolePermissions: {
                             select: {
                                 permission: {
@@ -115,11 +112,10 @@ export class AssignPermissionsUseCase {
                 }
             }
 
-            // 3. ດຶງຂໍ້ມູນຜູ້ໃຊ້ພ້ອມລາຍການສິດທີ່ອັບເດດແລ້ວ (ບໍ່ສົ່ງ passwordHash)
+            // 3. ດຶງຂໍ້ມູນຜູ້ໃຊ້ພ້ອມລາຍການສິດທີ່ອັບເດດແລ້ວ
             const updatedUser = await tx.user.findUnique({
                 where: { id: userId },
-                select: {
-                    ...USER_SAFE_SELECT,
+                include: {
                     userPermissions: {
                         select: {
                             effect: true,

@@ -188,72 +188,24 @@ async function main() {
 
     // 4. ສ້າງ/ອັບເດດ SuperAdmin User
     const saltRounds = 10;
-    const superAdminEmail = 'admin@edl.com.la';
-    const configuredSuperAdminPassword = process.env.SUPERADMIN_PASSWORD?.trim();
-    const forceResetSuperAdmin = process.env.SUPERADMIN_RESET_PASSWORD === 'true';
-    const existingSuperAdmin = await prisma.user.findUnique({
-        where: { email: superAdminEmail },
-    });
+    const passwordHash = await bcrypt.hash('EDL1234', saltRounds);
 
-    const validateStrongPassword = (password: string) => {
-        if (password.length < 6 || password === 'EDL1234') {
-            throw new Error(
-                'SUPERADMIN_PASSWORD must be at least 12 characters long and must not be the default weak password.',
-            );
-        }
-    };
-
-    let superAdmin;
-    if (!existingSuperAdmin) {
-        if (!configuredSuperAdminPassword) {
-            throw new Error(
-                'SUPERADMIN_PASSWORD is required in environment variables when creating the initial SuperAdmin user.',
-            );
-        }
-        validateStrongPassword(configuredSuperAdminPassword);
-        const passwordHash = await bcrypt.hash(configuredSuperAdminPassword, saltRounds);
-
-        superAdmin = await prisma.user.create({
-            data: {
-                employeeCode: 'EDL-0001',
-                firstName: 'Super',
-                lastName: 'Admin',
-                email: superAdminEmail,
-                passwordHash,
-                role: { connect: { id: roleMap['SUPERADMIN'] } },
-                status: 'ACTIVE',
-                mustChangePassword: false,
-            },
-        });
-    } else {
-        const updateData: {
-            role: { connect: { id: number } };
-            status: 'ACTIVE';
-            passwordHash?: string;
-            mustChangePassword?: boolean;
-        } = {
-            role: { connect: { id: roleMap['SUPERADMIN'] } },
+    const superAdmin = await prisma.user.upsert({
+        where: { email: 'admin@edl.com.la' },
+        update: {
+            roleId: roleMap['SUPERADMIN'],
             status: 'ACTIVE',
-        };
-
-        if (configuredSuperAdminPassword) {
-            const hasLegacyDefaultPassword = await bcrypt.compare(
-                'EDL1234',
-                existingSuperAdmin.passwordHash,
-            );
-            if (forceResetSuperAdmin || hasLegacyDefaultPassword) {
-                validateStrongPassword(configuredSuperAdminPassword);
-                updateData.passwordHash = await bcrypt.hash(configuredSuperAdminPassword, saltRounds);
-                updateData.mustChangePassword = false;
-                console.log('==> [Prisma Seed] Rotated SuperAdmin password from SUPERADMIN_PASSWORD.');
-            }
-        }
-
-        superAdmin = await prisma.user.update({
-            where: { email: superAdminEmail },
-            data: updateData,
-        });
-    }
+        },
+        create: {
+            employeeCode: 'EDL-0001',
+            firstName: 'Super',
+            lastName: 'Admin',
+            email: 'admin@edl.com.la',
+            passwordHash: passwordHash,
+            roleId: roleMap['SUPERADMIN'],
+            status: 'ACTIVE',
+        },
+    });
     console.log(`==> [Prisma Seed] Created/Updated Super Admin User: ${superAdmin.email}`);
 
     // ============================================================================

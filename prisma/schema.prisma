@@ -402,10 +402,9 @@ model User {
   departmentName String?    @map("department_name")
   divisionName   String?    @map("division_name")
   unitName       String?    @map("unit_name")
-  roleId             Int?       @map("role_id")
-  status             UserStatus @default(ACTIVE)
-  mustChangePassword Boolean    @default(false) @map("must_change_password")
-  lastLoginAt        DateTime?  @map("last_login_at") @db.Timestamptz
+  roleId         Int?       @map("role_id")
+  status         UserStatus @default(ACTIVE)
+  lastLoginAt    DateTime?  @map("last_login_at") @db.Timestamptz
   createdAt      DateTime   @default(now()) @map("created_at") @db.Timestamptz
   updatedAt      DateTime   @updatedAt @map("updated_at") @db.Timestamptz
 

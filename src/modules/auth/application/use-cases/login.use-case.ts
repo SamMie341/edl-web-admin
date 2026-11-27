@@ -22,7 +22,7 @@ export class LoginUseCase {
         const user = await this.userRepository.findByEmployeeCode(String(dto.empCode));
 
         if (!user) {
-            throw new UnauthorizedException('ລະຫັດພະນັກງານ ຫຼື ລະຫັດຜ່ານບໍ່ຖືກຕ້ອງ');
+            throw new UnauthorizedException('ບໍ່ມີຂໍ້ມູນຜູ້ໃຊ້')
         }
 
         const isPasswordValid = await this.passwordHasher.compare(dto.password, user.passwordHash);

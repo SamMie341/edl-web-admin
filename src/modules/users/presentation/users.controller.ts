@@ -1,7 +1,6 @@
 import { Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UseGuards } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
-import { AllowDuringPasswordChange } from "../../../core/decorators/allow-during-password-change.decorator.js";
 import { RequireAnyPermission, RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { CurrentUser } from "../../../core/decorators/current-user.decorator.js";
 import type { RequestUser } from "../../auth/domain/entities/auth-user.entity.js";
@@ -73,7 +72,6 @@ export class UsersController {
     }
 
     @Put('change-password/:id')
-    @AllowDuringPasswordChange()
     async changePassword(
         @Param('id', ParseIntPipe) id: number,
         @Body() dto: ChangePasswordDto,

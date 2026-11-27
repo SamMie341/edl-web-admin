@@ -13,7 +13,10 @@ export class ChangePasswordUseCase {
     ) { }
 
     async execute(id: number, dto: ChangePasswordDto, currentUser?: RequestUser) {
-        const user = await this.repo.findForPasswordChange(id);
+        let user = await this.repo.findById(id);
+        if (!user) {
+            user = await this.repo.findByEmployeeCode(id.toString());
+        }
 
         if (!user) {
             throw new NotFoundException(`ບໍ່ພົບຜູ້ໃຊ້ ID: ${id} ໃນລະບົບ`);
@@ -22,10 +25,6 @@ export class ChangePasswordUseCase {
         // ກວດສອບສິດການປ່ຽນລະຫັດຜ່ານ
         if (currentUser) {
             const isSelf = currentUser.id === user.id;
-
-            if (currentUser.mustChangePassword && !isSelf) {
-                throw new ForbiddenException('ກະລຸນາປ່ຽນລະຫັດຜ່ານເລີ່ມຕົ້ນຂອງຕົນເອງກ່ອນ');
-            }
 
             if (isSelf) {
                 // 1. ປ່ຽນລະຫັດຜ່ານຂອງຕົນເອງ: ຕ້ອງໃສ່ລະຫັດຜ່ານເກົ່າສະເໝີ
@@ -72,21 +71,15 @@ export class ChangePasswordUseCase {
             }
         }
 
-        const isSameAsCurrent = await bcrypt.compare(newPassword, user.passwordHash);
-        if (isSameAsCurrent) {
-            throw new BadRequestException('ລະຫັດຜ່ານໃໝ່ຕ້ອງບໍ່ຊ້ຳກັບລະຫັດຜ່ານເກົ່າ');
-        }
-
         const saltRounds = 10;
         const passwordHash = await bcrypt.hash(newPassword, saltRounds);
 
-        await this.repo.update(user.id, { passwordHash, mustChangePassword: false });
+        await this.repo.update(user.id, { passwordHash });
 
         return {
             message: 'ປ່ຽນລະຫັດຜ່ານສຳເລັດ',
             userId: user.id,
             employeeCode: user.employeeCode,
-            mustChangePassword: false,
         };
     }
 }

@@ -1,6 +1,8 @@
+import { diskStorage } from "multer";
+import { join } from "path";
+import * as fs from 'fs';
 import { CleanupUploadedFileOnErrorInterceptor } from "../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js";
-import { ValidateUploadedFileSignatureInterceptor } from "../../../core/interceptors/validate-uploaded-file-signature.interceptor.js";
-import { createImageUploadOptions } from "../../../core/utils/file-upload.utils.js";
+import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseEnumPipe, ParseIntPipe, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
 import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
@@ -16,7 +18,17 @@ import { Public } from "../../../core/decorators/public.decorator.js";
 import { CommonStatus } from "../../../generated/prisma/enums.js";
 import { UpdateCarouselDto } from "../application/dtos/update-carousel.dto.js";
 
-const carouselUploadOptions = createImageUploadOptions(['carousels']);
+const carouselUploadOptions = {
+    storage: diskStorage({
+        destination: (req, file, callback) => {
+            const dest = join(process.cwd(), '..', 'uploads', 'carousels');
+            if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+            callback(null, dest);
+        },
+        filename: editFileName,
+    }),
+    fileFilter: imageFileFilter,
+};
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('carousels')
@@ -33,7 +45,6 @@ export class CarouselsController {
     @RequirePermission('CAROUSELS', 'CREATE')
     @UseInterceptors(
         FileInterceptor('file', carouselUploadOptions),
-        ValidateUploadedFileSignatureInterceptor,
         CleanupUploadedFileOnErrorInterceptor,
     )
     create(
@@ -64,7 +75,6 @@ export class CarouselsController {
     @RequirePermission('CAROUSELS', 'UPDATE')
     @UseInterceptors(
         FileInterceptor('file', carouselUploadOptions),
-        ValidateUploadedFileSignatureInterceptor,
         CleanupUploadedFileOnErrorInterceptor,
     )
     update(

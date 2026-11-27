@@ -5,7 +5,6 @@ import { GetProfileUseCase } from "../application/use-cases/get-profile.use-case
 import { JwtAuthGuard } from "./guards/jwt-auth.guard.js";
 import { CurrentUser } from "../../../core/decorators/current-user.decorator.js";
 import type { RequestUser } from "../domain/entities/auth-user.entity.js";
-import { Throttle } from "@nestjs/throttler";
 
 @Controller('auth')
 export class AuthController {
@@ -14,7 +13,6 @@ export class AuthController {
         private readonly getProfileUseCase: GetProfileUseCase,
     ) { }
 
-    @Throttle({ default: { limit: 5, ttl: 60_000 } })
     @Post('login')
     @HttpCode(HttpStatus.OK)
     async login(@Body() loginDto: LoginDto) {

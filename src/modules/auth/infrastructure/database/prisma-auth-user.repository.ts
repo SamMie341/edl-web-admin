@@ -89,7 +89,6 @@ export class PrismaAuthUserRepository implements IAuthUserRepository {
             unitName: user.unitName,
             role: user.role?.name || 'STAFF',
             status: user.status,
-            mustChangePassword: Boolean(user.mustChangePassword),
             permissions: effectivePermissions,
             deniedPermissions,
         });

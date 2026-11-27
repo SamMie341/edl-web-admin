@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, UploadedFiles, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor, FilesInterceptor } from '@nestjs/platform-express';
-import { createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
-import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
-import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+import * as fs from 'fs';
+import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
@@ -76,11 +77,17 @@ export class NewsController {
     // API ອັບໂຫຼດຮູບປົກ (1 ຮູບ)
     @Post(':id/upload/cover')
     @RequirePermission('NEWS', 'UPDATE')
-    @UseInterceptors(
-        FileInterceptor('file', createImageUploadOptions(['news', 'covers'])),
-        ValidateUploadedFileSignatureInterceptor,
-        CleanupUploadedFileOnErrorInterceptor,
-    )
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, cb) => {
+                const dest = join(process.cwd(), '..', 'uploads', 'news', 'covers');
+                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+                cb(null, dest);
+            },
+            filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+    }))
     async uploadCover(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const path = `/uploads/news/covers/${file.filename}`;
@@ -91,11 +98,17 @@ export class NewsController {
     // API ອັບໂຫຼດຮູບ Gallery (ຫຼາຍຮູບ)
     @Post(':id/upload/gallery')
     @RequirePermission('NEWS', 'UPDATE')
-    @UseInterceptors(
-        FilesInterceptor('files', 10, createImageUploadOptions(['news', 'galleries'])),
-        ValidateUploadedFileSignatureInterceptor,
-        CleanupUploadedFileOnErrorInterceptor,
-    )
+    @UseInterceptors(FilesInterceptor('files', 10, {
+        storage: diskStorage({
+            destination: (req, file, cb) => {
+                const dest = join(process.cwd(), '..', 'uploads', 'news', 'galleries');
+                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+                cb(null, dest);
+            },
+            filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+    }))
     async uploadGallery(@Param('id', ParseIntPipe) id: number, @UploadedFiles() files: Array<Express.Multer.File>) {
         if (!files || files.length === 0) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
 

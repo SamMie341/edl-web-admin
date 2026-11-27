@@ -12,9 +12,10 @@ import { GetJobPostingsUseCase } from '../application/use-cases/get-job-posting.
 import { UpdateJobPostingUseCase } from '../application/use-cases/update-job-posting.use-case.js';
 import { UploadJobPostingImageUseCase } from '../application/use-cases/upload-job-posting-image.use-case.js';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
-import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
-import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
+import * as fs from 'fs';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('job-postings')
@@ -66,11 +67,17 @@ export class JobPostingsController {
 
     @Post(':id/upload/image')
     @RequirePermission('JOB_POSTINGS', 'UPDATE')
-    @UseInterceptors(
-        FileInterceptor('file', createImageUploadOptions(['job-postings'])),
-        ValidateUploadedFileSignatureInterceptor,
-        CleanupUploadedFileOnErrorInterceptor,
-    )
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, cb) => {
+                const dest = join(process.cwd(), '..', 'uploads', 'job-postings');
+                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+                cb(null, dest);
+            },
+            filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+    }))
     async uploadImage(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const path = `/uploads/job-postings/${file.filename}`;

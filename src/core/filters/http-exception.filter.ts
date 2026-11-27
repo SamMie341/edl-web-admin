@@ -11,9 +11,7 @@ export class HttpExceptionFilter implements ExceptionFilter {
         let status = exception instanceof HttpException ? exception.getStatus() : HttpStatus.INTERNAL_SERVER_ERROR;
         let message = exception instanceof HttpException 
             ? exception.getResponse() 
-            : (process.env.NODE_ENV === 'production'
-                ? 'Internal server error'
-                : (exception?.message || 'Internal server error'));
+            : (exception?.message || 'Internal server error');
 
         // Friendly handling for payload too large
         if (exception?.type === 'entity.too.large' || exception?.status === 413 || exception?.name === 'PayloadTooLargeError') {

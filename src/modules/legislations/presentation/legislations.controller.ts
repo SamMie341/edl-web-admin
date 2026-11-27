@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createDocumentUploadOptions } from '../../../core/utils/file-upload.utils.js';
-import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
-import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+import * as fs from 'fs';
+import { editFileName, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
@@ -67,11 +68,17 @@ export class LegislationsController {
   // API ສຳລັບອັບໂຫຼດເອກະສານ PDF ນິຕິກຳ
   @Post(':id/upload/document')
   @RequirePermission('LEGISLATIONS', 'UPDATE')
-  @UseInterceptors(
-    FileInterceptor('file', createDocumentUploadOptions(['legislations'])),
-    ValidateUploadedFileSignatureInterceptor,
-    CleanupUploadedFileOnErrorInterceptor,
-  )
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: (req, file, cb) => {
+        const dest = join(process.cwd(), '..', 'uploads', 'legislations');
+        if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+        cb(null, dest);
+      },
+      filename: editFileName,
+    }),
+    fileFilter: documentFileFilter,
+  }))
   async uploadDocument(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
     if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ PDF');
     const path = `/uploads/legislations/${file.filename}`;

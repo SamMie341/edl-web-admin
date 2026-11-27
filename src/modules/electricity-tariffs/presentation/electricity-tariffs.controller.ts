@@ -1,8 +1,9 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { createDocumentUploadOptions, createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
-import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
-import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
+import { diskStorage } from 'multer';
+import { join } from 'path';
+import * as fs from 'fs';
+import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
@@ -67,11 +68,17 @@ export class ElectricityTariffsController {
     // API ສຳລັບອັບໂຫຼດຮູບພາບ
     @Post(':id/upload/image')
     @RequirePermission('ELECTRICITY_TARIFFS', 'UPDATE')
-    @UseInterceptors(
-        FileInterceptor('file', createImageUploadOptions(['electricity-tariffs', 'images'])),
-        ValidateUploadedFileSignatureInterceptor,
-        CleanupUploadedFileOnErrorInterceptor,
-    )
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, cb) => {
+                const dest = join(process.cwd(), '..', 'uploads', 'electricity-tariffs', 'images');
+                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+                cb(null, dest);
+            },
+            filename: editFileName,
+        }),
+        fileFilter: imageFileFilter,
+    }))
     async uploadImage(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const path = `/uploads/electricity-tariffs/images/${file.filename}`;
@@ -82,11 +89,17 @@ export class ElectricityTariffsController {
     // API ສຳລັບອັບໂຫຼດເອກະສານ PDF
     @Post(':id/upload/document')
     @RequirePermission('ELECTRICITY_TARIFFS', 'UPDATE')
-    @UseInterceptors(
-        FileInterceptor('file', createDocumentUploadOptions(['electricity-tariffs', 'documents'])),
-        ValidateUploadedFileSignatureInterceptor,
-        CleanupUploadedFileOnErrorInterceptor,
-    )
+    @UseInterceptors(FileInterceptor('file', {
+        storage: diskStorage({
+            destination: (req, file, cb) => {
+                const dest = join(process.cwd(), '..', 'uploads', 'electricity-tariffs', 'documents');
+                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
+                cb(null, dest);
+            },
+            filename: editFileName,
+        }),
+        fileFilter: documentFileFilter,
+    }))
     async uploadDocument(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ PDF');
         const path = `/uploads/electricity-tariffs/documents/${file.filename}`;
