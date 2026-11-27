@@ -38,6 +38,7 @@ async function main() {
 
     // 2. Seed Master Permissions ສຳລັບທຸກໆໂມດູນໃນລະບົບ (21 ໂມດູນ)
     const modules = [
+        'CAROUSELS',
         'DEPARTMENTS',
         'BRANCHES',
         'SERVICE_CENTERS',
@@ -140,6 +141,7 @@ async function main() {
     // - ອ່ານຂໍ້ມູນອ້າງອີງອົງກອນ & ພູມສາດ (7 Reference Modules × READ = 7 Permissions)
     // - ບໍ່ມີສິດເຂົ້າເຖິງ: USERS ແລະ ROLES
     const editorContentModules = [
+        'CAROUSELS',
         'NEWS',
         'NEWS_CATEGORIES',
         'NEWS_TAGS',
@@ -186,24 +188,72 @@ async function main() {
 
     // 4. ສ້າງ/ອັບເດດ SuperAdmin User
     const saltRounds = 10;
-    const passwordHash = await bcrypt.hash('EDL1234', saltRounds);
-
-    const superAdmin = await prisma.user.upsert({
-        where: { email: 'admin@edl.com.la' },
-        update: {
-            roleId: roleMap['SUPERADMIN'],
-            status: 'ACTIVE',
-        },
-        create: {
-            employeeCode: 'EDL-0001',
-            firstName: 'Super',
-            lastName: 'Admin',
-            email: 'admin@edl.com.la',
-            passwordHash: passwordHash,
-            roleId: roleMap['SUPERADMIN'],
-            status: 'ACTIVE',
-        },
+    const superAdminEmail = 'admin@edl.com.la';
+    const configuredSuperAdminPassword = process.env.SUPERADMIN_PASSWORD?.trim();
+    const forceResetSuperAdmin = process.env.SUPERADMIN_RESET_PASSWORD === 'true';
+    const existingSuperAdmin = await prisma.user.findUnique({
+        where: { email: superAdminEmail },
     });
+
+    const validateStrongPassword = (password: string) => {
+        if (password.length < 6 || password === 'EDL1234') {
+            throw new Error(
+                'SUPERADMIN_PASSWORD must be at least 12 characters long and must not be the default weak password.',
+            );
+        }
+    };
+
+    let superAdmin;
+    if (!existingSuperAdmin) {
+        if (!configuredSuperAdminPassword) {
+            throw new Error(
+                'SUPERADMIN_PASSWORD is required in environment variables when creating the initial SuperAdmin user.',
+            );
+        }
+        validateStrongPassword(configuredSuperAdminPassword);
+        const passwordHash = await bcrypt.hash(configuredSuperAdminPassword, saltRounds);
+
+        superAdmin = await prisma.user.create({
+            data: {
+                employeeCode: 'EDL-0001',
+                firstName: 'Super',
+                lastName: 'Admin',
+                email: superAdminEmail,
+                passwordHash,
+                role: { connect: { id: roleMap['SUPERADMIN'] } },
+                status: 'ACTIVE',
+                mustChangePassword: false,
+            },
+        });
+    } else {
+        const updateData: {
+            role: { connect: { id: number } };
+            status: 'ACTIVE';
+            passwordHash?: string;
+            mustChangePassword?: boolean;
+        } = {
+            role: { connect: { id: roleMap['SUPERADMIN'] } },
+            status: 'ACTIVE',
+        };
+
+        if (configuredSuperAdminPassword) {
+            const hasLegacyDefaultPassword = await bcrypt.compare(
+                'EDL1234',
+                existingSuperAdmin.passwordHash,
+            );
+            if (forceResetSuperAdmin || hasLegacyDefaultPassword) {
+                validateStrongPassword(configuredSuperAdminPassword);
+                updateData.passwordHash = await bcrypt.hash(configuredSuperAdminPassword, saltRounds);
+                updateData.mustChangePassword = false;
+                console.log('==> [Prisma Seed] Rotated SuperAdmin password from SUPERADMIN_PASSWORD.');
+            }
+        }
+
+        superAdmin = await prisma.user.update({
+            where: { email: superAdminEmail },
+            data: updateData,
+        });
+    }
     console.log(`==> [Prisma Seed] Created/Updated Super Admin User: ${superAdmin.email}`);
 
     // ============================================================================
@@ -274,288 +324,288 @@ async function main() {
         orderIndex: number;
         flatRate: number;
     }> = [
-        // ==========================================
-        // 1. ແຮງດັນຕ່ຳ 0.4 kV (Low Voltage - 9 Categories)
-        // ==========================================
-        {
-            id: 1,
-            nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
-            nameEn: 'International Organizations',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນຕ່ຳ 0.4 kV (2,632 ກີບ/kWh)',
-            orderIndex: 1,
-            flatRate: 2632,
-        },
-        {
-            id: 2,
-            nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
-            nameEn: 'General Business, Backup & Temporary Power',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນຕ່ຳ 0.4 kV (2,101 ກີບ/kWh)',
-            orderIndex: 2,
-            flatRate: 2101,
-        },
-        {
-            id: 3,
-            nameLa: 'ທຸລະກິດສຶກສາ',
-            nameEn: 'Educational Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ທຸລະກິດສຶກສາ ແຮງດັນຕ່ຳ 0.4 kV (1,673 ກີບ/kWh)',
-            orderIndex: 3,
-            flatRate: 1673,
-        },
-        {
-            id: 4,
-            nameLa: 'ທຸລະກິດກິລາ',
-            nameEn: 'Sports Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ທຸລະກິດກິລາ ແຮງດັນຕ່ຳ 0.4 kV (2,029 ກີບ/kWh)',
-            orderIndex: 4,
-            flatRate: 2029,
-        },
-        {
-            id: 5,
-            nameLa: 'ທຸລະກິດບັນເທີງ',
-            nameEn: 'Entertainment Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ທຸລະກິດບັນເທີງ ແຮງດັນຕ່ຳ 0.4 kV (2,715 ກີບ/kWh)',
-            orderIndex: 5,
-            flatRate: 2715,
-        },
-        {
-            id: 6,
-            nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
-            nameEn: 'State Administrative Offices',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນຕ່ຳ 0.4 kV (1,711 ກີບ/kWh)',
-            orderIndex: 6,
-            flatRate: 1711,
-        },
-        {
-            id: 7,
-            nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
-            nameEn: 'Irrigation & Household Agriculture',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນຕ່ຳ 0.4 kV (1,465 ກີບ/kWh)',
-            orderIndex: 7,
-            flatRate: 1465,
-        },
-        {
-            id: 8,
-            nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
-            nameEn: 'Commercial Agriculture',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນຕ່ຳ 0.4 kV (1,826 ກີບ/kWh)',
-            orderIndex: 8,
-            flatRate: 1826,
-        },
-        {
-            id: 9,
-            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
-            nameEn: 'General Processing Industry',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '0.4 kV',
-            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນຕ່ຳ 0.4 kV (1,921 ກີບ/kWh)',
-            orderIndex: 9,
-            flatRate: 1921,
-        },
+            // ==========================================
+            // 1. ແຮງດັນຕ່ຳ 0.4 kV (Low Voltage - 9 Categories)
+            // ==========================================
+            {
+                id: 1,
+                nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
+                nameEn: 'International Organizations',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນຕ່ຳ 0.4 kV (2,632 ກີບ/kWh)',
+                orderIndex: 1,
+                flatRate: 2632,
+            },
+            {
+                id: 2,
+                nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+                nameEn: 'General Business, Backup & Temporary Power',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນຕ່ຳ 0.4 kV (2,101 ກີບ/kWh)',
+                orderIndex: 2,
+                flatRate: 2101,
+            },
+            {
+                id: 3,
+                nameLa: 'ທຸລະກິດສຶກສາ',
+                nameEn: 'Educational Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ທຸລະກິດສຶກສາ ແຮງດັນຕ່ຳ 0.4 kV (1,673 ກີບ/kWh)',
+                orderIndex: 3,
+                flatRate: 1673,
+            },
+            {
+                id: 4,
+                nameLa: 'ທຸລະກິດກິລາ',
+                nameEn: 'Sports Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ທຸລະກິດກິລາ ແຮງດັນຕ່ຳ 0.4 kV (2,029 ກີບ/kWh)',
+                orderIndex: 4,
+                flatRate: 2029,
+            },
+            {
+                id: 5,
+                nameLa: 'ທຸລະກິດບັນເທີງ',
+                nameEn: 'Entertainment Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ທຸລະກິດບັນເທີງ ແຮງດັນຕ່ຳ 0.4 kV (2,715 ກີບ/kWh)',
+                orderIndex: 5,
+                flatRate: 2715,
+            },
+            {
+                id: 6,
+                nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
+                nameEn: 'State Administrative Offices',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນຕ່ຳ 0.4 kV (1,711 ກີບ/kWh)',
+                orderIndex: 6,
+                flatRate: 1711,
+            },
+            {
+                id: 7,
+                nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
+                nameEn: 'Irrigation & Household Agriculture',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນຕ່ຳ 0.4 kV (1,465 ກີບ/kWh)',
+                orderIndex: 7,
+                flatRate: 1465,
+            },
+            {
+                id: 8,
+                nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
+                nameEn: 'Commercial Agriculture',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນຕ່ຳ 0.4 kV (1,826 ກີບ/kWh)',
+                orderIndex: 8,
+                flatRate: 1826,
+            },
+            {
+                id: 9,
+                nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+                nameEn: 'General Processing Industry',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '0.4 kV',
+                description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນຕ່ຳ 0.4 kV (1,921 ກີບ/kWh)',
+                orderIndex: 9,
+                flatRate: 1921,
+            },
 
-        // ==========================================
-        // 2. ແຮງດັນກາງ 22 kV (Medium Voltage - 12 Categories)
-        // ==========================================
-        {
-            id: 10,
-            nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
-            nameEn: 'International Organizations',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນກາງ 22 kV (2,347 ກີບ/kWh)',
-            orderIndex: 10,
-            flatRate: 2347,
-        },
-        {
-            id: 11,
-            nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
-            nameEn: 'General Business, Backup & Temporary Power',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນກາງ 22 kV (1,882 ກີບ/kWh)',
-            orderIndex: 11,
-            flatRate: 1882,
-        },
-        {
-            id: 12,
-            nameLa: 'ທຸລະກິດສຶກສາ',
-            nameEn: 'Educational Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ທຸລະກິດສຶກສາ ແຮງດັນກາງ 22 kV (1,505 ກີບ/kWh)',
-            orderIndex: 12,
-            flatRate: 1505,
-        },
-        {
-            id: 13,
-            nameLa: 'ທຸລະກິດກິລາ',
-            nameEn: 'Sports Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ທຸລະກິດກິລາ ແຮງດັນກາງ 22 kV (1,817 ກີບ/kWh)',
-            orderIndex: 13,
-            flatRate: 1817,
-        },
-        {
-            id: 14,
-            nameLa: 'ທຸລະກິດບັນເທີງ',
-            nameEn: 'Entertainment Business',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ທຸລະກິດບັນເທີງ ແຮງດັນກາງ 22 kV (2,422 ກີບ/kWh)',
-            orderIndex: 14,
-            flatRate: 2422,
-        },
-        {
-            id: 15,
-            nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
-            nameEn: 'State Administrative Offices',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນກາງ 22 kV (1,539 ກີບ/kWh)',
-            orderIndex: 15,
-            flatRate: 1539,
-        },
-        {
-            id: 16,
-            nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
-            nameEn: 'Irrigation & Household Agriculture',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນກາງ 22 kV (1,375 ກີບ/kWh)',
-            orderIndex: 16,
-            flatRate: 1375,
-        },
-        {
-            id: 17,
-            nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
-            nameEn: 'Commercial Agriculture',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນກາງ 22 kV (1,785 ກີບ/kWh)',
-            orderIndex: 17,
-            flatRate: 1785,
-        },
-        {
-            id: 18,
-            nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
-            nameEn: 'Mining & Mineral Processing Industry',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນກາງ 22 kV (2,228 ກີບ/kWh)',
-            orderIndex: 18,
-            flatRate: 2228,
-        },
-        {
-            id: 19,
-            nameLa: 'ເຂດເສດຖະກິດພິເສດ',
-            nameEn: 'Special Economic Zones (SEZ)',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນກາງ 22 kV (2,133 ກີບ/kWh)',
-            orderIndex: 19,
-            flatRate: 2133,
-        },
-        {
-            id: 20,
-            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
-            nameEn: 'General Processing Industry',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນກາງ 22 kV (1,840 ກີບ/kWh)',
-            orderIndex: 20,
-            flatRate: 1840,
-        },
-        {
-            id: 21,
-            nameLa: 'ນິຄົມອຸດສາຫະກຳ',
-            nameEn: 'Industrial Estate / Industrial Zone',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '22 kV',
-            description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນກາງ 22 kV (1,722 ກີບ/kWh)',
-            orderIndex: 21,
-            flatRate: 1722,
-        },
+            // ==========================================
+            // 2. ແຮງດັນກາງ 22 kV (Medium Voltage - 12 Categories)
+            // ==========================================
+            {
+                id: 10,
+                nameLa: 'ອົງການຈັດຕັ້ງສາກົນ',
+                nameEn: 'International Organizations',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ສະຖານທູດ ແລະ ອົງການຈັດຕັ້ງສາກົນ ແຮງດັນກາງ 22 kV (2,347 ກີບ/kWh)',
+                orderIndex: 10,
+                flatRate: 2347,
+            },
+            {
+                id: 11,
+                nameLa: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+                nameEn: 'General Business, Backup & Temporary Power',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ທຸລະກິດທົ່ວໄປ, ໄຟຟ້າສຳຮອງ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນກາງ 22 kV (1,882 ກີບ/kWh)',
+                orderIndex: 11,
+                flatRate: 1882,
+            },
+            {
+                id: 12,
+                nameLa: 'ທຸລະກິດສຶກສາ',
+                nameEn: 'Educational Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ທຸລະກິດສຶກສາ ແຮງດັນກາງ 22 kV (1,505 ກີບ/kWh)',
+                orderIndex: 12,
+                flatRate: 1505,
+            },
+            {
+                id: 13,
+                nameLa: 'ທຸລະກິດກິລາ',
+                nameEn: 'Sports Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ທຸລະກິດກິລາ ແຮງດັນກາງ 22 kV (1,817 ກີບ/kWh)',
+                orderIndex: 13,
+                flatRate: 1817,
+            },
+            {
+                id: 14,
+                nameLa: 'ທຸລະກິດບັນເທີງ',
+                nameEn: 'Entertainment Business',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ທຸລະກິດບັນເທີງ ແຮງດັນກາງ 22 kV (2,422 ກີບ/kWh)',
+                orderIndex: 14,
+                flatRate: 2422,
+            },
+            {
+                id: 15,
+                nameLa: 'ສຳນັກງານລັດບໍລິຫານ',
+                nameEn: 'State Administrative Offices',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ສຳນັກງານລັດບໍລິຫານ ແຮງດັນກາງ 22 kV (1,539 ກີບ/kWh)',
+                orderIndex: 15,
+                flatRate: 1539,
+            },
+            {
+                id: 16,
+                nameLa: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ',
+                nameEn: 'Irrigation & Household Agriculture',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ຊົນລະປະທານ ແລະ ກະສິກຳແບບຄົວເຮືອນ ແຮງດັນກາງ 22 kV (1,375 ກີບ/kWh)',
+                orderIndex: 16,
+                flatRate: 1375,
+            },
+            {
+                id: 17,
+                nameLa: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ',
+                nameEn: 'Commercial Agriculture',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ທຸລະກິດກະສິກຳ ເພື່ອການຄ້າ ແຮງດັນກາງ 22 kV (1,785 ກີບ/kWh)',
+                orderIndex: 17,
+                flatRate: 1785,
+            },
+            {
+                id: 18,
+                nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
+                nameEn: 'Mining & Mineral Processing Industry',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນກາງ 22 kV (2,228 ກີບ/kWh)',
+                orderIndex: 18,
+                flatRate: 2228,
+            },
+            {
+                id: 19,
+                nameLa: 'ເຂດເສດຖະກິດພິເສດ',
+                nameEn: 'Special Economic Zones (SEZ)',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນກາງ 22 kV (2,133 ກີບ/kWh)',
+                orderIndex: 19,
+                flatRate: 2133,
+            },
+            {
+                id: 20,
+                nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+                nameEn: 'General Processing Industry',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນກາງ 22 kV (1,840 ກີບ/kWh)',
+                orderIndex: 20,
+                flatRate: 1840,
+            },
+            {
+                id: 21,
+                nameLa: 'ນິຄົມອຸດສາຫະກຳ',
+                nameEn: 'Industrial Estate / Industrial Zone',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '22 kV',
+                description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນກາງ 22 kV (1,722 ກີບ/kWh)',
+                orderIndex: 21,
+                flatRate: 1722,
+            },
 
-        // ==========================================
-        // 3. ແຮງດັນສູງ 115 kV (High Voltage - 6 Categories)
-        // ==========================================
-        {
-            id: 22,
-            nameLa: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
-            nameEn: 'General Business & Temporary Power',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນສູງ 115 kV (1,801 ກີບ/kWh)',
-            orderIndex: 22,
-            flatRate: 1801,
-        },
-        {
-            id: 23,
-            nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
-            nameEn: 'Mining & Mineral Processing Industry',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນສູງ 115 kV (2,133 ກີບ/kWh)',
-            orderIndex: 23,
-            flatRate: 2133,
-        },
-        {
-            id: 24,
-            nameLa: 'ເຂດເສດຖະກິດພິເສດ',
-            nameEn: 'Special Economic Zones (SEZ)',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນສູງ 115 kV (2,045 ກີບ/kWh)',
-            orderIndex: 24,
-            flatRate: 2045,
-        },
-        {
-            id: 25,
-            nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
-            nameEn: 'General Processing Industry',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນສູງ 115 kV (1,792 ກີບ/kWh)',
-            orderIndex: 25,
-            flatRate: 1792,
-        },
-        {
-            id: 26,
-            nameLa: 'ນິຄົມອຸດສາຫະກຳ',
-            nameEn: 'Industrial Estate / Industrial Zone',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນສູງ 115 kV (1,680 ກີບ/kWh)',
-            orderIndex: 26,
-            flatRate: 1680,
-        },
-        {
-            id: 27,
-            nameLa: 'ທາງລົດໄຟຄວາມໄວສູງ',
-            nameEn: 'High-Speed Railway',
-            categoryGroup: 'NON_RESIDENTIAL',
-            voltageLevel: '115 kV',
-            description: 'ທາງລົດໄຟຄວາມໄວສູງ ແຮງດັນສູງ 115 kV (1,961 ກີບ/kWh)',
-            orderIndex: 27,
-            flatRate: 1961,
-        },
-    ];
+            // ==========================================
+            // 3. ແຮງດັນສູງ 115 kV (High Voltage - 6 Categories)
+            // ==========================================
+            {
+                id: 22,
+                nameLa: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ',
+                nameEn: 'General Business & Temporary Power',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ທຸລະກິດທົ່ວໄປ ແລະ ໄຟຟ້າຊົ່ວຄາວ ແຮງດັນສູງ 115 kV (1,801 ກີບ/kWh)',
+                orderIndex: 22,
+                flatRate: 1801,
+            },
+            {
+                id: 23,
+                nameLa: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ',
+                nameEn: 'Mining & Mineral Processing Industry',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ອຸດສາຫະກຳຂຸດຄົ້ນ ແລະ ປຸງແຕ່ງແຮ່ທາດ ແຮງດັນສູງ 115 kV (2,133 ກີບ/kWh)',
+                orderIndex: 23,
+                flatRate: 2133,
+            },
+            {
+                id: 24,
+                nameLa: 'ເຂດເສດຖະກິດພິເສດ',
+                nameEn: 'Special Economic Zones (SEZ)',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ເຂດເສດຖະກິດພິເສດ ແຮງດັນສູງ 115 kV (2,045 ກີບ/kWh)',
+                orderIndex: 24,
+                flatRate: 2045,
+            },
+            {
+                id: 25,
+                nameLa: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ',
+                nameEn: 'General Processing Industry',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ອຸດສາຫະກຳປຸງແຕ່ງທົ່ວໄປ ແຮງດັນສູງ 115 kV (1,792 ກີບ/kWh)',
+                orderIndex: 25,
+                flatRate: 1792,
+            },
+            {
+                id: 26,
+                nameLa: 'ນິຄົມອຸດສາຫະກຳ',
+                nameEn: 'Industrial Estate / Industrial Zone',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ນິຄົມອຸດສາຫະກຳ ແຮງດັນສູງ 115 kV (1,680 ກີບ/kWh)',
+                orderIndex: 26,
+                flatRate: 1680,
+            },
+            {
+                id: 27,
+                nameLa: 'ທາງລົດໄຟຄວາມໄວສູງ',
+                nameEn: 'High-Speed Railway',
+                categoryGroup: 'NON_RESIDENTIAL',
+                voltageLevel: '115 kV',
+                description: 'ທາງລົດໄຟຄວາມໄວສູງ ແຮງດັນສູງ 115 kV (1,961 ກີບ/kWh)',
+                orderIndex: 27,
+                flatRate: 1961,
+            },
+        ];
 
     for (const tc of tariffCategoriesData) {
         await prisma.tariffCategory.upsert({

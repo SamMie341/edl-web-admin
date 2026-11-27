@@ -53,8 +53,11 @@ COPY --from=builder /app/edl-admin/prisma ./prisma
 COPY --from=builder /app/edl-admin/prisma7.config.ts ./
 COPY docker-entrypoint.sh ./
 
-# Ensure correct line endings (LF) and executable permissions for shell script
-RUN sed -i 's/\r$//' ./docker-entrypoint.sh && chmod +x ./docker-entrypoint.sh
+# Ensure correct line endings (LF), permissions, and non-root ownership
+RUN sed -i 's/\r$//' ./docker-entrypoint.sh && chmod +x ./docker-entrypoint.sh \
+    && chown -R node:node /app
+
+USER node
 
 EXPOSE 3000
 

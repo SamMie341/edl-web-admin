@@ -1,6 +1,7 @@
 import { CanActivate, ExecutionContext, ForbiddenException, Injectable } from "@nestjs/common";
 import { Reflector } from "@nestjs/core";
 import { Observable } from "rxjs";
+import { ALLOW_DURING_PASSWORD_CHANGE_KEY } from "../../../../core/decorators/allow-during-password-change.decorator.js";
 import { PERMISSION_KEY, RequiredPermission } from "../../../../core/decorators/permissions.decorator.js";
 import { IS_PUBLIC_KEY } from "../../../../core/decorators/public.decorator.js";
 import { hasUserEffectivePermission } from "../../../../core/utils/permission-resolver.util.js";
@@ -20,6 +21,18 @@ export class PermissionsGuard implements CanActivate {
             return true;
         }
 
+        const request = context.switchToHttp().getRequest();
+        const user = request?.user;
+
+        const allowDuringPasswordChange = this.reflector.getAllAndOverride<boolean>(
+            ALLOW_DURING_PASSWORD_CHANGE_KEY,
+            [context.getHandler(), context.getClass()],
+        );
+
+        if (user?.mustChangePassword && !allowDuringPasswordChange) {
+            throw new ForbiddenException('ກະລຸນາປ່ຽນລະຫັດຜ່ານເລີ່ມຕົ້ນກ່ອນນຳໃຊ້ລະບົບ');
+        }
+
         const required = this.reflector.getAllAndOverride<RequiredPermission | RequiredPermission[]>(PERMISSION_KEY, [
             context.getHandler(),
             context.getClass(),
@@ -33,9 +46,6 @@ export class PermissionsGuard implements CanActivate {
         if (requiredList.length === 0) {
             return true;
         }
-
-        const request = context.switchToHttp().getRequest();
-        const user = request.user;
 
         if (!user) {
             throw new ForbiddenException('ບໍ່ພົບຂໍ້ມູນຜູ້ໃຊ້ງານ');

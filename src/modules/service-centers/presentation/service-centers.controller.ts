@@ -13,10 +13,9 @@ import { CreateServiceCenterDto } from "../application/dtos/create-service-cente
 import { UpdateServiceCenterDto } from "../application/dtos/update-service-center.dto.js";
 import { UploadServiceCenterImageUseCase } from "../application/use-cases/upload-service-center-image.use-case.js";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { join } from "path";
-import * as fs from 'fs';
-import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
+import { createImageUploadOptions } from "../../../core/utils/file-upload.utils.js";
+import { ValidateUploadedFileSignatureInterceptor } from "../../../core/interceptors/validate-uploaded-file-signature.interceptor.js";
+import { CleanupUploadedFileOnErrorInterceptor } from "../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js";
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('service-centers')
@@ -34,19 +33,9 @@ export class ServiceCenterController {
     @Post(':id/upload/image')
     @RequirePermission('SERVICE_CENTERS', 'UPDATE')
     @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination(req, file, callback) {
-                    const dest = join(process.cwd(), '..', 'uploads', 'centers');
-                    if (!fs.existsSync(dest)) {
-                        fs.mkdirSync(dest, { recursive: true });
-                    }
-                    callback(null, dest);
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        }),
+        FileInterceptor('file', createImageUploadOptions(['centers'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
     )
     async uploadImage(
         @Param('id', ParseIntPipe) id: number,

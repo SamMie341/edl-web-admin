@@ -1,15 +1,26 @@
 import { Injectable, NotFoundException, UnauthorizedException } from "@nestjs/common";
+import { ConfigService } from "@nestjs/config";
 import { IHrmService } from "../../domain/repositories/hrm.service.interface.js";
 import { HttpService } from "@nestjs/axios";
 import { firstValueFrom } from "rxjs";
 
 @Injectable()
 export class HrmService implements IHrmService {
-    constructor(private readonly httpService: HttpService) { }
+    constructor(
+        private readonly httpService: HttpService,
+        private readonly configService: ConfigService,
+    ) { }
+
+    private getBaseUrl(): string {
+        return this.configService.getOrThrow<string>('HRM_API_BASE_URL').replace(/\/+$/, '');
+    }
 
     private async getHrmToken(): Promise<string> {
-        const loginUrl = 'https://api-test.edl.com.la/hrm/api/auth/login';
-        const credentials = { username: 'Ton', password: 'HRM1234' };
+        const loginUrl = `${this.getBaseUrl()}/auth/login`;
+        const credentials = {
+            username: this.configService.getOrThrow<string>('HRM_USERNAME'),
+            password: this.configService.getOrThrow<string>('HRM_PASSWORD'),
+        };
 
         const response = await firstValueFrom(this.httpService.post(loginUrl, credentials));
         if (!response.data || !response.data.token) {
@@ -20,7 +31,7 @@ export class HrmService implements IHrmService {
 
     async getEmployeeData(employeeCode: string): Promise<any> {
         const hrmToken = await this.getHrmToken();
-        const url = `https://api-test.edl.com.la/hrm/api/hrms/employee?search=${employeeCode}`;
+        const url = `${this.getBaseUrl()}/hrms/employee?search=${encodeURIComponent(employeeCode)}`;
 
         const response = await firstValueFrom(
             this.httpService.get(url, { headers: { Authorization: `Bearer ${hrmToken}` } })

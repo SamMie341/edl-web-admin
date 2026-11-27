@@ -1,9 +1,8 @@
 import { Controller, Get, Post, Body, Param, Delete, UseGuards, ParseIntPipe, UseInterceptors, UploadedFile, BadRequestException, Query, Put } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
-import * as fs from 'fs';
-import { editFileName, imageFileFilter, documentFileFilter } from '../../../core/utils/file-upload.utils.js';
+import { createDocumentUploadOptions, createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
+import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
+import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
@@ -68,17 +67,11 @@ export class ProcurementsController {
     // API ສຳລັບອັບໂຫຼດຮູບພາບປະກອບການປະກວດລາຄາ
     @Post(':id/upload/image')
     @RequirePermission('PROCUREMENTS', 'UPDATE')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: (req, file, cb) => {
-                const dest = join(process.cwd(), '..', 'uploads', 'procurements', 'images');
-                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-                cb(null, dest);
-            },
-            filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-    }))
+    @UseInterceptors(
+        FileInterceptor('file', createImageUploadOptions(['procurements', 'images'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
+    )
     async uploadImage(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const path = `/uploads/procurements/images/${file.filename}`;
@@ -89,17 +82,11 @@ export class ProcurementsController {
     // API ສຳລັບອັບໂຫຼດເອກະສານ PDF ລາຍລະອຽດການປະມູນ (TOR)
     @Post(':id/upload/document')
     @RequirePermission('PROCUREMENTS', 'UPDATE')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination: (req, file, cb) => {
-                const dest = join(process.cwd(), '..', 'uploads', 'procurements', 'documents');
-                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-                cb(null, dest);
-            },
-            filename: editFileName,
-        }),
-        fileFilter: documentFileFilter,
-    }))
+    @UseInterceptors(
+        FileInterceptor('file', createDocumentUploadOptions(['procurements', 'documents'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
+    )
     async uploadDocument(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ PDF');
         const path = `/uploads/procurements/documents/${file.filename}`;

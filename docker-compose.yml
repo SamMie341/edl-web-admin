@@ -6,7 +6,7 @@ services:
     container_name: edl-admin-backend
     restart: always
     ports:
-      - "${PORT:-3000}:3000"
+      - "127.0.0.1:${PORT:-3000}:${PORT:-3000}"
     env_file:
       - .env
     environment:

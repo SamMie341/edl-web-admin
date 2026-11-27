@@ -30,9 +30,19 @@ import { ElectricityCalculatorModule } from './modules/electricity-calculator/el
 import { ProcurementsModule } from './modules/procurements/procurements.module.js';
 import { PositionsModule } from './modules/positions/positions.module.js';
 import { JobPostingsModule } from './modules/job-postings/job-postings.module.js';
+import { CarouselsModule } from './modules/carousels/carousels.module.js';
+import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler';
+import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
+    ThrottlerModule.forRoot([
+      {
+        name: 'default',
+        ttl: 60_000,
+        limit: 120,
+      }
+    ]),
     ConfigModule.forRoot({
       isGlobal: true,
     }),
@@ -68,8 +78,14 @@ import { JobPostingsModule } from './modules/job-postings/job-postings.module.js
     ProcurementsModule,
     PositionsModule,
     JobPostingsModule,
+    CarouselsModule,
   ],
   controllers: [],
-  providers: [],
+  providers: [
+    {
+      provide: APP_GUARD,
+      useClass: ThrottlerGuard
+    }
+  ],
 })
 export class AppModule { }

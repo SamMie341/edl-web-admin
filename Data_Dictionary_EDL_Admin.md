@@ -10,14 +10,14 @@
 | DBMS Engine | PostgreSQL 15+ / 16+ | Collation | UTF8 (Multi-lingual Lao/EN/TH) |  |
 | Architecture Pattern | Relational Schema (Normalized 3NF) | Primary Key Standard | INTEGER (SERIAL / IDENTITY) |  |
 | Timestamp Convention | UTC / Asia/Vientiane (UTC+7) | Audit Standard | TIMESTAMPTZ with CURRENT_TIMESTAMP |  |
-| Total Core Tables | 31 Tables (27 Core Tables + 4 Pivot/Junction Tables) | Status Pattern | CommonStatus / Specific Enums |  |
+| Total Core Tables | 32 Tables (28 Core Tables + 4 Pivot/Junction Tables) | Status Pattern | CommonStatus / Specific Enums |  |
 |  |  |  |  |  |
 |  |  |  |  |  |
 | 2. System Module Breakdown (ການແບ່ງໝວດໝູ່ໂມດູນຂອງລະບົບ) |  |  |  |  |
 | Module Code | Module Name (English / Lao / Thai) | Included Tables | Description & Responsibilities |  |
 | MOD-01 | Organization Structure & Branches (ໂຄງຮ່າງການຈັດຕັ້ງ ແລະ ສາຂາ) | departments, branches, service_centers, organization_structures, vision_missions | ຈັດການໂຄງສ້າງອົງກອນ, ຂໍ້ມູນຝ່າຍ (departments), ສາຂາທົ່ວປະເທດ, ສູນບໍລິການລູກຄ້າ ແລະ ວິໄສທັດ/ພາລະກິດ |  |
 | MOD-02 | Geographic Administrative Data (ຂໍ້ມູນເຂດການປົກຄອງ) | provinces, districts, villages | ຂໍ້ມູນເຂດການປົກຄອງ ແຂວງ, ເມືອງ, ບ້ານ ສຳລັບຜູກກັບສູນບໍລິການ ແລະ ຂໍ້ມູນທີ່ຢູ່ |  |
-| MOD-03 | News & Media Management (ຂ່າວສານ ແລະ ສື່ປະຊາສຳພັນ) | news, news_categories, news_tags, news_tag_relations, electrical_knowledge, magazines | ລະບົບຂ່າວສານປະຊາສຳພັນ 2 ພາສາ (ລາວ/ອັງກິດ), ໝວດໝູ່, ແທັກ, ວິດິໂອຄວາມຮູ້ໄຟຟ້າ ແລະ ວາລະສານດິຈິຕອນ |  |
+| MOD-03 | News & Media Management (ຂ່າວສານ ແລະ ສື່ປະຊາສຳພັນ) | news, news_categories, news_tags, news_tag_relations, electrical_knowledge, magazines, carousels | ລະບົບຂ່າວສານປະຊາສຳພັນ 2 ພາສາ (ລາວ/ອັງກິດ), ໝວດໝູ່, ແທັກ, ວິດິໂອຄວາມຮູ້ໄຟຟ້າ ແລະ ວາລະສານດິຈິຕອນ |  |
 | MOD-04 | Public Disclosure & Services (ຂໍ້ມູນສາທາລະນະ ແລະ ບໍລິການ) | electricity_tariffs, legislations, procurements, job_postings | ປະກາດລາຄາໄຟຟ້າ, ນິຕິກຳ/ລະບຽບການ (PDF), ປະກາດປະມູນຈັດຊື້-ຈັດຈ້າງ, ແລະ ປະກາດຮັບສະໝັກພະນັກງານ |  |
 | MOD-05 | IAM & Personnel Management (ຈັດການຜູ້ໃຊ້, ບົດບາດ, ສິດທິ ແລະ ຕຳແໜ່ງ) | users, positions, roles, permissions, role_permissions, user_permissions | ລະບົບຈັດການບັນຊີຜູ້ໃຊ້ງານ (Admin/Staff), ການເຊື່ອມຕໍ່ HRM, ບົດບາດ (Roles), ສິດທິລະອຽດ (Permissions ALLOW/DENY), ແລະ ຕຳແໜ່ງ |  |
 | MOD-06 | Electricity Calculator & Tariff Simulation (ລະບົບຄຳນວນຄ່າໄຟຟ້າ ແລະ ຈຳລອງລາຄາ) | tariff_categories, tariff_notices, tariff_schedules, tariff_tiers, appliance_categories, appliance_presets, saving_action_templates | ລະບົບຈຳລອງ ແລະ ຄຳນວນຄ່າໄຟຟ້າຂັ້ນບັນໄດ, ປະກາດອັດຕາຄ່າໄຟ, ປະເພດເຄື່ອງໃຊ້ໄຟຟ້າ, ຄ່າເລີ່ມຕົ້ນ, ແລະ ແມ່ແບບຄຳແນະນຳການປະຢັດໄຟຟ້າ |  |
@@ -27,7 +27,7 @@
 |  |  |  |  |  |  |  |  |  |  |  |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | EDL ADMIN SYSTEM - COMPREHENSIVE DATA DICTIONARY (ຕາຕະລາງພົດຈະນານຸກົມຂໍ້ມູນ) |  |  |  |  |  |  |  |  |  |  |  |
-| Master Data Dictionary for PostgreSQL: all 31 tables, columns, data types, keys, constraints, and Lao/Thai descriptions |  |  |  |  |  |  |  |  |  |  |  |
+| Master Data Dictionary for PostgreSQL: all 32 tables, columns, data types, keys, constraints, and Lao/Thai descriptions |  |  |  |  |  |  |  |  |  |  |  |
 |  |  |  |  |  |  |  |  |  |  |  |  |
 | Table (Physical) | Table (Lao) | Table (Thai) | Column (Physical) | Column (Lao) | Column (Thai) | Data Type | Key | Nullability | Default Value | References (FK) | Description & Business Rules |
 | TABLE: departments | ຕາຕະລາງຂໍ້ມູນຝ່າຍ (ตารางข้อมูลฝ่าย (Departments)) — ເກັບກຳຂໍ້ມູນລາຍຊື່ຝ່າຍຕ່າງໆ ພາຍໃນອົງກອນ (ເກັບສະເພາະຊື່ຝ່າຍ) |  |  |  |  |  |  |  |  |  |  |
@@ -324,12 +324,20 @@
 | tariff_tiers | ຂັ້ນບັນໄດອັດຕາຄ່າໄຟ | ตารางขั้นบันไดอัตราค่าไฟฟ้า (Tariff Tiers) | max_kwh | ໜ່ວຍສູງສຸດ (kWh) | หน่วยไฟฟ้าสูงสุดของขั้น (NULL = ไม่จำกัด) | INTEGER | - | NULL | NULL | - | Upper kWh boundary (NULL for unbounded top tier) |
 | tariff_tiers | ຂັ້ນບັນໄດອັດຕາຄ່າໄຟ | ตารางขั้นบันไดอัตราค่าไฟฟ้า (Tariff Tiers) | rate_kip_per_kwh | ລາຄາຕໍ່ໜ່ວຍ (ກີບ/kWh) | อัตราค่าไฟฟ้าต่อหน่วย (กีบ/kWh) | DECIMAL(10,2) | - | NOT NULL | NULL | - | Electricity rate in Kip per kilowatt-hour |
 
+| TABLE: carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ (ตารางภาพสไลด์แบนเนอร์ (Carousels & Banners)) — ເກັບກຳຮູບພາບສະໄລ້ໜ້າຫຼັກເວັບໄຊ ຟຟລ, ລຳດັບ ແລະ ສະຖານະ |  |  |  |  |  |  |  |  |  |  |
+| carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | id | ລະຫັດຫຼັກ | รหัสไอดีหลัก (Primary Key) | INTEGER | PK | NOT NULL | IDENTITY / SERIAL | - | Primary Key, Auto increment |
+| carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | image_url | ຮູບພາບສະໄລ້ | URL รูปภาพแบนเนอร์สไลด์ | TEXT | - | NOT NULL | NULL | - | Carousel image URL/path (/uploads/carousels/...) |
+| carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | order_index | ລຳດັບການສະແດງ | ลำดับการแสดงผล | INTEGER | - | NOT NULL | 0 | - | Display sort ordering |
+| carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | status | ສະຖານະ | สถานะการเปิดใช้งาน (ACTIVE/INACTIVE) | TEXT | - | NOT NULL | 'ACTIVE' | - | Status: ACTIVE, INACTIVE |
+| carousels | ຂໍ້ມູນຮູບພາບສະไล້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | created_at | ວັນທີສ້າງ | วันที่สร้างข้อมูล | TIMESTAMPTZ | - | NOT NULL | CURRENT_TIMESTAMP | - | Record creation timestamp |
+| carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | updated_at | ວັນທີອັບເດດ | วันที่อัปเดตข้อมูลล่าสุด | TIMESTAMPTZ | - | NOT NULL | CURRENT_TIMESTAMP | - | Record modification timestamp |
+
 ## Tables_Catalog
 
 |  |  |  |  |  |  |  |  |  |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
 | EDL ADMIN SYSTEM - TABLES CATALOG & INVENTORY (ລາຍການຕາຕະລາງທັງໝົດ) |  |  |  |  |  |  |  |  |
-| Complete catalog of 31 PostgreSQL tables (27 core tables and 4 junction/pivot tables) with schema metrics |  |  |  |  |  |  |  |  |
+| Complete catalog of 32 PostgreSQL tables (27 core tables and 4 junction/pivot tables) with schema metrics |  |  |  |  |  |  |  |  |
 |  |  |  |  |  |  |  |  |  |
 | No. | Module | Table Name (Physical) | Table Name (Lao) | Table Name (Thai) | Columns | Primary Key | Foreign Keys | Business Scope / Purpose |
 | 1 | MOD-01: Organization | departments | ຕາຕະລາງຂໍ້ມູນຝ່າຍ | ตารางข้อมูลฝ่าย (Departments) | 4 | id | - | ເກັບກຳຂໍ້ມູນລາຍຊື່ຝ່າຍຕ່າງໆ ພາຍໃນອົງກອນ (ເກັບສະເພາະຊື່ຝ່າຍ) |
@@ -363,6 +371,8 @@
 | 29 | MOD-06: Calculator | tariff_categories | ປະເພດອັດຕາຄ່າໄຟຟ້າ | ตารางประเภทอัตราค่าไฟฟ้า | 10 | id | - | ປະເພດຜູ້ຊົມໃຊ້ໄຟຟ້າ (ທີ່ຢູ່ອາໄສ, ທຸລະກິດ, ອຸດສາຫະກຳ, ກະສິກຳ, ຫ້ອງການລັດ, ອົງການສາກົນ) |
 | 30 | MOD-06: Calculator | tariff_schedules | ຕາຕະລາງຄ່າໄຟລາຍເດືອນ | ตารางกำหนดการอัตราค่าไฟฟ้ารายเดือน | 8 | id | notice_id -> tariff_notices(id); category_id -> tariff_categories(id) | ຕາຕະລາງເຊື່ອມໂຍງປະກາດ ແລະ ປະເພດລາຄາໄຟ ຕາມປີ/ເດືອນ ພ້ອມທຸງລະດູຮ້ອນ |
 | 31 | MOD-06: Calculator | tariff_tiers | ຂັ້ນບັນໄດອັດຕາຄ່າໄຟ | ตารางขั้นบันไดอัตราค่าไฟฟ้า (Tariff Tiers) | 7 | id | schedule_id -> tariff_schedules(id) | ຂັ້ນບັນໄດລາຄາຄ່າໄຟ (1-8 ຂັ້ນ) ຕາມຈຳນວນ kWh ທີ່ຊົມໃຊ້ (min_kwh, max_kwh, rate_kip_per_kwh) |
+
+| 32 | MOD-03: News & Media | carousels | ຂໍ້ມູນຮູບພາບສະໄລ້ | ตารางภาพสไลด์แบนเนอร์ (Carousels) | 6 | id | - | ຈັດການຮູບພາບສະໄລ້ໜ້າເວັບ (Banners) ພ້ອມລຳດັບ ແລະ ສະຖານະ |
 
 ## Relationships_ERD
 

@@ -1,8 +1,5 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, Query, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
-import * as fs from 'fs';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { SyncBranchesUseCase } from '../application/use-cases/sync-branches.use-case.js';
@@ -16,7 +13,9 @@ import { CreateBranchDto } from '../application/dtos/create-branch.dto.js';
 import { UpdateBranchDto } from '../application/dtos/update-branch.dto.js';
 import { UploadBranchImageUseCase } from '../application/use-cases/upload-branch-image.use-case.js';
 
-import { editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
+import { createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
+import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
+import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
 import { RequirePermission } from '../../../core/decorators/permissions.decorator.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
 
@@ -37,19 +36,9 @@ export class BranchesController {
     @RequirePermission('BRANCHES', 'UPDATE')
     @Post(':id/upload/:imageType')
     @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination(req, file, callback) {
-                    const dest = join(process.cwd(), '..', 'uploads', 'branches');
-                    if (!fs.existsSync(dest)) {
-                        fs.mkdirSync(dest, { recursive: true });
-                    }
-                    callback(null, dest);
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        })
+        FileInterceptor('file', createImageUploadOptions(['branches'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
     )
     async uploadImage(
         @Param('id', ParseIntPipe) id: number,

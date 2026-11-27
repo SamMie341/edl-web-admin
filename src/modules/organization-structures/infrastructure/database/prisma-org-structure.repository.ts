@@ -19,8 +19,9 @@ export class PrismaOrgStructureRepository implements IOrgStructureRepository {
         });
     }
 
-    async findAll(): Promise<OrganizationStructure[]> {
+    async findAll(includeInactive = false): Promise<OrganizationStructure[]> {
         return this.prisma.organizationStructure.findMany({
+            where: includeInactive ? undefined : { status: 'ACTIVE' },
             orderBy: { orderIndex: 'asc' },
         });
     }

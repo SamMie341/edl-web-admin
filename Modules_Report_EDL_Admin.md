@@ -2,8 +2,8 @@
 > **ລະບົບບໍລິຫານຈັດການຂໍ້ມູນ ລັດວິສາຫະກິດໄຟຟ້າລາວ (EDL Admin Management System)**  
 > **ພາສາ/ເທັກໂນໂລຢີ:** NestJS (TypeScript), Prisma ORM, PostgreSQL  
 > **ສະຖາປັດຕະຍະກຳ:** Clean Architecture / Domain-Driven Design (DDD)  
-> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 22 ໂມດູນຫຼັກ / 27 Clean Architecture Units (153 Endpoints)  
-> **ອັບເດດຫຼ້າສຸດ:** 2026-11-16
+> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 23 ໂມດູນຫຼັກ / 28 Clean Architecture Units (158 Endpoints)  
+> **ອັບເດດຫຼ້າສຸດ:** 2026-11-20
 
 ---
 
@@ -113,7 +113,7 @@
 | - *22.4 Appliance Presets* | `/api/v1/electricity-calculator/presets` | 5 | ຈັດການເຄື່ອງໃຊ້ໄຟຟ້າຕົ້ນແບບ | ພ້ອມໃຊ້ງານ |
 | - *22.5 Saving Templates* | `/api/v1/electricity-calculator/saving-templates` | 5 | ຈັດການແມ່ແບບວິທີປະຢັດໄຟຟ້າ | ພ້ອມໃຊ້ງານ |
 | - *22.6 Calculation Engine & Config* | `/api/v1/electricity-calculator` | 3 | Public API ຄິດໄລ່ຄ່າໄຟ & Config | ພ້ອມໃຊ້ງານ |
-| **ລວມທັງໝົດ (Total)** | **22 Modules (27 Clean Architecture Units)** | **153 Endpoints** | | |
+| **ລວມທັງໝົດ (Total)** | **23 Modules (28 Clean Architecture Units)** | **158 Endpoints** | | |
 
 ---
 
@@ -613,7 +613,7 @@
 | `title` | `string` | Yes | ຫົວຂໍ້ບົດຄວາມ |
 | `videoUrl` | `string` | No | ລິ້ງວິດິໂອ (YouTube / MP4) |
 | `content` | `string` | No | ເນື້ອໃນບົດຄວາມ (HTML/Rich Text) |
-| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `DRAFT`, `ARCHIVED` |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `DRAFT` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
@@ -653,17 +653,17 @@
 | :--- | :--- | :---: | :--- |
 | `title` | `string` | Yes | ຊື່ວາລະສານ / ສະບັບ |
 | `issueNumber` | `string` | No | ເລກທີສະບັບ ເຊັ່ນ: `"ສະບັບທີ 1/2026"` |
-| `coverImage` | `string` | No | URL ຮູບໜ້າປົກ |
-| `fileUrl` | `string` | No | URL ໄຟລ໌ PDF |
-| `publishedDate` | `string` | No | ວັນທີເຜີຍແຜ່ (ISO 8601) |
-| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `INACTIVE` |
+| `publishedYear` | `string` | No | ປີພິມ ເຊັ່ນ: `"2026"` |
+| `description` | `string` | No | ຄຳອະທິບາຍເນື້ອໃນວາລະສານ |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `DRAFT`, `ARCHIVED` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
 {
   "title": "ວາລະສານ ໄຟຟ້າລາວ ປະຈຳໄຕຣມາດ 1 ປີ 2026",
   "issueNumber": "ສະບັບທີ 1/2026",
-  "publishedDate": "2026-03-01T00:00:00.000Z",
+  "publishedYear": "2026",
+  "description": "ລວບລວມຂ່າວສານ ແລະ ຜົນງານການດຳເນີນງານຂອງ ຟຟລ",
   "status": "ACTIVE"
 }
 ```
@@ -735,8 +735,8 @@
 | `titleEn` | `string` | No | ຫົວຂໍ້ຂ່າວພາສາອັງກິດ |
 | `contentLa` | `string` | Yes | ເນື້ອໃນຂ່າວພາສາລາວ (HTML/Rich Text) |
 | `contentEn` | `string` | No | ເນື້ອໃນຂ່າວພາສາອັງກິດ (HTML/Rich Text) |
-| `publishedAt` | `string` | No | ວັນທີເຜີຍແຜ່ (ISO 8601) |
-| `status` | `string` | No | ສະຖານະ (`NewsStatus`): `DRAFT`, `PUBLISHED`, `ARCHIVED` (Default: `DRAFT`) |
+| `isPinned` | `boolean` | No | ປັກໝຸດຂ່າວເດັ່ນ (Default: `false`) |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `DRAFT` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
@@ -747,7 +747,8 @@
   "titleEn": "EDL Launches New EV Charging Station in Vientiane",
   "contentLa": "<p>ລັດວິສາຫະກິດໄຟຟ້າລາວ ໄດ້ຈັດພິທີເປີດສະຖານີສາກລົດໄຟຟ້າ...</p>",
   "contentEn": "<p>Electricite du Laos has officially launched a new EV charging station...</p>",
-  "status": "PUBLISHED"
+  "isPinned": true,
+  "status": "ACTIVE"
 }
 ```
 
@@ -804,18 +805,19 @@
 #### ໂຄງສ້າງ DTO (`CreateLegislationDto`):
 | Field | Type | Required | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| `documentNumber` | `string` | Yes | ເລກທີເອກະສານ ເຊັ່ນ: `"ເລກທີ 012/ສພຊ"` |
 | `title` | `string` | Yes | ຊື່ເອກະສານນິຕິກຳ |
-| `fileUrl` | `string` | No | URL ໄຟລ໌ PDF (ຫຼື ອັບໂຫຼດຕາມຫຼັງ) |
-| `issueDate` | `string` | Yes | ວັນທີປະກາດໃຊ້ (ISO 8601 ເຊັ່ນ `"2026-01-15T00:00:00.000Z"`) |
-| `status` | `string` | No | ສະຖານະ (`LegislationStatus`): `ACTIVE`, `INACTIVE`, `ARCHIVED` |
+| `docNumber` | `string` | No | ເລກທີເອກະສານ ເຊັ່ນ: `"ເລກທີ 012/ສພຊ"` |
+| `category` | `string` | Yes | ປະເພດນິຕິກຳ: `LAW`, `DECREE`, `DECISION`, `REGULATION` |
+| `publishedDate` | `string` | No | ວັນທີປະກາດໃຊ້ (ISO 8601 ເຊັ່ນ `"2026-01-15T00:00:00.000Z"`) |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `INACTIVE` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
 {
-  "documentNumber": "ເລກທີ 012/ສພຊ",
   "title": "ກົດໝາຍວ່າດ້ວຍໄຟຟ້າ (ສະບັບປັບປຸງ)",
-  "issueDate": "2026-01-15T00:00:00.000Z",
+  "docNumber": "ເລກທີ 012/ສພຊ",
+  "category": "LAW",
+  "publishedDate": "2026-01-15T00:00:00.000Z",
   "status": "ACTIVE"
 }
 ```
@@ -846,18 +848,20 @@
 | Field | Type | Required | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
 | `title` | `string` | Yes | ຫົວຂໍ້ອັດຕາຄ່າໄຟຟ້າ |
-| `tariffType` | `string` | Yes | ປະເພດຜູ້ຊົມໃຊ້ (`TariffType`): `RESIDENTIAL`, `COMMERCIAL`, `INDUSTRIAL` |
-| `imageUrl` | `string` | No | URL ຮູບພາບຕາຕະລາງຄ່າໄຟ |
-| `pdfUrl` | `string` | No | URL ໄຟລ໌ PDF ປະກາດ |
+| `customerType` | `string` | Yes | ປະເພດຜູ້ຊົມໃຊ້: `RESIDENTIAL`, `COMMERCIAL`, `INDUSTRIAL`, `AGRICULTURE`, `OFFICE` |
+| `voltageLevel` | `string` | No | ລະດັບແຮງດັນ: `LOW_VOLTAGE`, `MEDIUM_VOLTAGE`, `HIGH_VOLTAGE` |
 | `effectiveDate` | `string` | No | ວັນທີເລີ່ມມີຜົນ (ISO 8601 ເຊັ່ນ `"2026-01-01T00:00:00.000Z"`) |
-| `status` | `string` | No | ສະຖານະ (`TariffStatus`): `ACTIVE`, `INACTIVE`, `HISTORICAL` |
+| `description` | `string` | No | ລາຍລະອຽດໂຄງສ້າງຄ່າໄຟ (HTML/Rich Text) |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `INACTIVE` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
 {
   "title": "ອັດຕາຄ່າໄຟຟ້າປະເພດທີ່ຢູ່ອາໄສ ປີ 2026",
-  "tariffType": "RESIDENTIAL",
+  "customerType": "RESIDENTIAL",
+  "voltageLevel": "LOW_VOLTAGE",
   "effectiveDate": "2026-01-01T00:00:00.000Z",
+  "description": "<p>ລາຍລະອຽດອັດຕາຄ່າໄຟຟ້າແບບຂັ້ນບັນໄດສຳລັບຄົວເຮືອນ...</p>",
   "status": "ACTIVE"
 }
 ```
@@ -880,31 +884,31 @@
 | `POST` | `/api/v1/procurements/:id/upload/document` | JWT | ອັບໂຫຼດເອກະສານ TOR/PDF (form-data: `file`) |
 
 #### ວິທີການເພີ່ມ/ບັນທຶກຂໍ້ມູນ (Data Insertion & Management):
-1. ສ້າງປະກາດປະມູນ: `POST /api/v1/procurements` ພ້ອມ JSON Body (ກຳນົດ `startDate` ແລະ `endDate`).
+1. ສ້າງປະກາດປະມູນ: `POST /api/v1/procurements` ພ້ອມ JSON Body (ກຳນົດ `openDate` ແລະ `closeDate`).
 2. ອັບໂຫຼດຮູບປະກອບ: `POST /api/v1/procurements/:id/upload/image` (`file` -> `/uploads/procurements/images/`).
 3. ອັບໂຫຼດເອກະສານ TOR: `POST /api/v1/procurements/:id/upload/document` (`file` -> `/uploads/procurements/documents/`).
 
 #### ໂຄງສ້າງ DTO (`CreateProcurementDto`):
 | Field | Type | Required | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| `tenderNumber` | `string` | No | ເລກທີຊອງປະມູນ (Unique) |
 | `title` | `string` | Yes | ຫົວຂໍ້ການປະກາດປະມູນ |
-| `fileUrl` | `string` | No | URL ໄຟລ໌ TOR/PDF |
-| `imageUrl` | `string` | No | URL ຮູບພາບປະກອບ |
-| `startDate` | `string` | Yes | ວັນທີເປີດຮັບຊອງ (ISO 8601) |
-| `endDate` | `string` | Yes | ວັນທີປິດຮັບຊອງ (ISO 8601) |
-| `description` | `string` | No | ເງື່ອນໄຂ ແລະ ລາຍລະອຽດເຕັກນິກ |
-| `status` | `string` | No | ສະຖານະ (`ProcurementStatus`): `DRAFT`, `OPEN`, `CLOSED`, `CANCELLED`, `AWARDED` |
+| `procurementType` | `string` | Yes | ປະເພດ: `GOODS`, `WORKS`, `SERVICES`, `CONSULTING` |
+| `budgetAmount` | `number` | No | ມູນຄ່າງົບປະມານ (ກີບ) |
+| `openDate` | `string` | Yes | ວັນທີເປີດຮັບຊອງ (ISO 8601) |
+| `closeDate` | `string` | Yes | ວັນທີປິດຮັບຊອງ (ISO 8601) |
+| `content` | `string` | No | ເງື່ອນໄຂ ແລະ ລາຍລະອຽດເຕັກນິກ (HTML) |
+| `status` | `string` | No | ສະຖານະ: `ACTIVE`, `DRAFT`, `CANCELLED`, `CLOSED` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
 {
-  "tenderNumber": "EDL-TENDER-2026-001",
   "title": "ປະກາດປະມູນຈັດຊື້ໝໍ້ແປງໄຟຟ້າຂະໜາດ 250 kVA",
-  "startDate": "2026-11-01T00:00:00.000Z",
-  "endDate": "2026-11-30T17:00:00.000Z",
-  "description": "<p>ເງື່ອນໄຂ ແລະ ລາຍລະອຽດເຕັກນິກຂອງໝໍ້ແປງໄຟຟ້າ...</p>",
-  "status": "OPEN"
+  "procurementType": "GOODS",
+  "budgetAmount": 500000000,
+  "openDate": "2026-11-01T00:00:00.000Z",
+  "closeDate": "2026-11-30T17:00:00.000Z",
+  "content": "<p>ເງື່ອນໄຂ ແລະ ລາຍລະອຽດເຕັກນິກຂອງໝໍ້ແປງໄຟຟ້າ...</p>",
+  "status": "ACTIVE"
 }
 ```
 
@@ -968,24 +972,29 @@
 #### ໂຄງສ້າງ DTO (`CreateJobPostingDto`):
 | Field | Type | Required | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :--- |
-| `positionId` | `number` | Yes | ລະຫັດຕຳແໜ່ງງານ (Foreign Key) |
 | `title` | `string` | Yes | ຫົວຂໍ້ປະກາດຮັບສະໝັກ |
-| `subtitle` | `string` | No | ຫົວຂໍ້ຍ່ອຍ |
-| `imageUrl` | `string` | No | URL ຮູບພາບປ້າຍປະກາດ |
-| `startDate` | `string` | Yes | ວັນທີເປີດຮັບສະໝັກ (ISO 8601) |
-| `endDate` | `string` | Yes | ວັນທີປິດຮັບສະໝັກ (ISO 8601) |
-| `description` | `string` | Yes | ລາຍລະອຽດໜ້າທີ່ຮັບຜິດຊອບ ແລະ ເງື່ອນໄຂ (HTML) |
-| `status` | `string` | No | ສະຖານະ (`JobPostingStatus`): `OPEN`, `CLOSED`, `CANCELLED` |
+| `positionId` | `number` | Yes | ລະຫັດຕຳແໜ່ງງານ (Foreign Key) |
+| `departmentId` | `number` | No | ລະຫັດຝ່າຍທີ່ສັງກັດ (Foreign Key) |
+| `location` | `string` | No | ສະຖານທີ່ປະຕິບັດງານ ເຊັ່ນ: `"ນະຄອນຫຼວງວຽງຈັນ"` |
+| `employmentType` | `string` | Yes | ປະເພດການຈ້າງ: `FULL_TIME`, `PART_TIME`, `CONTRACT`, `INTERNSHIP` |
+| `openDate` | `string` | Yes | ວັນທີເປີດຮັບສະໝັກ (ISO 8601) |
+| `closeDate` | `string` | Yes | ວັນທີປິດຮັບສະໝັກ (ISO 8601) |
+| `description` | `string` | No | ລາຍລະອຽດໜ້າທີ່ຮັບຜິດຊອບ (HTML) |
+| `qualifications` | `string` | No | ເງື່ອນໄຂ ແລະ ຄຸນສົມບັດຜູ້ສະໝັກ (HTML) |
+| `status` | `string` | No | ສະຖານະ: `OPEN`, `CLOSED`, `DRAFT` |
 
 #### ຕົວຢ່າງ Request Payload:
 ```json
 {
-  "positionId": 1,
   "title": "ຮັບສະໝັກນັກວິສະວະກອນໄຟຟ້າ 2 ຕຳແໜ່ງ",
-  "subtitle": "ປະຈຳນະຄອນຫຼວງວຽງຈັນ",
-  "startDate": "2026-11-01T00:00:00.000Z",
-  "endDate": "2026-11-25T17:00:00.000Z",
+  "positionId": 1,
+  "departmentId": 1,
+  "location": "ນະຄອນຫຼວງວຽງຈັນ",
+  "employmentType": "FULL_TIME",
+  "openDate": "2026-11-01T00:00:00.000Z",
+  "closeDate": "2026-11-25T17:00:00.000Z",
   "description": "<p>ປະຕິບັດໜ້າທີ່ໃນການຄວບຄຸມ ແລະ ບຳລຸງຮັກສາລະບົບສາຍສົ່ງ...</p>",
+  "qualifications": "<p>ຈົບປະລິນຍາຕີ ສາຂາວິສະວະກຳໄຟຟ້າ ຫຼື ສາຂາທີ່ກ່ຽວຂ້ອງ</p>",
   "status": "OPEN"
 }
 ```
@@ -1230,16 +1239,20 @@
 ##### ໂຄງສ້າງ DTO (`CreateApplianceCategoryDto`):
 | Field | Type | Required | Default | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :---: | :--- |
+| `code` | `string` | Yes | - | ລະຫັດໝວດໝູ່ (Unique) ເຊັ່ນ: `"ev_charger"` |
 | `nameLa` | `string` | Yes | - | ຊື່ໝວດໝູ່ພາສາລາວ |
 | `nameEn` | `string` | No | - | ຊື່ໝວດໝູ່ພາສາອັງກິດ |
+| `iconName` | `string` | No | - | ຊື່ໄອຄອນ Lucide React (ເຊັ່ນ `"Zap"`, `"Tv"`) |
 | `orderIndex` | `number` | No | `0` | ລຳດັບການສະແດງຜົນ |
 | `status` | `string` | No | `ACTIVE` | ສະຖານະ (`ACTIVE`, `INACTIVE`) |
 
 ##### ຕົວຢ່າງ Request Payload:
 ```json
 {
+  "code": "ev_charger",
   "nameLa": "ເຄື່ອງສາກລົດໄຟຟ້າ (EV Charger)",
   "nameEn": "EV Home Charger",
+  "iconName": "Zap",
   "orderIndex": 11,
   "status": "ACTIVE"
 }
@@ -1274,6 +1287,7 @@
 | Field | Type | Required | Default | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :---: | :--- |
 | `categoryId` | `number` | Yes | - | ລະຫັດໝວດໝູ່ຕົ້ນສັງກັດ (Foreign Key) |
+| `code` | `string` | Yes | - | ລະຫັດຕົ້ນແບບ ເຊັ່ນ: `"ac24"` |
 | `nameLa` | `string` | Yes | - | ຊື່ເຄື່ອງໃຊ້ໄຟຟ້າພາສາລາວ |
 | `nameEn` | `string` | No | - | ຊື່ເຄື່ອງໃຊ້ໄຟຟ້າພາສາອັງກິດ |
 | `defaultWatt` | `number` | Yes | - | ກຳລັງໄຟຟ້າເລີ່ມຕົ້ນ (Watts) |
@@ -1288,6 +1302,7 @@
 ```json
 {
   "categoryId": 1,
+  "code": "ac24",
   "nameLa": "ແອ 24,000 BTU",
   "nameEn": "Air Conditioner 24,000 BTU",
   "defaultWatt": 2200,
@@ -1333,11 +1348,12 @@
 | Field | Type | Required | Default | ຄຳອະທິບາຍ |
 | :--- | :--- | :---: | :---: | :--- |
 | `categoryId` | `number` | Yes | - | ລະຫັດໝວດໝູ່ (Foreign Key) |
+| `code` | `string` | Yes | - | ລະຫັດແມ່ແບບ ເຊັ່ນ: `"acinverter"` |
 | `titleLa` | `string` | Yes | - | ຫົວຂໍ້ວິທີປະຢັດໄຟພາສາລາວ |
 | `titleEn` | `string` | No | - | ຫົວຂໍ້ວິທີປະຢັດໄຟພາສາອັງກິດ |
 | `descriptionLa` | `string` | No | - | ຄຳອະທິບາຍພາສາລາວ |
 | `descriptionEn` | `string` | No | - | ຄຳອະທິບາຍພາສາອັງກິດ |
-| `effortLevel` | `string` | No | `EASY` | ລະດັບ (`EffortLevel`): `EASY`, `LOW_COST`, `INVESTMENT` |
+| `effortLevel` | `string` | No | `NO_COST` | ລະດັບ: `NO_COST`, `LOW_EFFORT`, `INVESTMENT` |
 | `ruleType` | `string` | Yes | - | ຮູບແບບ: `FIXED_FRACTION`, `REDUCE_HOURS`, `REPLACE_WATTAGE` |
 | `fixedFraction` | `number` | No | - | ສັດສ່ວນການປະຢັດ ເຊັ່ນ `0.3` |
 | `defaultSelected` | `boolean` | No | `false` | ຕິກເລືອກອັດຕະໂນມັດ |
@@ -1348,6 +1364,7 @@
 ```json
 {
   "categoryId": 1,
+  "code": "acinverter",
   "titleLa": "ປ່ຽນເຄື່ອງປັບອາກາດເປັນລະບົບ Inverter",
   "titleEn": "Upgrade to Inverter Air Conditioner",
   "descriptionLa": "ລະບົບ Inverter ຊ່ວຍຄວບຄຸມຮອບຄອມເພຣສເຊີ ປະຢັດໄຟລົງໄດ້ 30%",
@@ -1424,6 +1441,80 @@
     }
   ]
 }
+```
+
+---
+
+### 3.23 Carousels Module (ລະບົບຈັດການຮູບພາບສະໄລ້ໜ້າເວັບ & Banners)
+* **ທີ່ຕັ້ງໂຟນເດີ:** `src/modules/carousels/`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງຮູບພາບສະໄລ້ (Carousel Banners) ຢູ່ໜ້າຫຼັກຂອງເວັບໄຊ ຟຟລ.
+  - ຮອງຮັບການອັບໂຫຼດໄຟລ໌ຮູບພາບ (Multer disk storage ລົງໃນ `uploads/carousels`).
+  - ກຳນົດລຳດັບການສະແດງຜົນ (`orderIndex`) ແລະ ສະຖານະການສະແດງຜົນ (`status`: `ACTIVE`, `INACTIVE`).
+  - ລຶບໄຟລ໌ຮູບພາບເກົ່າອອກຈາກ Server ອັດຕະໂນມັດເມື່ອມີການອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນ ຫຼື ເມື່ອມີການລຶບ Carousel.
+
+#### Use Cases ໃນລະບົບ:
+1. **`CreateCarouselUseCase`**: ຮັບ URL ຮູບພາບທີ່ອັບໂຫຼດແລ້ວ ພ້ອມ DTO ເພື່ອສ້າງລາຍການ Carousel ໃໝ່.
+2. **`GetCarouselsUseCase`**: ດຶງລາຍການ Carousel ທັງໝົດ, ຮອງຮັບ Filter ຕາມ `status` (ຈັດລຽງຕາມ `orderIndex asc`, `id desc`).
+3. **`GetCarouselByIdUseCase`**: ດຶງຂໍ້ມູນ Carousel ຕາມ ID ທີ່ລະບຸ.
+4. **`UpdateCarouselUseCase`**: ແກ້ໄຂລຳດັບ `orderIndex`, `status` ຫຼື ອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນຮູບເກົ່າ (ລຶບໄຟລ໌ເກົ່າໃນ Server ອັດຕະໂນມັດ).
+5. **`DeleteCarouselUseCase`**: ລຶບລາຍການ Carousel ອອກຈາກຖານຂໍ້ມູນ ພ້ອມລຶບໄຟລ໌ຮູບພາບຕົວຈິງອອກຈາກ Server.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| `POST` | `/api/v1/carousels` | JWT (CAROUSELS:CREATE) | ອັບໂຫຼດຮູບພາບ ແລະ ເພີ່ມ Carousel ໃໝ່ (`multipart/form-data`) |
+| `GET` | `/api/v1/carousels` | Public | ດຶງລາຍການ Carousel ທັງໝົດ (ຮອງຮັບ `?status=ACTIVE`) |
+| `GET` | `/api/v1/carousels/:id` | Public | ດຶງຂໍ້ມູນ Carousel ຕາມ ID |
+| `PUT` | `/api/v1/carousels/:id` | JWT (CAROUSELS:UPDATE) | ແກ້ໄຂ Carousel ຫຼື ອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນ (`multipart/form-data`) |
+| `DELETE` | `/api/v1/carousels/:id` | JWT (CAROUSELS:DELETE) | ລຶບ Carousel ແລະ ໄຟລ໌ຮູບພາບອອກຈາກ Server |
+
+#### ວິທີການເພີ່ມ/ບັນທຶກຂໍ້ມູນ (Data Insertion & Management):
+1. **ການສ້າງ Carousel ໃໝ່:**
+   - ຍິງ HTTP POST ໄປທີ່ `/api/v1/carousels` ໂດຍສົ່ງແບບ `multipart/form-data`.
+   - Field `file`: ເລືອກໄຟລ໌ຮູບພາບ (ຮອງຮັບ JPG, PNG, WebP).
+   - Field `orderIndex`: ລະບຸລຳດັບການສະແດງຜົນ (ຕົວເລກ, ເຊັ່ນ `1`).
+   - Field `status`: ລະບຸສະຖານະ (`ACTIVE` ຫຼື `INACTIVE`, ຄ່າເລີ່ມຕົ້ນ `ACTIVE`).
+2. **ການແກ້ໄຂ Carousel:**
+   - ຍິງ HTTP PUT ໄປທີ່ `/api/v1/carousels/:id`.
+   - ສາມາດສົ່ງສະເພາະ `orderIndex` ແລະ `status` ໂດຍບໍ່ຕ້ອງສົ່ງ `file` ຖ້າບໍ່ຕ້ອງການປ່ຽນຮູບ.
+   - ຫາກສົ່ງ `file` ໃໝ່, ລະບົບຈະບັນທຶກຮູບໃໝ່ ແລະ ລຶບຮູບເກົ່າອອກຈາກ Server ໂດຍອັດຕະໂນມັດ.
+
+#### ໂຄງສ້າງ DTO:
+- **`CreateCarouselDto` (Form Data Fields):**
+  | Field | Type | Required | Default | ຄຳອະທິບາຍ |
+  | :--- | :--- | :---: | :---: | :--- |
+  | `file` | `file` | Yes | - | ໄຟລ໌ຮູບພາບ (ສົ່ງຜ່ານ multipart field ຊື່ `file`) |
+  | `orderIndex` | `number` | No | `0` | ລຳດັບການສະແດງຜົນ (Integer) |
+  | `status` | `string` | No | `ACTIVE` | ສະຖານະ (`ACTIVE`, `INACTIVE`) |
+
+- **`UpdateCarouselDto`:**
+  | Field | Type | Required | Default | ຄຳອະທິບາຍ |
+  | :--- | :--- | :---: | :---: | :--- |
+  | `file` | `file` | No | - | ໄຟລ໌ຮູບພາບໃໝ່ປ່ຽນແທນ (Optional) |
+  | `orderIndex` | `number` | No | - | ລຳດັບການສະແດງຜົນ |
+  | `status` | `string` | No | - | ສະຖານະ (`ACTIVE`, `INACTIVE`) |
+
+#### ຕົວຢ່າງ Request Payloads:
+```
+// 1. POST /api/v1/carousels (multipart/form-data)
+Headers:
+  Authorization: Bearer <accessToken>
+  Content-Type: multipart/form-data
+
+Form-Data Body:
+  file: [ເລືອກໄຟລ໌ banner1.jpg]
+  orderIndex: 1
+  status: ACTIVE
+
+// 2. PUT /api/v1/carousels/1 (multipart/form-data)
+Headers:
+  Authorization: Bearer <accessToken>
+  Content-Type: multipart/form-data
+
+Form-Data Body:
+  orderIndex: 2
+  status: ACTIVE
 ```
 
 ---

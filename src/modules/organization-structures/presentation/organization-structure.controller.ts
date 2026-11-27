@@ -1,6 +1,9 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from "@nestjs/common";
+import { CurrentUser } from "../../../core/decorators/current-user.decorator.js";
 import { Public } from "../../../core/decorators/public.decorator.js";
+import { ActorPermissionContext, hasUserEffectivePermission } from "../../../core/utils/permission-resolver.util.js";
 import { JwtAuthGuard } from "../../auth/presentation/guards/jwt-auth.guard.js";
+import { OptionalJwtAuthGuard } from "../../auth/presentation/guards/optional-jwt-auth.guard.js";
 import { PermissionsGuard } from "../../auth/presentation/guards/permissions.guard.js";
 import { RequirePermission } from "../../../core/decorators/permissions.decorator.js";
 import { CreateOrgStructureUseCase } from "../application/use-cases/create-org-structure.use-case.js";
@@ -12,10 +15,9 @@ import { UpdateOrgStructureDto } from "../application/dtos/update-org-structure.
 import { GetOrgStructureDropdownUseCase } from "../application/use-cases/get-org-structures-dropdown.use-case.js";
 import { UploadImageStructureUseCase } from "../application/use-cases/upload-org-structure-image.use-case.js";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { join } from "path";
-import * as fs from 'fs';
-import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
+import { createImageUploadOptions } from "../../../core/utils/file-upload.utils.js";
+import { ValidateUploadedFileSignatureInterceptor } from "../../../core/interceptors/validate-uploaded-file-signature.interceptor.js";
+import { CleanupUploadedFileOnErrorInterceptor } from "../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js";
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('org-structures')
@@ -38,19 +40,9 @@ export class OrganizationStructureController {
     @Post('upload-avatar')
     @RequirePermission('ORGANIZATION_STRUCTURES', 'CREATE')
     @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination(req, file, callback) {
-                    const dest = join(process.cwd(), '..', 'uploads', 'org-structures', 'avatars');
-                    if (!fs.existsSync(dest)) {
-                        fs.mkdirSync(dest, { recursive: true });
-                    }
-                    callback(null, dest);
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter,
-        })
+        FileInterceptor('file', createImageUploadOptions(['org-structures', 'avatars'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
     )
     async uploadAvatar(@UploadedFile() file: Express.Multer.File) {
         if (!file) {
@@ -77,9 +69,14 @@ export class OrganizationStructureController {
     }
 
     @Public()
+    @UseGuards(OptionalJwtAuthGuard)
     @Get()
-    findAll() {
-        return this.getUseCase.execute();
+    findAll(@CurrentUser() user?: ActorPermissionContext | null) {
+        const includeInactive = hasUserEffectivePermission(user, {
+            module: 'ORGANIZATION_STRUCTURES',
+            action: 'READ',
+        });
+        return this.getUseCase.execute(includeInactive);
     }
 
     @Public()
@@ -91,19 +88,9 @@ export class OrganizationStructureController {
     @Post(':id/upload/image')
     @RequirePermission('ORGANIZATION_STRUCTURES', 'UPDATE')
     @UseInterceptors(
-        FileInterceptor('file', {
-            storage: diskStorage({
-                destination(req, file, callback) {
-                    const dest = join(process.cwd(), '..', 'uploads', 'org-structures');
-                    if (!fs.existsSync(dest)) {
-                        fs.mkdirSync(dest, { recursive: true });
-                    }
-                    callback(null, dest);
-                },
-                filename: editFileName,
-            }),
-            fileFilter: imageFileFilter
-        })
+        FileInterceptor('file', createImageUploadOptions(['org-structures'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
     )
     async uploadImage(
         @Param('id', ParseIntPipe) id: number,

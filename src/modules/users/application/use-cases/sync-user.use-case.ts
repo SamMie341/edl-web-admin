@@ -1,4 +1,4 @@
-import { Injectable, Inject, BadRequestException } from '@nestjs/common';
+import { Injectable, Inject, BadRequestException, Logger } from '@nestjs/common';
 import { PASSWORD_HASHER } from '../../../auth/domain/services/password-hasher.interface.js';
 import type { IPasswordHasher } from '../../../auth/domain/services/password-hasher.interface.js';
 import * as hrmServiceInterface from '../../domain/repositories/hrm.service.interface.js';
@@ -8,6 +8,8 @@ import { UserStatus } from '../../../../generated/prisma/enums.js';
 
 @Injectable()
 export class SyncUserUseCase {
+    private readonly logger = new Logger(SyncUserUseCase.name);
+
     constructor(
         @Inject(hrmServiceInterface.HRM_SERVICE)
         private readonly hrmService: hrmServiceInterface.IHrmService,
@@ -53,6 +55,7 @@ export class SyncUserUseCase {
                     employeeCode: emp.emp_code.toString(),
                     firstName, lastName, email, phoneNumber, departmentName, divisionName, unitName, status,
                     passwordHash: passwordHash,
+                    mustChangePassword: true,
                     roleId: defaultRole?.id,
                 });
             }
@@ -60,7 +63,8 @@ export class SyncUserUseCase {
             return user;
         } catch (error: any) {
             if (error.status === 404 || error.status === 401) throw error;
-            throw new BadRequestException(`ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນຈາກ HRM: ${error.message}`)
+            this.logger.error(`Failed to sync employee ${employeeCode} from HRM: ${error?.message ?? error}`);
+            throw new BadRequestException('ເກີດຂໍ້ຜິດພາດໃນການດຶງຂໍ້ມູນຈາກ HRM');
         }
     }
 }

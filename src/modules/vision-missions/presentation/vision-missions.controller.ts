@@ -11,10 +11,9 @@ import { UploadVisionMissionImageUseCase } from "../application/use-cases/upload
 import { CreateVisionMissionDto } from "../application/dtos/create-vision-mission.dto.js";
 import { UpdateVisionMissionDto } from "../application/dtos/update-vision-missions.dto.js";
 import { FileInterceptor } from "@nestjs/platform-express";
-import { diskStorage } from "multer";
-import { join } from "path";
-import * as fs from 'fs';
-import { editFileName, imageFileFilter } from "../../../core/utils/file-upload.utils.js";
+import { createImageUploadOptions } from "../../../core/utils/file-upload.utils.js";
+import { ValidateUploadedFileSignatureInterceptor } from "../../../core/interceptors/validate-uploaded-file-signature.interceptor.js";
+import { CleanupUploadedFileOnErrorInterceptor } from "../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js";
 import { GetVisionMissionByIdUseCase } from "../application/use-cases/get-vision-mission-by-id.use-case.js";
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
@@ -61,17 +60,11 @@ export class VisionMissionController {
 
     @Post(':id/upload/image')
     @RequirePermission('VISION_MISSIONS', 'UPDATE')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination(req, file, callback) {
-                const dest = join(process.cwd(), '..', 'uploads', 'vision-missions');
-                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-                callback(null, dest);
-            },
-            filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-    }))
+    @UseInterceptors(
+        FileInterceptor('file', createImageUploadOptions(['vision-missions'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
+    )
     async uploadImage(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const imagePath = `/uploads/vision-missions/${file.filename}`;

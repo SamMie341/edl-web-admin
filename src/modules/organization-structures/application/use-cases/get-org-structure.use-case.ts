@@ -5,7 +5,7 @@ import * as orgStructureRepositoryInterface from "../../domain/repositories/org-
 export class GetOrgStructureUseCase {
     constructor(@Inject(orgStructureRepositoryInterface.ORG_STRUCTURE_REPOSITORY) private readonly repo: orgStructureRepositoryInterface.IOrgStructureRepository) { }
 
-    async execute() {
-        return await this.repo.findAll();
+    async execute(includeInactive = false) {
+        return await this.repo.findAll(includeInactive);
     }
 }

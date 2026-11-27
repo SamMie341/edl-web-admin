@@ -5,8 +5,8 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 > **ລະບົບບໍລິຫານຈັດການຂໍ້ມູນ ລັດວິສາຫະກິດໄຟຟ້າລາວ (EDL Admin Management System)**  
 > **ພາສາ/ເທັກໂນໂລຢີ:** NestJS (TypeScript), Prisma ORM, PostgreSQL  
 > **ສະຖາປັດຕະຍະກຳ:** Clean Architecture / Domain-Driven Design (DDD)  
-> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 22 ໂມດູນຫຼັກ / 27 Clean Architecture Units (153 Endpoints)  
-> **ອັບເດດຫຼ້າສຸດ:** 2026-11-16
+> **ສະຖານະ:** ພວມພັດທະນາ (Active Development) - 23 ໂມດູນຫຼັກ / 28 Clean Architecture Units (158 Endpoints)  
+> **ອັບເດດຫຼ້າສຸດ:** 2026-11-20
 
 ---
 
@@ -116,7 +116,7 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
 | - *22.4 Appliance Presets* | \`/api/v1/electricity-calculator/presets\` | 5 | ຈັດການເຄື່ອງໃຊ້ໄຟຟ້າຕົ້ນແບບ | ພ້ອມໃຊ້ງານ |
 | - *22.5 Saving Templates* | \`/api/v1/electricity-calculator/saving-templates\` | 5 | ຈັດການແມ່ແບບວິທີປະຢັດໄຟຟ້າ | ພ້ອມໃຊ້ງານ |
 | - *22.6 Calculation Engine & Config* | \`/api/v1/electricity-calculator\` | 3 | Public API ຄິດໄລ່ຄ່າໄຟ & Config | ພ້ອມໃຊ້ງານ |
-| **ລວມທັງໝົດ (Total)** | **22 Modules (27 Clean Architecture Units)** | **153 Endpoints** | | |
+| **ລວມທັງໝົດ (Total)** | **23 Modules (28 Clean Architecture Units)** | **158 Endpoints** | | |
 
 ---
 
@@ -1444,6 +1444,80 @@ const content = `# ບົດລາຍງານໂມດູນ ແລະ ສະ�
     }
   ]
 }
+\`\`\`
+
+---
+
+### 3.23 Carousels Module (ລະບົບຈັດການຮູບພາບສະໄລ້ໜ້າເວັບ & Banners)
+* **ທີ່ຕັ້ງໂຟນເດີ:** \`src/modules/carousels/\`
+* **ຄວາມຮັບຜິດຊອບ:**
+  - ຄຸ້ມຄອງຮູບພາບສະໄລ້ (Carousel Banners) ຢູ່ໜ້າຫຼັກຂອງເວັບໄຊ ຟຟລ.
+  - ຮອງຮັບການອັບໂຫຼດໄຟລ໌ຮູບພາບ (Multer disk storage ລົງໃນ \`uploads/carousels\`).
+  - ກຳນົດລຳດັບການສະແດງຜົນ (\`orderIndex\`) ແລະ ສະຖານະການສະແດງຜົນ (\`status\`: \`ACTIVE\`, \`INACTIVE\`).
+  - ລຶບໄຟລ໌ຮູບພາບເກົ່າອອກຈາກ Server ອັດຕະໂນມັດເມື່ອມີການອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນ ຫຼື ເມື່ອມີການລຶບ Carousel.
+
+#### Use Cases ໃນລະບົບ:
+1. **\`CreateCarouselUseCase\`**: ຮັບ URL ຮູບພາບທີ່ອັບໂຫຼດແລ້ວ ພ້ອມ DTO ເພື່ອສ້າງລາຍການ Carousel ໃໝ່.
+2. **\`GetCarouselsUseCase\`**: ດຶງລາຍການ Carousel ທັງໝົດ, ຮອງຮັບ Filter ຕາມ \`status\` (ຈັດລຽງຕາມ \`orderIndex asc\`, \`id desc\`).
+3. **\`GetCarouselByIdUseCase\`**: ດຶງຂໍ້ມູນ Carousel ຕາມ ID ທີ່ລະບຸ.
+4. **\`UpdateCarouselUseCase\`**: ແກ້ໄຂລຳດັບ \`orderIndex\`, \`status\` ຫຼື ອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນຮູບເກົ່າ (ລຶບໄຟລ໌ເກົ່າໃນ Server ອັດຕະໂນມັດ).
+5. **\`DeleteCarouselUseCase\`**: ລຶບລາຍການ Carousel ອອກຈາກຖານຂໍ້ມູນ ພ້ອມລຶບໄຟລ໌ຮູບພາບຕົວຈິງອອກຈາກ Server.
+
+#### ເສັ້ນທາງ API (Endpoints):
+| Method | URL | Auth Guard | ຄຳອະທິບາຍ |
+| :--- | :--- | :---: | :--- |
+| \`POST\` | \`/api/v1/carousels\` | JWT (CAROUSELS:CREATE) | ອັບໂຫຼດຮູບພາບ ແລະ ເພີ່ມ Carousel ໃໝ່ (\`multipart/form-data\`) |
+| \`GET\` | \`/api/v1/carousels\` | Public | ດຶງລາຍການ Carousel ທັງໝົດ (ຮອງຮັບ \`?status=ACTIVE\`) |
+| \`GET\` | \`/api/v1/carousels/:id\` | Public | ດຶງຂໍ້ມູນ Carousel ຕາມ ID |
+| \`PUT\` | \`/api/v1/carousels/:id\` | JWT (CAROUSELS:UPDATE) | ແກ້ໄຂ Carousel ຫຼື ອັບໂຫຼດຮູບໃໝ່ປ່ຽນແທນ (\`multipart/form-data\`) |
+| \`DELETE\` | \`/api/v1/carousels/:id\` | JWT (CAROUSELS:DELETE) | ລຶບ Carousel ແລະ ໄຟລ໌ຮູບພາບອອກຈາກ Server |
+
+#### ວິທີການເພີ່ມ/ບັນທຶກຂໍ້ມູນ (Data Insertion & Management):
+1. **ການສ້າງ Carousel ໃໝ່:**
+   - ຍິງ HTTP POST ໄປທີ່ \`/api/v1/carousels\` ໂດຍສົ່ງແບບ \`multipart/form-data\`.
+   - Field \`file\`: ເລືອກໄຟລ໌ຮູບພາບ (ຮອງຮັບ JPG, PNG, WebP).
+   - Field \`orderIndex\`: ລະບຸລຳດັບການສະແດງຜົນ (ຕົວເລກ, ເຊັ່ນ \`1\`).
+   - Field \`status\`: ລະບຸສະຖານະ (\`ACTIVE\` ຫຼື \`INACTIVE\`, ຄ່າເລີ່ມຕົ້ນ \`ACTIVE\`).
+2. **ການແກ້ໄຂ Carousel:**
+   - ຍິງ HTTP PUT ໄປທີ່ \`/api/v1/carousels/:id\`.
+   - ສາມາດສົ່ງສະເພາະ \`orderIndex\` ແລະ \`status\` ໂດຍບໍ່ຕ້ອງສົ່ງ \`file\` ຖ້າບໍ່ຕ້ອງການປ່ຽນຮູບ.
+   - ຫາກສົ່ງ \`file\` ໃໝ່, ລະບົບຈະບັນທຶກຮູບໃໝ່ ແລະ ລຶບຮູບເກົ່າອອກຈາກ Server ໂດຍອັດຕະໂນມັດ.
+
+#### ໂຄງສ້າງ DTO:
+- **\`CreateCarouselDto\` (Form Data Fields):**
+  | Field | Type | Required | Default | ຄຳອະທິບາຍ |
+  | :--- | :--- | :---: | :---: | :--- |
+  | \`file\` | \`file\` | Yes | - | ໄຟລ໌ຮູບພາບ (ສົ່ງຜ່ານ multipart field ຊື່ \`file\`) |
+  | \`orderIndex\` | \`number\` | No | \`0\` | ລຳດັບການສະແດງຜົນ (Integer) |
+  | \`status\` | \`string\` | No | \`ACTIVE\` | ສະຖານະ (\`ACTIVE\`, \`INACTIVE\`) |
+
+- **\`UpdateCarouselDto\`:**
+  | Field | Type | Required | Default | ຄຳອະທິບາຍ |
+  | :--- | :--- | :---: | :---: | :--- |
+  | \`file\` | \`file\` | No | - | ໄຟລ໌ຮູບພາບໃໝ່ປ່ຽນແທນ (Optional) |
+  | \`orderIndex\` | \`number\` | No | - | ລຳດັບການສະແດງຜົນ |
+  | \`status\` | \`string\` | No | - | ສະຖານະ (\`ACTIVE\`, \`INACTIVE\`) |
+
+#### ຕົວຢ່າງ Request Payloads:
+\`\`\`
+// 1. POST /api/v1/carousels (multipart/form-data)
+Headers:
+  Authorization: Bearer <accessToken>
+  Content-Type: multipart/form-data
+
+Form-Data Body:
+  file: [ເລືອກໄຟລ໌ banner1.jpg]
+  orderIndex: 1
+  status: ACTIVE
+
+// 2. PUT /api/v1/carousels/1 (multipart/form-data)
+Headers:
+  Authorization: Bearer <accessToken>
+  Content-Type: multipart/form-data
+
+Form-Data Body:
+  orderIndex: 2
+  status: ACTIVE
 \`\`\`
 
 ---

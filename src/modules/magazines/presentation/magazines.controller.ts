@@ -1,5 +1,4 @@
 import { BadRequestException, Body, Controller, Delete, Get, Param, ParseIntPipe, Post, Put, UploadedFile, UseGuards, UseInterceptors } from '@nestjs/common';
-import * as fs from 'fs';
 import { Public } from '../../../core/decorators/public.decorator.js';
 import { JwtAuthGuard } from '../../auth/presentation/guards/jwt-auth.guard.js';
 import { PermissionsGuard } from '../../auth/presentation/guards/permissions.guard.js';
@@ -14,9 +13,9 @@ import { UploadMagazineFilesUseCase } from '../application/use-cases/upload-maga
 import { CreateMagazineDto } from '../application/dtos/create-magazine.dto.js';
 import { UpdateMagazineDto } from '../application/dtos/update-magazine.dto.js';
 import { FileInterceptor } from '@nestjs/platform-express';
-import { diskStorage } from 'multer';
-import { join } from 'path';
-import { documentFileFilter, editFileName, imageFileFilter } from '../../../core/utils/file-upload.utils.js';
+import { createDocumentUploadOptions, createImageUploadOptions } from '../../../core/utils/file-upload.utils.js';
+import { ValidateUploadedFileSignatureInterceptor } from '../../../core/interceptors/validate-uploaded-file-signature.interceptor.js';
+import { CleanupUploadedFileOnErrorInterceptor } from '../../../core/interceptors/cleanup-uploaded-file-on-error.interceptor.js';
 
 @UseGuards(JwtAuthGuard, PermissionsGuard)
 @Controller('magazines')
@@ -72,17 +71,11 @@ export class MagazinesController {
 
     @Post(':id/upload/cover')
     @RequirePermission('MAGAZINES', 'UPDATE')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination(req, file, callback) {
-                const dest = join(process.cwd(), '..', 'uploads', 'magazines', 'covers');
-                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-                callback(null, dest);
-            },
-            filename: editFileName,
-        }),
-        fileFilter: imageFileFilter,
-    }))
+    @UseInterceptors(
+        FileInterceptor('file', createImageUploadOptions(['magazines', 'covers'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
+    )
     async uploadCover(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ຮູບພາບ');
         const path = `/uploads/magazines/covers/${file.filename}`;
@@ -96,17 +89,11 @@ export class MagazinesController {
 
     @Post(':id/upload/document')
     @RequirePermission('MAGAZINES', 'UPDATE')
-    @UseInterceptors(FileInterceptor('file', {
-        storage: diskStorage({
-            destination(req, file, callback) {
-                const dest = join(process.cwd(), '..', 'uploads', 'magazines', 'documents');
-                if (!fs.existsSync(dest)) fs.mkdirSync(dest, { recursive: true });
-                callback(null, dest);
-            },
-            filename: editFileName,
-        }),
-        fileFilter: documentFileFilter,
-    }))
+    @UseInterceptors(
+        FileInterceptor('file', createDocumentUploadOptions(['magazines', 'documents'])),
+        ValidateUploadedFileSignatureInterceptor,
+        CleanupUploadedFileOnErrorInterceptor,
+    )
     async uploadDocument(@Param('id', ParseIntPipe) id: number, @UploadedFile() file: Express.Multer.File) {
         if (!file) throw new BadRequestException('ກະລຸນາເລືອກໄຟລ໌ PDF');
         const path = `/uploads/magazines/documents/${file.filename}`;

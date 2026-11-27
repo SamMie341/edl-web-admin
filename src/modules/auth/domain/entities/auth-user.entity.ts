@@ -18,6 +18,7 @@ export interface AuthUserProps {
     unitName: string | null;
     role: string;
     status: string;
+    mustChangePassword?: boolean;
     permissions?: UserPermissionItem[];
     deniedPermissions?: UserPermissionItem[];
 }
@@ -66,6 +67,7 @@ export class AuthUser {
             unitName: this.props.unitName,
             role: this.props.role,
             status: this.props.status,
+            mustChangePassword: Boolean(this.props.mustChangePassword),
             permissions: this.props.permissions || [],
         };
     }
@@ -85,6 +87,7 @@ export class AuthUser {
             unitName: this.props.unitName,
             role: this.props.role,
             status: this.props.status,
+            mustChangePassword: Boolean(this.props.mustChangePassword),
             permissions: this.props.permissions || [],
             deniedPermissions: this.props.deniedPermissions || [],
         };
@@ -104,6 +107,7 @@ export interface RequestUser {
     unitName: string | null;
     role: string;
     status: string;
+    mustChangePassword?: boolean;
     permissions: UserPermissionItem[];
     deniedPermissions?: UserPermissionItem[];
 }
